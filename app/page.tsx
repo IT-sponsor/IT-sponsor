@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Link from "next/link";
 
 import ProjectCard from "./components/ProjectCard/ProjectCard";
 
@@ -150,18 +151,23 @@ export default function Home() {
 
 
       {filteredProjects.map((project, index) => (
-        <div className="p-6 max-w-2xl max-h-60">
-        <ProjectCard 
-          image_url={project.logo}
-          title={project.name}
-          description={project.short_description}
-          timeUpdated={project.last_updated}
-          issueCount={0}
-          volunteerCount={0}
-          tags={project.technology.split(' ')}
-        />
-        </div>
-      ))}
+      <div className="p-6 max-w-2xl max-h-60" key={index}>
+        <Link href={`/projects/${project.id_project}`} passHref>
+          <div style={{ cursor: 'pointer' }}>
+            <ProjectCard 
+              image_url={project.logo}
+              title={project.name}
+              description={project.short_description}
+              timeUpdated={project.last_updated}
+              issueCount={0} // You'll replace this with real data
+              volunteerCount={0} // And this as well
+              tags={project.technology.split(' ')}
+            />
+          </div>
+        </Link>
+      </div>
+    ))}
+
     </div>
   );
 }
