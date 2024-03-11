@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import ProjectCard from "./components/ProjectCard/ProjectCard";
 
@@ -16,13 +16,24 @@ interface Project {
 }
 
 export default function Home() {
-  const [isOpen, setIsOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [sortBy, setSortBy] = useState('newest_updated');
   const [filterBy, setFilterBy] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const filterDropdownRef = useRef(null);
+  const sortDropdownRef = useRef(null);
+
+  const closeDropdowns = (event: MouseEvent) => {
+    if ((filterDropdownRef.current) && !(filterDropdownRef.current as HTMLElement).contains(event.target as Node)) {
+      setIsFilterOpen(false);
+    }
+    if ((sortDropdownRef.current) && !(sortDropdownRef.current as HTMLElement).contains(event.target as Node)) {
+      setIsSortOpen(false);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/project/all")
@@ -40,6 +51,15 @@ export default function Home() {
         setProjects(modifiedData);
       })
       .catch(err => console.error(err));
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', closeDropdowns);
+
+    // Clean up the event listener when the component is unmounted
+    return () => {
+      document.removeEventListener('mousedown', closeDropdowns);
+    };
   }, []);
 
   const toggleFilterDropdown = () => {
