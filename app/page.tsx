@@ -151,8 +151,8 @@ export default function Home() {
 
 
       {filteredProjects.map((project, index) => (
-      <div className="p-6 max-w-2xl max-h-60" key={index}>
-        <Link href={`/projects/${project.id_project}`} passHref>
+      <div className="p-6 max-w-4xl max-h-60" key={index}>
+        <Link href={`/project/${project.id_project}`} passHref>
           <div style={{ cursor: 'pointer' }}>
             <ProjectCard 
               image_url={project.logo}
