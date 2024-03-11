@@ -152,3 +152,60 @@ select:focus {
   src: url("../public/fonts/google/Roboto-BlackItalic.ttf") format("woff2"); /* Replace YourFontFile with your font file name */
   /* Add additional font formats and sources for cross-browser compatibility */
 }
+
+/* global.css or the respective CSS module */
+
+.markdown-container h1, .markdown-container h2 {
+  font-size: 1.3rem; /* Equivalent to text-lg */
+  font-weight: 500; /* Equivalent to font-medium */
+  margin-bottom: 0.5em;
+  padding-top: 0.5em; /* Added padding above the heading */
+  padding-bottom: 0.25em; /* Added padding below the heading */
+}
+/*
+.markdown-container p {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.875rem; 
+  color: #4B5563; 
+} 
+
+*/
+.markdown-container a {
+  color: #007bff; /* Adjust if needed for link color */
+  text-decoration: none;
+}
+
+.markdown-container a:hover {
+  text-decoration: underline;
+}
+
+.markdown-container ul {
+  padding-left: 20px;
+  margin-bottom: 1em;
+  list-style-type: disc; /* Default bullet style. Change as needed */
+}
+
+.markdown-container ol {
+  padding-left: 20px;
+  margin-bottom: 1em;
+  list-style-type: decimal; /* Default numbering. Change as needed */
+}
+
+
+.markdown-container li {
+  margin-bottom: 0.25em;
+}
+
+
+.long-description-right {
+  margin-left: auto; 
+  margin-right: 1rem; 
+  background-color: #D0D7DE;
+  padding: 16px;
+  border-radius: 0.5rem;
+  max-width: 635px;
+  width: 100%;
+}
