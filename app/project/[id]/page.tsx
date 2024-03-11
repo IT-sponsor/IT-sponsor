@@ -58,7 +58,6 @@ export default function ProjectPage({ params }: {
           creation_date={project.creation_date}
           last_updated={project.last_updated}
           id_project={project.id_project}
-          // Pass any additional props that ProjectDashboard expects
         />
 
       </>

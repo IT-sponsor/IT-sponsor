@@ -14,7 +14,6 @@ interface ProjectDashboardProps {
   id_project: number;
 }
 
-
 const ProjectDashboard = ({
   name,
   short_description,

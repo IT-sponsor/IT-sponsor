@@ -153,15 +153,16 @@ select:focus {
   /* Add additional font formats and sources for cross-browser compatibility */
 }
 
-/* global.css or the respective CSS module */
+/* Markdown features */
 
 .markdown-container h1, .markdown-container h2 {
-  font-size: 1.3rem; /* Equivalent to text-lg */
-  font-weight: 500; /* Equivalent to font-medium */
+  font-size: 1.3rem; 
+  font-weight: 500; 
   margin-bottom: 0.5em;
-  padding-top: 0.5em; /* Added padding above the heading */
-  padding-bottom: 0.25em; /* Added padding below the heading */
+  padding-top: 0.5em; 
+  padding-bottom: 0.25em; 
 }
+
 /*
 .markdown-container p {
   display: -webkit-box;
@@ -171,10 +172,10 @@ select:focus {
   font-size: 0.875rem; 
   color: #4B5563; 
 } 
-
 */
+
 .markdown-container a {
-  color: #007bff; /* Adjust if needed for link color */
+  color: #007bff; 
   text-decoration: none;
 }
 
@@ -185,20 +186,19 @@ select:focus {
 .markdown-container ul {
   padding-left: 20px;
   margin-bottom: 1em;
-  list-style-type: disc; /* Default bullet style. Change as needed */
+  list-style-type: disc;
 }
 
 .markdown-container ol {
   padding-left: 20px;
   margin-bottom: 1em;
-  list-style-type: decimal; /* Default numbering. Change as needed */
+  list-style-type: decimal; 
 }
 
 
 .markdown-container li {
   margin-bottom: 0.25em;
 }
-
 
 .long-description-right {
   margin-left: auto; 
