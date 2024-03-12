@@ -1,5 +1,5 @@
 import prisma from "./client"; // is it the right one?
-import { getRepo } from "../github/api";
+import { getRepo, getRepoContributors } from "../github/api";
 
 // Store repo info
 export async function updateRepoInfo(username: string, repo: string) {
@@ -8,4 +8,10 @@ export async function updateRepoInfo(username: string, repo: string) {
     where: { repository: `github.com/${username}/${repo}` }, // fix db schema?
     data: { last_updated: updated_at, creation_date: created_at, star_count: stargazers_count }, // add star count to db schema
   });
+}
+
+// Returns contributor username array
+export async function getContributorArray(username: string, repo: string) {
+  const contributors = await getRepoContributors(username, repo);
+  return contributors.map((contributor: any) => contributor.login);
 }
