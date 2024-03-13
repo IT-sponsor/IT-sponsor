@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className={`${inter.className} antialiased`}>
         <Providers>
           <Navigation />
           <div className="flex flex-col min-h-screen justify-center">
