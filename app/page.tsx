@@ -159,8 +159,8 @@ export default function Home() {
               title={project.name}
               description={project.short_description}
               timeUpdated={project.last_updated}
-              issueCount={0} // You'll replace this with real data
-              volunteerCount={0} // And this as well
+              issueCount={0} 
+              volunteerCount={0} 
               tags={project.technology.split(' ')}
             />
           </div>

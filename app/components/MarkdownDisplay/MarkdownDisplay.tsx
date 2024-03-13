@@ -6,7 +6,7 @@ interface MarkdownDisplayProps {
   markdownText: string;
 }
 
-// In your MarkdownDisplay component
+// Markdown component
 const MarkdownDisplay: React.FC<MarkdownDisplayProps> = ({ markdownText }) => {
     return (
       <div className="markdown-container">

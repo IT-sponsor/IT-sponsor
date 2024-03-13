@@ -84,23 +84,13 @@ const NewProjectPage = () => {
               className="mt-1 p-2 w-full border rounded-md"
             />
           </div>
-
-          <div className="mt-4 flex justify-between items-center">
-            {/* Atšaukti - Cancel button as a Next.js Link */}
-            <Link href="/" passHref>
-              <a className="inline-block py-2 px-4 rounded-lg text-black font-medium cursor-pointer transition duration-150 ease-in-out" style={{ backgroundColor: '#C14040', marginRight: '8px', hover: { backgroundColor: '#A83232' } }}>Atšaukti</a>
+          
+          <div className="mt-4 flex justify-center gap-2">
+            {/* Atšaukti*/}
+            <Link href="/" passHref> {/*Goes to root*/}
+              <a className="py-2 px-4 rounded-lg text-black hover:bg-green-700 transition duration-150 ease-in-out" style={{ backgroundColor: '#C14040' }}>Atšaukti</a>
             </Link>
-
-            {/* Išsaugoti - Save button */}
-            <button
-              type="submit"
-              className="inline-block py-2 px-4 rounded-lg text-black font-medium transition duration-150 ease-in-out"
-              style={{ backgroundColor: '#40C173', marginLeft: '8px', hover: { backgroundColor: '#368B5E' } }}
-            >
-              Išsaugoti
-            </button>
           </div>
-
         </form>
       </div>
     </div>
