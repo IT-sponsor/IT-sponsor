@@ -8,11 +8,11 @@ datasource db {
 }
 
 model project {
-  id_project        Int       @unique
+  id_project        Int       @id
   name              String?   @db.VarChar(255)
   short_description String?   @db.VarChar(255)
   long_description  String?   @db.VarChar(255)
-  repository        String    @db.VarChar(255)
+  repository        String    @db.VarChar(255)@unique
   technology        String?   @db.VarChar(255)
   created_at        DateTime? @db.Date
   updated_at        DateTime? @db.Date
@@ -21,8 +21,6 @@ model project {
   fk_imageid_image  Int?      @unique(map: "fk_imageid_image")
   image             image?    @relation(fields: [fk_imageid_image], references: [id_image], onDelete: Restrict, onUpdate: Restrict, map: "project_ibfk_1")
   users             users[]
-
-  @@id([id_project, repository])
 }
 
 model vote {
@@ -33,8 +31,8 @@ model vote {
   user                 users    @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "votes")
   comment              comment  @relation(fields: [fk_commentid_comment], references: [id_comment], onUpdate: Restrict, map: "vote_ibfk_2")
 
+  @@index([fk_userid_user], map: "votes")
   @@index([fk_commentid_comment], map: "fk_commentid_comment")
-  @@index([fk_userid_user], map: "fk_userid_user")
 }
 
 model comment {
@@ -101,12 +99,12 @@ model issue {
 }
 
 model users {
-  id_user              Int       @unique
+  id_user              Int       @id
   name                 String?   @db.VarChar(255)
   surname              String?   @db.VarChar(255)
-  email                String    @db.VarChar(255)
+  email                String    @db.VarChar(255)@unique
   password             String?   @db.VarChar(255)
-  github               String    @db.VarChar(255)
+  github               String    @db.VarChar(255)@unique
   banned_until         DateTime? @db.Date
   role                 String?   @db.Char(13)
   fk_projectid_project Int
@@ -116,6 +114,5 @@ model users {
   project              project   @relation(fields: [fk_projectid_project], references: [id_project], onUpdate: Restrict, map: "controls")
   vote                 vote[]
 
-  @@id([id_user, email, github])
   @@index([fk_projectid_project], map: "controls")
 }
