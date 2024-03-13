@@ -1,5 +1,5 @@
 "use server";
-
+/// TODO: here were working with the whole string as a repo identifier instead of username and repo name separately
 const BASE_URL = 'https://api.github.com';
 
 // https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#get-a-repository

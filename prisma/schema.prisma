@@ -7,88 +7,115 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model discussion {
-  name                  String?                @db.VarChar(255)
-  description           String?                @db.VarChar(255)
-  active                Boolean?
-  visibility            Int?
-  id_discussion         Int                    @id
-  fk_userid_user        Int
-  discussion_visibility discussion_visibility? @relation(fields: [visibility], references: [id_discussion_visibility], onDelete: Restrict, onUpdate: Restrict, map: "discussion_ibfk_1")
-  user                  user                   @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "discussion_ibfk_2")
-  discussion_comment    discussion_comment[]
-
-  @@index([fk_userid_user], map: "fk_userid_user")
-  @@index([visibility], map: "visibility")
-}
-
-model discussion_comment {
-  description                String?    @db.VarChar(255)
-  creation_date              DateTime?  @db.Date
-  id_discussion_comment      Int        @id
-  fk_userid_user             Int
-  fk_discussionid_discussion Int
-  user                       user       @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "comments")
-  discussion                 discussion @relation(fields: [fk_discussionid_discussion], references: [id_discussion], onUpdate: Restrict, map: "discussion_comment_ibfk_1")
-  vote                       vote[]
-
-  @@index([fk_userid_user], map: "comments")
-  @@index([fk_discussionid_discussion], map: "fk_discussionid_discussion")
-}
-
-model discussion_visibility {
-  id_discussion_visibility Int          @id
-  name                     String       @db.Char(7)
-  discussion               discussion[]
-}
-
 model project {
+  id_project        Int       @unique
   name              String?   @db.VarChar(255)
   short_description String?   @db.VarChar(255)
   long_description  String?   @db.VarChar(255)
-  repository        String?   @db.VarChar(255)
-  logo              Bytes?    @db.Blob
+  repository        String    @db.VarChar(255)
   technology        String?   @db.VarChar(255)
-  creation_date     DateTime? @db.Date
-  last_updated      DateTime? @db.Date
-  id_project        Int       @id
-  user              user[]
-}
+  created_at        DateTime? @db.Date
+  updated_at        DateTime? @db.Date
+  star_count        Int?
+  contributor_count Int?
+  fk_imageid_image  Int?      @unique(map: "fk_imageid_image")
+  image             image?    @relation(fields: [fk_imageid_image], references: [id_image], onDelete: Restrict, onUpdate: Restrict, map: "project_ibfk_1")
+  users             users[]
 
-model roles {
-  id_roles Int    @id
-  name     String @db.Char(13)
-  user     user[]
-}
-
-model user {
-  name                 String?              @db.VarChar(255)
-  surname              String?              @db.VarChar(255)
-  email                String?              @db.VarChar(255)
-  password             String?              @db.VarChar(255)
-  github               String?              @db.VarChar(255)
-  banned_until         DateTime?            @db.Date
-  role                 Int?
-  id_user              Int                  @id
-  fk_projectid_project Int
-  discussion           discussion[]
-  discussion_comment   discussion_comment[]
-  project              project              @relation(fields: [fk_projectid_project], references: [id_project], onUpdate: Restrict, map: "controls")
-  roles                roles?               @relation(fields: [role], references: [id_roles], onDelete: Restrict, onUpdate: Restrict, map: "user_ibfk_1")
-  vote                 vote[]
-
-  @@index([fk_projectid_project], map: "controls")
-  @@index([role], map: "role")
+  @@id([id_project, repository])
 }
 
 model vote {
-  is_positive                                Boolean?
-  id_vote                                    Int                @id
-  fk_discussion_commentid_discussion_comment Int
-  fk_userid_user                             Int
-  discussion_comment                         discussion_comment @relation(fields: [fk_discussion_commentid_discussion_comment], references: [id_discussion_comment], onUpdate: Restrict, map: "vote_ibfk_1")
-  user                                       user               @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "votes")
+  is_positive          Boolean?
+  id_vote              Int      @id
+  fk_userid_user       Int
+  fk_commentid_comment Int
+  user                 users    @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "votes")
+  comment              comment  @relation(fields: [fk_commentid_comment], references: [id_comment], onUpdate: Restrict, map: "vote_ibfk_2")
 
-  @@index([fk_discussion_commentid_discussion_comment], map: "fk_discussion_commentid_discussion_comment")
-  @@index([fk_userid_user], map: "votes")
+  @@index([fk_commentid_comment], map: "fk_commentid_comment")
+  @@index([fk_userid_user], map: "fk_userid_user")
+}
+
+model comment {
+  description      String?   @db.VarChar(255)
+  created_at       DateTime? @db.Date
+  id_comment       Int       @id
+  fk_issueid_issue Int?
+  fk_faultid_fault Int?
+  fk_userid_user   Int
+  issue            issue?    @relation(fields: [fk_issueid_issue], references: [id_issue], onDelete: Restrict, onUpdate: Restrict, map: "comment_ibfk_1")
+  fault            fault?    @relation(fields: [fk_faultid_fault], references: [id_fault], onDelete: Restrict, onUpdate: Restrict, map: "comment_ibfk_2")
+  users            users     @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "comments")
+  vote             vote[]
+
+  @@index([fk_userid_user], map: "comments")
+  @@index([fk_faultid_fault], map: "fk_faultid_fault")
+  @@index([fk_issueid_issue], map: "fk_issueid_issue")
+}
+
+model fault {
+  severity          String?   @db.VarChar(255)
+  created_at        DateTime? @db.Date
+  description       String?   @db.VarChar(255)
+  replication_steps String?   @db.VarChar(255)
+  fix_info          String?   @db.VarChar(255)
+  resolved          Boolean?
+  visibility        String?   @db.Char(7)
+  id_fault          Int       @id
+  fk_userid_user    Int
+  comment           comment[]
+  users             users     @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "fault_ibfk_1")
+  image             image[]
+
+  @@index([fk_userid_user], map: "fk_userid_user")
+}
+
+model image {
+  uploaded_at      DateTime? @db.Date
+  image_blob       Bytes?    @db.Blob
+  id_image         Int       @id
+  fk_issueid_issue Int?
+  fk_faultid_fault Int?
+  issue            issue?    @relation(fields: [fk_issueid_issue], references: [id_issue], onDelete: Restrict, onUpdate: Restrict, map: "image_ibfk_1")
+  fault            fault?    @relation(fields: [fk_faultid_fault], references: [id_fault], onDelete: Restrict, onUpdate: Restrict, map: "image_ibfk_2")
+  project          project?
+
+  @@index([fk_faultid_fault], map: "fk_faultid_fault")
+  @@index([fk_issueid_issue], map: "fk_issueid_issue")
+}
+
+model issue {
+  name           String?   @db.VarChar(255)
+  description    String?   @db.VarChar(255)
+  resolved       Boolean?
+  requirements   String?   @db.VarChar(255)
+  desired_result String?   @db.VarChar(255)
+  id_issue       Int       @id
+  fk_userid_user Int
+  comment        comment[]
+  image          image[]
+  users          users     @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "creates")
+
+  @@index([fk_userid_user], map: "creates")
+}
+
+model users {
+  id_user              Int       @unique
+  name                 String?   @db.VarChar(255)
+  surname              String?   @db.VarChar(255)
+  email                String    @db.VarChar(255)
+  password             String?   @db.VarChar(255)
+  github               String    @db.VarChar(255)
+  banned_until         DateTime? @db.Date
+  role                 String?   @db.Char(13)
+  fk_projectid_project Int
+  comment              comment[]
+  fault                fault[]
+  issue                issue[]
+  project              project   @relation(fields: [fk_projectid_project], references: [id_project], onUpdate: Restrict, map: "controls")
+  vote                 vote[]
+
+  @@id([id_user, email, github])
+  @@index([fk_projectid_project], map: "controls")
 }
