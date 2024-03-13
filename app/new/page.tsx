@@ -12,13 +12,11 @@ const NewProjectPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here, you would assemble the data from the form into a structure
-    // appropriate for your backend and then send it with an API call.
     const projectData = {
       projectName,
       shortDescription,
       repository,
-      technologies: technologies.split(' '), // Assuming technologies are separated by spaces
+      technologies: technologies.split(' '), 
       fullDescription,
     };
 
@@ -32,6 +30,7 @@ const NewProjectPage = () => {
       <div className="bg-[#A1A3A7] p-6 rounded-lg shadow-lg" style={{ maxWidth: '600px', width: '100%', height: 'auto' }}>
         <h2 className="text-2xl font-bold mb-4 text-center">Naujas projektas</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
+
           <div>
             <label htmlFor="projectName" className="block">Pavadinimas</label>
             <input
@@ -85,16 +84,19 @@ const NewProjectPage = () => {
             />
           </div>
           
-          <div className="mt-4 flex justify-center gap-2">
-            {/* Atšaukti*/}
+          <div className="mt-4 flex justify-between items-center">
             <Link href="/" passHref> {/*Goes to root*/}
               <a className="py-2 px-4 rounded-lg text-black hover:bg-green-700 transition duration-150 ease-in-out" style={{ backgroundColor: '#C14040' }}>Atšaukti</a>
             </Link>
+            <button type="submit" style={{ backgroundColor: '#40C173 '}} className="py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out">Pateikti</button>
           </div>
         </form>
       </div>
     </div>
   );
+
 };
+
+
 
 export default NewProjectPage;

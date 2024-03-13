@@ -9,8 +9,8 @@ interface ProjectDashboardProps {
   repository: string;
   logo: string;
   tags: string[];
-  creation_date: string;
-  last_updated: string;
+  created_at: string;
+  updated_at: string;
   id_project: number;
 }
 
@@ -21,7 +21,7 @@ const ProjectDashboard = ({
   repository,
   logo,
   tags,
-  last_updated,
+  updated_at,
 }: ProjectDashboardProps) => {
   return (
     <div className="flex flex-col items-center justify-center p-6 max-w-4xl mx-auto">
@@ -30,7 +30,7 @@ const ProjectDashboard = ({
         image_url={logo}
         title={name}
         description={short_description}
-        timeUpdated={last_updated}
+        timeUpdated={updated_at}
         issueCount={0} // Replace 
         volunteerCount={0} // Replace 
         tags={tags}

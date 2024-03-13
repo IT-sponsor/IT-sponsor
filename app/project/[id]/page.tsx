@@ -9,8 +9,8 @@ interface Project {
   repository: string;
   logo: string; // Changed type to string
   technology: string;
-  creation_date: string;
-  last_updated: string;
+  created_at: string;
+  updated_at: string;
   id_project: number;
 }
 
@@ -26,17 +26,15 @@ export default function ProjectPage({ params }: {
       fetch(`/api/project/${productId}`)
         .then(res => res.json())
         .then(data => {
-          // Assuming the logo data is within the response and needs conversion
           if (data && data.logo && data.logo.data) {
             const logoData = data.logo.data;
             const base64String = Buffer.from(logoData).toString('base64');
             const modifiedProject = {
               ...data,
-              logo: `data:image/jpeg;base64,${base64String}` // Modify as per the actual format of the logo if not JPEG
+              logo: `data:image/jpeg;base64,${base64String}` 
             };
             setProject(modifiedProject);
           } else {
-            // Set project data directly if there's no logo to modify or if the format is different
             setProject(data);
           }
         })
@@ -55,8 +53,8 @@ export default function ProjectPage({ params }: {
           repository={project.repository}
           logo={project.logo}
           tags={project.technology.split(' ')}
-          creation_date={project.creation_date}
-          last_updated={project.last_updated}
+          created_at={project.created_at}
+          updated_at={project.updated_at}
           id_project={project.id_project}
         />
 
