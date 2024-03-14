@@ -272,7 +272,7 @@ export default function Home() {
 
 
       {filteredProjects.map((project, index) => (
-      <div className="p-6 max-w-4xl max-h-60" key={index}>
+      <div className="p-6 w-[800px] max-h-60" key={index}>
         {/* link to the project page by the id*/}
         <Link href={`/project/${project.id_project}`} passHref>
           <div style={{ cursor: 'pointer' }}>
