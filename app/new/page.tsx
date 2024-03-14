@@ -85,7 +85,7 @@ const NewProjectPage = () => {
           </div>
           
           <div className="mt-4 flex justify-between items-center">
-            <Link href="/" passHref> {/*Goes to root*/}
+            <Link href="/" legacyBehavior>
               <a className="py-2 px-4 rounded-lg text-black hover:bg-green-700 transition duration-150 ease-in-out" style={{ backgroundColor: '#C14040' }}>Atšaukti</a>
             </Link>
             <button type="submit" style={{ backgroundColor: '#40C173 '}} className="py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out">Pateikti</button>
@@ -94,9 +94,5 @@ const NewProjectPage = () => {
       </div>
     </div>
   );
-
 };
-
-
-
 export default NewProjectPage;

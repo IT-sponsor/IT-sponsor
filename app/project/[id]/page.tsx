@@ -12,6 +12,7 @@ interface Project {
   created_at: string;
   updated_at: string;
   id_project: number;
+  fk_imageid_image: number; 
 }
 
 export default function ProjectPage({ params }: {
@@ -26,8 +27,8 @@ export default function ProjectPage({ params }: {
       fetch(`/api/project/${productId}`)
         .then(res => res.json())
         .then(data => {
-          if (data && data.logo && data.logo.data) {
-            const logoData = data.logo.data;
+          if (data && data.image && data.image.image_blob && data.image.image_blob.data) {
+            const logoData = data.image.image_blob.data
             const base64String = Buffer.from(logoData).toString('base64');
             const modifiedProject = {
               ...data,

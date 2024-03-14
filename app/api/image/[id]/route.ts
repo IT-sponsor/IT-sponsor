@@ -6,7 +6,7 @@ export async function GET(
     request: NextApiResponse,
     { params }: { params: { id: Number } }
 ) {
-    console.log("Received params:", params);
+    console.log("Received image:", params);
 
     let image = await prisma.image.findUnique({
         where: { id_image: Number(params.id) },
