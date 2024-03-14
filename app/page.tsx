@@ -39,41 +39,21 @@ export default function Home() {
 
   // Guessing this is where the image does not load, the api get image by id returns correct results
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("/api/project/all");
-        const data = await res.json();
-        
-        const modifiedData = await Promise.all(data.map(async (project: Project) => {
-          try {
-            // Check if the project has a logo image
-            if (project.fk_imageid_image) {
-              const imageRes = await fetch(`/api/image/${project.fk_imageid_image}`);
-              console.log('imageRes data', imageRes); 
-              if (imageRes.ok) {
-                // Convert buffer to base64 string
-                const logoData = data.imageRes.data;
-                console.log('logo data', logoData); 
-                const base64String = Buffer.from(logoData).toString('base64');
-                return {
-                  ...project,
-                  logo: `data:image/jpeg;base64,${base64String}` // Assuming the logo is JPEG
-                };
-              }
-            }
-          } catch (imageError) {
-            console.error('Error with the image:', imageError);
-          }
-          return project;
-        }));
-
+    fetch("/api/project/all")
+      .then(res => res.json())
+      .then(data => {
+        const modifiedData = data.map((project: Project) => {
+          // Convert buffer to base64 string
+          const logoData = project.image.image_blob.data;
+          const base64String = Buffer.from(logoData).toString('base64');
+          return {
+            ...project,
+            logo: `data:image/jpeg;base64,${base64String}` // Assuming the logo is JPEG
+          };
+        });
         setProjects(modifiedData);
-      } catch (err) {
-        console.error('Error getting projects:', err);
-      }
-    };
-
-    fetchData();
+      })
+      .catch(err => console.error(err));
   }, []);
 
   useEffect(() => {
