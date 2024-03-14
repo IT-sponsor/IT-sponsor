@@ -49,9 +49,11 @@ export default function Home() {
             // Check if the project has a logo image
             if (project.fk_imageid_image) {
               const imageRes = await fetch(`/api/image/${project.fk_imageid_image}`);
+              console.log('imageRes data', imageRes); 
               if (imageRes.ok) {
                 // Convert buffer to base64 string
-                const logoData = imageRes.data;
+                const logoData = data.imageRes.data;
+                console.log('logo data', logoData); 
                 const base64String = Buffer.from(logoData).toString('base64');
                 return {
                   ...project,
@@ -291,6 +293,7 @@ export default function Home() {
 
       {filteredProjects.map((project, index) => (
       <div className="p-6 max-w-4xl max-h-60" key={index}>
+        {/* link to the project page by the id*/}
         <Link href={`/project/${project.id_project}`} passHref>
           <div style={{ cursor: 'pointer' }}>
             <ProjectCard 

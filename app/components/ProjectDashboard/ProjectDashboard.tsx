@@ -31,8 +31,8 @@ const ProjectDashboard = ({
         title={name}
         description={short_description}
         timeUpdated={updated_at}
-        issueCount={0} // Replace 
-        volunteerCount={0} // Replace 
+        issueCount={0} 
+        volunteerCount={0} 
         tags={tags}
       />
 
@@ -44,7 +44,7 @@ const ProjectDashboard = ({
         <a href="#" style={{ backgroundColor: '#C14040', color: '#000' }} className="py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out">Pranešti apie kritinę klaidą</a>
       </div>
 
-      {/* Long Description Below Buttons with Custom CSS */}
+      {/* description with markdown features */}
       <div className="mt-4 long-description-right">
         <MarkdownDisplay markdownText={long_description} />
       </div>

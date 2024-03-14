@@ -3,7 +3,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 const NewProjectPage = () => {
-
   const [projectName, setProjectName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [repository, setRepository] = useState('');
@@ -13,17 +12,39 @@ const NewProjectPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const projectData = {
-      projectName,
-      shortDescription,
-      repository,
-      technologies: technologies.split(' '), 
-      fullDescription,
+        name: projectName,
+        short_description: shortDescription,
+        long_description: fullDescription,
+        repository,
+        technology: technologies 
     };
 
-    console.log("Submit:", projectData);
-    // Here, you would typically make an API call to your backend to save the projectData
-    // Example: await saveProjectData(projectData);
-  };
+    try {
+        const response = await fetch('/api/project/new', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(projectData)
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Project created:', result);
+            //after submitting redirects to the newly created project page
+            window.location.href = `/project/${result.project.id_project}`;
+            
+        } else {
+            const errorText = await response.text();
+            console.error('Error creating project:', errorText);
+        }
+    } catch (error) {
+        console.error('Network error:', error);
+    }
+};
+
+  
+  
 
   return (
     <div className="flex items-center justify-center h-screen">

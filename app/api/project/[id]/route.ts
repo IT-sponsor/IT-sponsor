@@ -11,7 +11,7 @@ export async function GET(
     let project = await prisma.project.findUnique({
         where: { id_project: Number(params.id) },
         include: {
-            image: true, // Include related image data
+            image: true, // include related image data
         },
     });
     return NextResponse.json(project);

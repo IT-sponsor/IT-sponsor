@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   const projects = await prisma.project.findMany({
     include: {
-      image: true, // Include related image data
+      image: true, // include related image data
     },
   });
   return NextResponse.json(projects);
