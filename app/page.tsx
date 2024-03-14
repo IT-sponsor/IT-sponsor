@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
+import Link from "next/link";
 
 import ProjectCard from "./components/ProjectCard/ProjectCard";
 
@@ -10,9 +11,10 @@ interface Project {
   repository: string;
   logo: string; // Changed type to string
   technology: string;
-  creation_date: string;
-  last_updated: string;
+  created_at: string;
+  updated_at: string;
   id_project: number;
+  fk_imageid_image: number; 
 }
 
 export default function Home() {
@@ -35,13 +37,14 @@ export default function Home() {
     }
   };
 
+  // Guessing this is where the image does not load, the api get image by id returns correct results
   useEffect(() => {
     fetch("/api/project/all")
       .then(res => res.json())
       .then(data => {
         const modifiedData = data.map((project: Project) => {
           // Convert buffer to base64 string
-          const logoData = project.logo.data;
+          const logoData = project.image.image_blob.data;
           const base64String = Buffer.from(logoData).toString('base64');
           return {
             ...project,
@@ -77,13 +80,13 @@ export default function Home() {
 
   const sortedProjects = () => {
     if (sortBy === 'newest_updated') {
-      return projects.slice().sort((a, b) => new Date(b.last_updated).getTime() - new Date(a.last_updated).getTime());
+      return projects.slice().sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
     } else if (sortBy === 'newest_created') {
-      return projects.slice().sort((a, b) => new Date(b.creation_date).getTime() - new Date(a.creation_date).getTime());
+      return projects.slice().sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     } else if (sortBy === 'oldest_updated') {
-      return projects.slice().sort((a, b) => new Date(a.last_updated).getTime() - new Date(b.last_updated).getTime());
+      return projects.slice().sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
     } else if (sortBy === 'oldest_created') {
-      return projects.slice().sort((a, b) => new Date(a.creation_date).getTime() - new Date(b.creation_date).getTime());
+      return projects.slice().sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
     } else {
       return projects;
     }
@@ -269,18 +272,23 @@ export default function Home() {
 
 
       {filteredProjects.map((project, index) => (
-        <div className="p-6 max-w-2xl max-h-60">
-          <ProjectCard
-            image_url={project.logo}
-            title={project.name}
-            description={project.short_description}
-            timeUpdated={project.last_updated}
-            issueCount={0}
-            volunteerCount={0}
-            tags={project.technology.split(' ')}
-          />
-        </div>
-      ))}
+      <div className="p-6 w-[800px] max-h-60" key={index}>
+        {/* link to the project page by the id*/}
+        <Link href={`/project/${project.id_project}`} passHref>
+          <div style={{ cursor: 'pointer' }}>
+            <ProjectCard 
+              image_url={project.logo}
+              title={project.name}
+              description={project.short_description}
+              timeUpdated={project.updated_at}
+              issueCount={0} 
+              volunteerCount={0}
+              tags={project.technology.split(' ')}
+            />
+          </div>
+        </Link>
+      </div>
+    ))}
     </div>
   );
 }
