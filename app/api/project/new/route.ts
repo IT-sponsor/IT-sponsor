@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
             }); // Create new project in the database
 
             console.log('Project created', project); 
+            return new NextResponse(JSON.stringify({ message: "Project created successfully", project }), { status: 201 }); 
 
         } catch (error) {
             console.error('Error creating project:', error); 
