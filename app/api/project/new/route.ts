@@ -35,9 +35,9 @@ export async function POST(req: NextRequest) {
             return new NextResponse(JSON.stringify({ message: "Project created successfully", project }), { status: 201 }); 
 
         } catch (error) {
-            console.error('Error creating project:', error); 
+            return new NextResponse(JSON.stringify({ message: "Error creating project", error: error.message }), { status: 500 }); 
         }
     } else {
-        console.log(`Method ${req.method} Not Allowed`); // method not allowed (not post)
+        return new NextResponse(JSON.stringify({ message: `Method ${req.method} Not Allowed` }), { status: 405 });
     }
 }

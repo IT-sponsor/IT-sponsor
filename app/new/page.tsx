@@ -1,6 +1,8 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
+import { NextResponse } from '@/node_modules/next/server';
+//import { error } from 'console';
 
 const NewProjectPage = () => {
   const [projectName, setProjectName] = useState('');
@@ -45,10 +47,10 @@ const NewProjectPage = () => {
         const result = await response.json();
         window.location.href = `/project/${result.project.id_project}`;
       } else {
-        console.error('Error creating project:', await response.text());
+        return new NextResponse(JSON.stringify({ message: "Error creating project", error: error.message }), { status: 500, headers: {'Content-Type': 'application/json'} });
       }
     } catch (error) {
-      console.error('Network error:', error);
+      return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500, headers: {'Content-Type': 'application/json'} });
     }
   };
 
