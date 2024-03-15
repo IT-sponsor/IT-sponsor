@@ -5,13 +5,22 @@ import LogoIcon from "@/public/assets/work.svg";
 import Image from "next/image";
 import { cookies } from "next/headers";
 import { useState } from "react";
+import { useContext } from 'react';
+import RoleContext from '@/app/login/RoleContext';
+import { useRouter } from "next/navigation";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const {role} = useContext(RoleContext);
+ 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+  const router = useRouter();
+  const handleClick = () => {
+    router.push("/login");
+  }
 
   return (
     <nav className="bg-gray-800">
@@ -55,6 +64,13 @@ export default function Navigation() {
             </div> */}
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          <button 
+            type="button"
+            style={{ backgroundColor: '#40C173' }}
+            className="py-0.5 px-2 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out"
+            id="login-button" 
+            onClick={handleClick}
+          >Prisijungti</button>
             {/* <!-- Profile dropdown --> */}
             <div className="relative ml-3">
               <div>
@@ -98,6 +114,7 @@ export default function Navigation() {
               </div>
             </div>
           </div>
+          <span className="ml-2 text-white">{role}</span>
         </div>
       </div>
 

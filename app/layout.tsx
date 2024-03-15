@@ -4,6 +4,7 @@ import "./globals.css";
 import Footer from "./components/Footer/Footer";
 import Navigation from "./components/Navigation/Navigation";
 import { Providers } from "./api/utils/providers";
+import { RoleProvider } from './login/RoleContext';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,15 +21,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
-        <Providers>
-          <Navigation />
-          <div className="flex flex-col min-h-screen justify-center">
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </div>
-        </Providers>
+       <RoleProvider>
+          <Providers>
+            <Navigation />
+            <div className="flex flex-col min-h-screen justify-center">
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </div>
+          </Providers>
+        </RoleProvider>
       </body>
     </html>
   );
