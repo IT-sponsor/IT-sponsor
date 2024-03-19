@@ -6,8 +6,6 @@ export async function GET(
     request: NextApiResponse,
     { params }: { params: { id: Number } }
 ) {
-    console.log("Received params project:", params);
-
     let project = await prisma.project.findUnique({
         where: { id_project: Number(params.id) },
         include: {
