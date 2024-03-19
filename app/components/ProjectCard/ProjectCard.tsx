@@ -18,18 +18,14 @@ const ProjectCard = ({ image_url, title, description, timeUpdated, issueCount, v
     return (
         <article className="rounded-xl border-2 border-gray-100 bg-white">
             <div className="flex flex-col sm:flex-row items-start gap-4 p-4 sm:px-6 lg:px-8">
-                <a href="#" className="block shrink-0">
-                    <img
-                        alt={title}
-                        src={image_url}
-                        className="h-32 rounded-lg object-cover"
-                    />
-                </a>
+                <img
+                    alt={title}
+                    src={image_url}
+                    className="h-32 rounded-lg object-cover"
+                />
     
                 <div className="flex-grow">
-                    <h3 className="font-medium sm:text-lg">
-                        <a href="#" className="hover:underline"> {title} </a>
-                    </h3>
+                    <h3 className="font-medium sm:text-lg"> {title} </h3>
     
                     <p className="line-clamp-5 text-sm text-gray-700"> {description} </p>
                 </div>
