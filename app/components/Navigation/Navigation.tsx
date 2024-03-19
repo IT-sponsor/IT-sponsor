@@ -4,7 +4,7 @@ import Logo from "@/public/assets/logo_icon.svg";
 import LogoIcon from "@/public/assets/work.svg";
 import Image from "next/image";
 import { cookies } from "next/headers";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useContext } from 'react';
 import RoleContext from '@/app/login/RoleContext';
 import { useRouter } from "next/navigation";
@@ -21,6 +21,19 @@ export default function Navigation() {
   const handleClick = () => {
     router.push("/login");
   }
+
+  const closeDropdowns = (event: MouseEvent) => {
+    if (event.target !== document.getElementById("user-menu-button")) {
+      setIsMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("mousedown", closeDropdowns);
+    return () => {
+      window.removeEventListener("mousedown", closeDropdowns);
+    };
+  }, []);
 
   return (
     <nav className="bg-gray-800">
