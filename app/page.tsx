@@ -14,7 +14,7 @@ interface Project {
   created_at: string;
   updated_at: string;
   id_project: number;
-  fk_imageid_image: number; 
+  fk_imageid_image: number;
 }
 
 export default function Home() {
@@ -37,7 +37,6 @@ export default function Home() {
     }
   };
 
-  // Guessing this is where the image does not load, the api get image by id returns correct results
   useEffect(() => {
     fetch("/api/project/all")
       .then(res => res.json())
@@ -58,8 +57,6 @@ export default function Home() {
 
   useEffect(() => {
     document.addEventListener('mousedown', closeDropdowns);
-
-    // Clean up the event listener when the component is unmounted
     return () => {
       document.removeEventListener('mousedown', closeDropdowns);
     };
@@ -126,7 +123,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center" >
+    <div className="flex flex-col items-center">
       {/* Search bar */}
       <div className='flex items-center'>
         <div className="pt-2 relative mx-auto text-gray-600">
@@ -272,23 +269,23 @@ export default function Home() {
 
 
       {filteredProjects.map((project, index) => (
-      <div className="p-6 w-[800px] max-h-60" key={index}>
-        {/* link to the project page by the id*/}
-        <Link href={`/project/${project.id_project}`} passHref>
-          <div style={{ cursor: 'pointer' }}>
-            <ProjectCard 
-              image_url={project.logo}
-              title={project.name}
-              description={project.short_description}
-              timeUpdated={project.updated_at}
-              issueCount={0} 
-              volunteerCount={0}
-              tags={project.technology.split(' ')}
-            />
-          </div>
-        </Link>
-      </div>
-    ))}
+        <div className="p-6 w-[800px] max-h-60" key={index}>
+          {/* link to the project page by the id*/}
+          <Link href={`/project/${project.id_project}`} passHref>
+            <div style={{ cursor: 'pointer' }}>
+              <ProjectCard
+                image_url={project.logo}
+                title={project.name}
+                description={project.short_description}
+                timeUpdated={project.updated_at}
+                issueCount={0}
+                volunteerCount={0}
+                tags={project.technology.split(' ')}
+              />
+            </div>
+          </Link>
+        </div>
+      ))}
     </div>
   );
 }
