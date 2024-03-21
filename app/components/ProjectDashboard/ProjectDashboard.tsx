@@ -1,6 +1,7 @@
 "use client";
 import ProjectCard from "../ProjectCard/ProjectCard"; 
 import MarkdownDisplay from "../MarkdownDisplay/MarkdownDisplay"; 
+import Link from "next/link";
 
 interface ProjectDashboardProps {
   name: string;
@@ -22,6 +23,7 @@ const ProjectDashboard = ({
   logo,
   tags,
   updated_at,
+  id_project
 }: ProjectDashboardProps) => {
   return (
     <div className="flex flex-col items-center justify-center p-6">
@@ -41,9 +43,9 @@ const ProjectDashboard = ({
       {/* Buttons after the project card */}
       <div className="mt-4 flex justify-center gap-2">
         <a href={repository} target="_blank" rel="noopener noreferrer" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Repositorija</a>
-        <a href="#" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Diskusijos</a>
-        <a href="#" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Pradėti naują diskusiją</a>
-        <a href="#" className="py-2 px-4 rounded-lg text-black bg-[#C14040] hover:bg-red-700 transition duration-150 ease-in-out">Pranešti apie kritinę klaidą</a>
+        <a href="#" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Klaidos</a>
+        <Link href={`/project/${id_project}/fault/new`} className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Pranešti apie kritinę klaidą</Link>
+        <Link href={`/project/${id_project}/fault`} className="py-2 px-4 rounded-lg text-black bg-[#C14040] hover:bg-red-700 transition duration-150 ease-in-out">Kritinės klaidos</Link>
       </div>
 
       {/* Description with markdown features */}
