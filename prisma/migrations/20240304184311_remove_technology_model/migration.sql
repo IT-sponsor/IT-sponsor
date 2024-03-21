@@ -12,8 +12,7 @@ ALTER TABLE `has_technology` DROP FOREIGN KEY `has_technology`;
 ALTER TABLE `discussion_visibility` MODIFY `name` CHAR(7) NOT NULL;
 
 -- AlterTable
-ALTER TABLE `project` ADD COLUMN `technology` VARCHAR(255) NULL,
-    MODIFY `id_project` INTEGER NOT NULL AUTO_INCREMENT;
+ALTER TABLE `project` ADD COLUMN `technology` VARCHAR(255) NULL;
 
 -- AlterTable
 ALTER TABLE `roles` MODIFY `name` CHAR(13) NOT NULL;

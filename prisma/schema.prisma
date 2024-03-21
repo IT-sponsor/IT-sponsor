@@ -7,112 +7,140 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model project {
-  id_project        Int       @id
-  name              String?   @db.VarChar(255)
-  short_description String?   @db.VarChar(255)
-  long_description  String?   @db.VarChar(255)
-  repository        String    @db.VarChar(255)@unique
-  technology        String?   @db.VarChar(255)
-  created_at        DateTime? @db.Date
-  updated_at        DateTime? @db.Date
-  star_count        Int?
-  contributor_count Int?
-  fk_imageid_image  Int?      @unique(map: "fk_imageid_image")
-  image             image?    @relation(fields: [fk_imageid_image], references: [id_image], onDelete: Restrict, onUpdate: Restrict, map: "project_ibfk_1")
-  users             users[]
-}
-
-model vote {
-  is_positive          Boolean?
-  id_vote              Int      @id
-  fk_userid_user       Int
-  fk_commentid_comment Int
-  user                 users    @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "votes")
-  comment              comment  @relation(fields: [fk_commentid_comment], references: [id_comment], onUpdate: Restrict, map: "vote_ibfk_2")
-
-  @@index([fk_userid_user], map: "votes")
-  @@index([fk_commentid_comment], map: "fk_commentid_comment")
-}
-
-model comment {
-  description      String?   @db.VarChar(255)
-  created_at       DateTime? @db.Date
-  id_comment       Int       @id
-  fk_issueid_issue Int?
-  fk_faultid_fault Int?
-  fk_userid_user   Int
-  issue            issue?    @relation(fields: [fk_issueid_issue], references: [id_issue], onDelete: Restrict, onUpdate: Restrict, map: "comment_ibfk_1")
-  fault            fault?    @relation(fields: [fk_faultid_fault], references: [id_fault], onDelete: Restrict, onUpdate: Restrict, map: "comment_ibfk_2")
-  users            users     @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "comments")
-  vote             vote[]
-
-  @@index([fk_userid_user], map: "comments")
-  @@index([fk_faultid_fault], map: "fk_faultid_fault")
-  @@index([fk_issueid_issue], map: "fk_issueid_issue")
-}
-
-model fault {
-  severity          String?   @db.VarChar(255)
-  created_at        DateTime? @db.Date
-  description       String?   @db.VarChar(255)
-  replication_steps String?   @db.VarChar(255)
-  fix_info          String?   @db.VarChar(255)
-  resolved          Boolean?
-  visibility        String?   @db.Char(7)
-  id_fault          Int       @id
-  fk_userid_user    Int
-  comment           comment[]
-  users             users     @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "fault_ibfk_1")
-  image             image[]
-
-  @@index([fk_userid_user], map: "fk_userid_user")
-}
-
-model image {
-  uploaded_at      DateTime? @db.Date
-  image_blob       Bytes?    @db.Blob
-  id_image         Int       @id
-  fk_issueid_issue Int?
-  fk_faultid_fault Int?
-  issue            issue?    @relation(fields: [fk_issueid_issue], references: [id_issue], onDelete: Restrict, onUpdate: Restrict, map: "image_ibfk_1")
-  fault            fault?    @relation(fields: [fk_faultid_fault], references: [id_fault], onDelete: Restrict, onUpdate: Restrict, map: "image_ibfk_2")
-  project          project?
-
-  @@index([fk_faultid_fault], map: "fk_faultid_fault")
-  @@index([fk_issueid_issue], map: "fk_issueid_issue")
-}
-
-model issue {
-  name           String?   @db.VarChar(255)
-  description    String?   @db.VarChar(255)
-  resolved       Boolean?
-  requirements   String?   @db.VarChar(255)
-  desired_result String?   @db.VarChar(255)
-  id_issue       Int       @id
-  fk_userid_user Int
-  comment        comment[]
-  image          image[]
-  users          users     @relation(fields: [fk_userid_user], references: [id_user], onUpdate: Restrict, map: "creates")
-
-  @@index([fk_userid_user], map: "creates")
-}
-
 model users {
-  id_user              Int       @id
-  name                 String?   @db.VarChar(255)
-  surname              String?   @db.VarChar(255)
-  email                String    @db.VarChar(255)@unique
-  password             String?   @db.VarChar(255)
-  github               String    @db.VarChar(255)@unique
-  banned_until         DateTime? @db.Date
-  role                 String?   @db.Char(13)
-  fk_projectid_project Int
-  comment              comment[]
-  fault                fault[]
-  issue                issue[]
-  project              project   @relation(fields: [fk_projectid_project], references: [id_project], onUpdate: Restrict, map: "controls")
-  vote                 vote[]
+  id                 Int             @id
+  first_name         String?         @db.VarChar(255)
+  last_name          String?         @db.VarChar(255)
+  email              String?         @db.VarChar(255)@unique
+  password           String?         @db.VarChar(255)
+  github             String?         @db.VarChar(255)@unique
+  banned_until       DateTime?       @db.Date
+  role               users_role?
+  fk_imagesid_images Int?            @unique(map: "fk_imagesid_images")
+  applies            applies[]
+  controls           controls[]
+  faults             faults[]
+  gets_assigned      gets_assigned[]
+  images             images?         @relation(fields: [fk_imagesid_images], references: [id_images], onDelete: Restrict, onUpdate: Restrict, map: "uploads")
+}
 
-  @@index([fk_projectid_project], map: "controls")
+model applies {
+  fk_usersid  Int
+  fk_issuesid Int
+  users       users @relation(fields: [fk_usersid], references: [id], onUpdate: Restrict, map: "applies")
+
+  @@id([fk_usersid, fk_issuesid])
+}
+
+model controls {
+  fk_usersid    Int
+  fk_projectsid Int
+  users         users @relation(fields: [fk_usersid], references: [id], onUpdate: Restrict, map: "controls")
+
+  @@id([fk_usersid, fk_projectsid])
+}
+
+model faults {
+  id                Int              @id
+  title             String?          @db.VarChar(255)
+  created_at        DateTime?        @db.Date
+  description       String?          @db.VarChar(4000)
+  severity          faults_severity?
+  status            faults_status?
+  fk_projectsid     Int
+  fk_usersid        Int
+  projects          projects         @relation(fields: [fk_projectsid], references: [id], onUpdate: Restrict, map: "has3")
+  users             users            @relation(fields: [fk_usersid], references: [id], onUpdate: Restrict, map: "reports")
+  images            images[]
+
+  @@index([fk_projectsid], map: "has3")
+  @@index([fk_usersid], map: "reports")
+}
+
+model gets_assigned {
+  fk_usersid  Int
+  fk_issuesid Int
+  users       users @relation(fields: [fk_usersid], references: [id], onUpdate: Restrict, map: "gets_assigned")
+
+  @@id([fk_usersid, fk_issuesid])
+}
+
+model images {
+  uploaded_at DateTime? @db.Date
+  file_path   String?   @db.VarChar(255)
+  image       Bytes?    @db.Blob
+  id_images   Int       @id
+  fk_faultsid Int?
+  fk_issuesid Int?
+  faults      faults?   @relation(fields: [fk_faultsid], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "has2")
+  projects    projects?
+  users       users?
+
+  @@index([fk_faultsid], map: "has2")
+}
+
+model issues {
+  id             Int                @id
+  title          String?            @db.VarChar(255)
+  description    String?            @db.VarChar(4000)
+  status         issues_status?
+  visibility     issues_visibility?
+  fk_projectsid  Int
+  projects       projects           @relation(fields: [fk_projectsid], references: [id], onUpdate: Restrict, map: "has")
+
+  @@index([fk_projectsid], map: "has")
+}
+
+model projects {
+  id                  Int                           @id
+  name                String?                       @db.VarChar(255)
+  short_description   String?                       @db.VarChar(255)
+  long_description    String?                       @db.VarChar(4000)
+  repository          String?                       @db.VarChar(255)@unique
+  technologies        String?                       @db.VarChar(1000)
+  created_at          DateTime?                     @db.Date
+  updated_at          DateTime?                     @db.Date
+  star_count          Int?
+  contributor_count   Int?
+  codebase_visibility projects_codebase_visibility?
+  fk_imagesid_images  Int?                          @unique(map: "fk_imagesid_images")
+  faults              faults[]
+  issues              issues[]
+  images              images?                       @relation(fields: [fk_imagesid_images], references: [id_images], onDelete: Restrict, onUpdate: Restrict, map: "has1")
+}
+
+enum issues_status {
+  open
+  closed
+  draft
+  in_progress
+}
+
+enum faults_severity {
+  high
+  medium
+  low
+}
+
+enum issues_visibility {
+  public
+  private
+}
+
+enum faults_status {
+  open
+  closed
+  draft
+  in_progress
+}
+
+enum users_role {
+  volunteer
+  project_owner
+  admin
+}
+
+enum projects_codebase_visibility {
+  public
+  private
 }
