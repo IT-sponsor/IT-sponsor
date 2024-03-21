@@ -42,8 +42,8 @@ const ProjectDashboard = ({
 
       {/* Buttons after the project card */}
       <div className="mt-4 flex justify-center gap-2">
-        <a href={repository} target="_blank" rel="noopener noreferrer" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Repositorija</a>
-        <a href="#" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Klaidos</a>
+        <Link href={repository} target="_blank" rel="noopener noreferrer" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Repositorija</Link>
+        <Link href="#" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Klaidos</Link>
         <Link href={`/project/${id_project}/fault/new`} className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Pranešti apie kritinę klaidą</Link>
         <Link href={`/project/${id_project}/fault`} className="py-2 px-4 rounded-lg text-black bg-[#C14040] hover:bg-red-700 transition duration-150 ease-in-out">Kritinės klaidos</Link>
       </div>
