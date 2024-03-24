@@ -6,10 +6,10 @@ export async function GET(
     request: NextApiResponse,
     { params }: { params: { id: Number } }
 ) {
-    let project = await prisma.project.findUnique({
-        where: { id_project: Number(params.id) },
+    let project = await prisma.projects.findUnique({
+        where: { id: Number(params.id) },
         include: {
-            image: true, // include related image data
+            images: true, // include related image data
         },
     });
     return NextResponse.json(project);

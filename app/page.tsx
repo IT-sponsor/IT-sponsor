@@ -5,16 +5,26 @@ import Link from "next/link";
 import ProjectCard from "./components/ProjectCard/ProjectCard";
 
 interface Project {
+  id: number;
   name: string;
   short_description: string;
   long_description: string;
   repository: string;
-  logo: string; // Changed type to string
-  technology: string;
+  technologies: string;
   created_at: string;
   updated_at: string;
-  id_project: number;
-  fk_imageid_image: number;
+  star_count: number;
+  contributor_count: number;
+  codebase_visibility: string;
+  fk_imagesid_images: number;
+
+  logo: string;
+  images: {
+    image: {
+      data: Buffer;
+      contentType: string;
+    }
+  }
 }
 
 export default function Home() {
@@ -43,7 +53,7 @@ export default function Home() {
       .then(data => {
         const modifiedData = data.map((project: Project) => {
           // Convert buffer to base64 string
-          const logoData = project.image.image_blob.data;
+          const logoData = project.images.image.data;
           const base64String = Buffer.from(logoData).toString('base64');
           return {
             ...project,
@@ -94,11 +104,11 @@ export default function Home() {
     const isNameDescriptionMatch = project.name.toLowerCase().includes(searchQuery.toLocaleLowerCase()) ||
       project.short_description.toLowerCase().includes(searchQuery.toLocaleLowerCase());
 
-    const isTagMatch = project.technology.toLowerCase().split(' ').some(tag =>
+    const isTagMatch = project.technologies.toLowerCase().split(' ').some(tag =>
       tag.includes(searchQuery.toLocaleLowerCase())
     );
 
-    const isTechMatch = filterBy.every(tech => project.technology.includes(tech));
+    const isTechMatch = filterBy.every(tech => project.technologies.includes(tech));
 
     return (isNameDescriptionMatch || isTagMatch) && isTechMatch;
   });
@@ -107,7 +117,7 @@ export default function Home() {
     const techFrequency: { [key: string]: number } = {};
 
     filteredProjects.forEach(project => {
-      project.technology.split(' ').forEach(tech => {
+      project.technologies.split(' ').forEach(tech => {
         if (techFrequency[tech]) {
           techFrequency[tech]++;
         } else {
@@ -271,7 +281,7 @@ export default function Home() {
       {filteredProjects.map((project, index) => (
         <div className="p-6 w-[800px] max-h-60" key={index}>
           {/* link to the project page by the id*/}
-          <Link href={`/project/${project.id_project}`} passHref>
+          <Link href={`/project/${project.id}`} passHref>
             <div style={{ cursor: 'pointer' }}>
               <ProjectCard
                 image_url={project.logo}
@@ -280,7 +290,7 @@ export default function Home() {
                 timeUpdated={project.updated_at}
                 issueCount={0}
                 volunteerCount={0}
-                tags={project.technology.split(' ')}
+                tags={project.technologies.split(' ')}
               />
             </div>
           </Link>

@@ -10,14 +10,21 @@ interface Project {
     short_description: string;
     long_description: string;
     repository: string;
-    technology: string;
+    technologies: string;
     created_at: string;
     updated_at: string;
     star_count: number;
     contributor_count: number;
     codebase_visibility: string;
+    fk_imagesid_images: number;
 
     logo: string;
+    images: {
+        image: {
+            data: Buffer;
+            contentType: string;
+        }
+    }
 }
 
 interface Fault {
@@ -81,12 +88,12 @@ export default function FaultPage({ params }: {
     ];
 
     useEffect(() => {
-        if (projectId !== undefined) {
+        if (projectId) {
             fetch(`/api/project/${projectId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.image && data.image.image_blob && data.image.image_blob.data) {
-                        const logoData = data.image.image_blob.data
+                    if (data && data.images.image.data) {
+                        const logoData = data.images.image.data
                         const base64String = Buffer.from(logoData).toString('base64');
                         const modifiedProject = {
                             ...data,
@@ -94,6 +101,9 @@ export default function FaultPage({ params }: {
                         };
                         setProject(modifiedProject);
                     } else {
+                        console.error("No image data found");
+
+
                         setProject(data);
                     }
                 })
@@ -113,7 +123,7 @@ export default function FaultPage({ params }: {
                             timeUpdated={project.updated_at}
                             issueCount={0}
                             volunteerCount={0}
-                            tags={project.technology.split(' ')}
+                            tags={project.technologies.split(' ')}
                         />
                     </div>
 

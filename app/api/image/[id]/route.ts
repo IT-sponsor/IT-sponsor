@@ -8,9 +8,9 @@ export async function GET(
 ) {
     console.log("Received image:", params);
 
-    let image = await prisma.image.findUnique({
-        where: { id_image: Number(params.id) },
-        select: { image_blob: true } // getting only the image
+    let image = await prisma.images.findUnique({
+        where: { id_images: Number(params.id) },
+        select: { image: true } // getting only the image
     });
     return NextResponse.json(image);
 }

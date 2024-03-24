@@ -2,9 +2,9 @@ import prisma from "@/app/utils/prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const projects = await prisma.project.findMany({
+  const projects = await prisma.projects.findMany({
     include: {
-      image: true, // include related image data
+      images: true,
     },
   });
   return NextResponse.json(projects);
