@@ -95,7 +95,7 @@ export default function viewFaultPage({ params }: {
         <div className="flex flex-col items-center justify-center p-6">
             {project ? (
                 <>
-                    <div className="p-2 w-[800px] max-h-60">
+                    <div className="p-2 w-[800px]">
                         <ProjectCard
                             image_url={project.logo}
                             title={project.name}
@@ -112,13 +112,12 @@ export default function viewFaultPage({ params }: {
                                         <h2 className="text-lg leading-6 font-medium text-gray-900">{fault.title}</h2>
                                     </div>
                                     <div className="border-t border-gray-200">
-
                                         <dl>
                                             <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                                 <dt className="text-sm font-medium text-gray-500">Svarbumas</dt>
                                                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{severityLocale[fault.severity as keyof typeof severityLocale]}</dd>
                                             </div>
-                                            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                                 <dt className="text-sm font-medium text-gray-500">Statusas</dt>
                                                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{statusLocale[fault.status as keyof typeof statusLocale]}</dd>
                                             </div>
