@@ -10,14 +10,21 @@ interface Project {
     short_description: string;
     long_description: string;
     repository: string;
-    technology: string;
+    technologies: string;
     created_at: string;
     updated_at: string;
     star_count: number;
     contributor_count: number;
     codebase_visibility: string;
+    fk_imagesid_images: number;
 
     logo: string;
+    images: {
+        image: {
+            data: Buffer;
+            contentType: string;
+        }
+    }
 }
 
 interface Fault {
@@ -37,56 +44,17 @@ export default function FaultPage({ params }: {
     params: { id: number }
 }) {
     const [project, setProject] = useState<Project>();
-    //const [faults, setFaults] = useState<Fault[] | null>(null);
+    const [faults, setFaults] = useState<Fault[] | null>(null);
 
     const projectId = params.id;
 
-    const faults = [
-        {
-            id: 1,
-            title: 'Null Pointer Exception',
-            created_at: '2021-10-15',
-            description: 'When clicking on the submit button, the application crashes with a null pointer exception. When clicking on the submit button, the application crashes with a null pointer exception.',
-            replication_steps: '1. Open the application\n2. Navigate to the form page\n3. Fill in the required fields\n4. Click on the submit button',
-            fix_info: 'The issue is caused by accessing a null object. To fix it, check for null values before accessing the object and handle the case appropriately.',
-            severity: 'Kritinė',
-            status: 'Atviras',
-            id_project: 1,
-            user_id: 1
-        },
-        {
-            id: 2,
-            title: 'Incorrect Calculation',
-            created_at: '2021-10-16',
-            description: 'The calculation for the total price is incorrect. It is not taking into account the discount applied.',
-            replication_steps: '1. Add items to the cart\n2. Apply a discount code\n3. Proceed to checkout\n4. Check the total price',
-            fix_info: 'The issue is caused by not considering the discount when calculating the total price. To fix it, apply the discount before calculating the total price.',
-            severity: 'Kritinė',
-            status: 'Atviras',
-            id_project: 1,
-            user_id: 1
-        },
-        {
-            id: 3,
-            title: 'Incorrect Calculation',
-            created_at: '2021-10-16',
-            description: 'The calculation for the total price is incorrect. It is not taking into account the discount applied.The calculation for the total price is incorrect. It is not taking into account the discount applied.The calculation for the total price is incorrect. It is not taking into account the discount applied.The calculation for the total price is incorrect. It is not taking into account the discount applied.',
-            replication_steps: '1. Add items to the cart\n2. Apply a discount code\n3. Proceed to checkout\n4. Check the total price',
-            fix_info: 'The issue is caused by not considering the discount when calculating the total price. To fix it, apply the discount before calculating the total price.',
-            severity: 'Kritinė',
-            status: 'Atviras',
-            id_project: 1,
-            user_id: 1
-        },
-    ];
-
     useEffect(() => {
-        if (projectId !== undefined) {
+        if (projectId) {
             fetch(`/api/project/${projectId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.image && data.image.image_blob && data.image.image_blob.data) {
-                        const logoData = data.image.image_blob.data
+                    if (data && data.images.image.data) {
+                        const logoData = data.images.image.data
                         const base64String = Buffer.from(logoData).toString('base64');
                         const modifiedProject = {
                             ...data,
@@ -94,8 +62,18 @@ export default function FaultPage({ params }: {
                         };
                         setProject(modifiedProject);
                     } else {
+                        console.error("No image data found");
+
+
                         setProject(data);
                     }
+                })
+                .catch(console.error);
+
+            fetch(`/api/project/${projectId}/faults`)
+                .then(res => res.json())
+                .then(data => {
+                    setFaults(data);
                 })
                 .catch(console.error);
         }
@@ -113,7 +91,7 @@ export default function FaultPage({ params }: {
                             timeUpdated={project.updated_at}
                             issueCount={0}
                             volunteerCount={0}
-                            tags={project.technology.split(' ')}
+                            tags={project.technologies.split(' ')}
                         />
                     </div>
 
@@ -129,16 +107,16 @@ export default function FaultPage({ params }: {
                                     severity={fault.severity}
                                     status={fault.status}
                                     reporter_id={fault.user_id}
-                                    created_at={fault.created_at}
+                                    created_at={new Date(fault.created_at).toLocaleDateString()}
                                 />
                             ))
                         ) : (
-                            <div>Loading...</div>
+                            <div>Projektas neturi klaidų pranešimų</div>
                         )}
                     </div>
                 </>
             ) : (
-                <div>Loading...</div>
+                <div>Kraunama...</div>
             )}
         </div>
     );

@@ -8,12 +8,12 @@ datasource db {
 }
 
 model users {
-  id                 Int             @id
+  id                 Int             @id @default(autoincrement())
   first_name         String?         @db.VarChar(255)
   last_name          String?         @db.VarChar(255)
-  email              String?         @db.VarChar(255)@unique
+  email              String?         @unique @db.VarChar(255)
   password           String?         @db.VarChar(255)
-  github             String?         @db.VarChar(255)@unique
+  github             String?         @unique @db.VarChar(255)
   banned_until       DateTime?       @db.Date
   role               users_role?
   fk_imagesid_images Int?            @unique(map: "fk_imagesid_images")
@@ -41,17 +41,17 @@ model controls {
 }
 
 model faults {
-  id                Int              @id
-  title             String?          @db.VarChar(255)
-  created_at        DateTime?        @db.Date
-  description       String?          @db.VarChar(4000)
-  severity          faults_severity?
-  status            faults_status?
-  fk_projectsid     Int
-  fk_usersid        Int
-  projects          projects         @relation(fields: [fk_projectsid], references: [id], onUpdate: Restrict, map: "has3")
-  users             users            @relation(fields: [fk_usersid], references: [id], onUpdate: Restrict, map: "reports")
-  images            images[]
+  id            Int              @id @default(autoincrement())
+  title         String?          @db.VarChar(255)
+  created_at    DateTime?        @db.Date
+  description   String?          @db.VarChar(4000)
+  severity      faults_severity?
+  status        faults_status?
+  fk_projectsid Int
+  fk_usersid    Int
+  projects      projects         @relation(fields: [fk_projectsid], references: [id], onUpdate: Restrict, map: "has3")
+  users         users            @relation(fields: [fk_usersid], references: [id], onUpdate: Restrict, map: "reports")
+  images        images[]
 
   @@index([fk_projectsid], map: "has3")
   @@index([fk_usersid], map: "reports")
@@ -69,7 +69,7 @@ model images {
   uploaded_at DateTime? @db.Date
   file_path   String?   @db.VarChar(255)
   image       Bytes?    @db.Blob
-  id_images   Int       @id
+  id_images   Int       @id @default(autoincrement())
   fk_faultsid Int?
   fk_issuesid Int?
   faults      faults?   @relation(fields: [fk_faultsid], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "has2")
@@ -80,13 +80,13 @@ model images {
 }
 
 model issues {
-  id             Int                @id
-  title          String?            @db.VarChar(255)
-  description    String?            @db.VarChar(4000)
-  status         issues_status?
-  visibility     issues_visibility?
-  fk_projectsid  Int
-  projects       projects           @relation(fields: [fk_projectsid], references: [id], onUpdate: Restrict, map: "has")
+  id            Int                @id
+  title         String?            @db.VarChar(255)
+  description   String?            @db.VarChar(4000)
+  status        issues_status?
+  visibility    issues_visibility?
+  fk_projectsid Int
+  projects      projects           @relation(fields: [fk_projectsid], references: [id], onUpdate: Restrict, map: "has")
 
   @@index([fk_projectsid], map: "has")
 }
@@ -96,7 +96,7 @@ model projects {
   name                String?                       @db.VarChar(255)
   short_description   String?                       @db.VarChar(255)
   long_description    String?                       @db.VarChar(4000)
-  repository          String?                       @db.VarChar(255)@unique
+  repository          String?                       @unique @db.VarChar(255)
   technologies        String?                       @db.VarChar(1000)
   created_at          DateTime?                     @db.Date
   updated_at          DateTime?                     @db.Date

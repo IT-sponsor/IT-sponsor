@@ -10,22 +10,22 @@ export async function POST(req: NextRequest) {
 
         // retrieves highest current id and ++
         try {
-            const lastProject = await prisma.project.findFirst({
+            const lastProject = await prisma.projects.findFirst({
                 orderBy: {
-                    id_project: 'desc',
+                    id: 'desc',
                 },
             }); 
 
-            const newId = lastProject ? lastProject.id_project + 1 : 1; // if there are no projects 
+            const newId = lastProject ? lastProject.id + 1 : 1; // if there are no projects 
 
-            const project = await prisma.project.create({
+            const project = await prisma.projects.create({
                 data: {
-                    id_project: newId,
+                    id: newId,
                     name,
                     short_description,
                     long_description,
                     repository,
-                    technology,
+                    technologies,
                     created_at: new Date(),
                     updated_at: new Date(),
                 },
