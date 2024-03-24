@@ -19,14 +19,14 @@ interface FaultCardSmallProps {
 }
 
 const FaultCardSmall = (
-    { 
+    {
         id,
-        title, 
-        description, 
-        severity, 
-        status, 
-        reporter_id, 
-        created_at 
+        title,
+        description,
+        severity,
+        status,
+        reporter_id,
+        created_at
     }: FaultCardSmallProps) => {
 
     const user = {
@@ -36,19 +36,25 @@ const FaultCardSmall = (
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'Atviras':
+            case 'open':
                 return 'red';
-            case 'Baigtas':
+            case 'closed':
                 return 'green';
             default:
                 return 'gray';
         }
     };
 
+    const severityLocale = {
+        low: 'žemas',
+        medium: 'vidutinis',
+        high: 'aukštas'
+    };
+
     useEffect(() => {
         console.log("Get user info for reporter_id: ", reporter_id);
     }, []);
-    
+
     return (
         <Link href={`fault/${id}`} className="rounded-xl border-2 border-gray-100 bg-white w-2/3 mb-3">
             <article>
@@ -57,7 +63,7 @@ const FaultCardSmall = (
                         <div className="flex items-center">
                             <span
                                 className="hidden sm:block h-4 w-4 rounded-full mr-2"
-                                style={{backgroundColor: getStatusColor(status)}}
+                                style={{ backgroundColor: getStatusColor(status) }}
                                 aria-hidden="true"
                             ></span>
                             <h3 className="font-medium sm:text-lg"> {title} </h3>
@@ -78,7 +84,7 @@ const FaultCardSmall = (
 
                     <span className="hidden sm:block" aria-hidden="true">&middot;</span>
 
-                    <p className="hidden sm:block sm:text-xs sm:text-gray-500"> {severity} </p>
+                    <p className="hidden sm:block sm:text-xs sm:text-gray-500"> Svarbumas: {severityLocale[severity as keyof typeof severityLocale]} </p>
 
                     <span className="hidden sm:block" aria-hidden="true">&middot;</span>
 
