@@ -1,9 +1,8 @@
 import prisma from "@/app/utils/prisma/client";
-import { NextApiResponse } from "next/server";
-import { NextResponse } from "next/server";
+import { NextRequest,NextResponse } from "next/server";
 
 export async function GET(
-    request: NextApiResponse,
+    request: NextRequest,
     { params }: { params: { id: Number } }
 ) {
     let project = await prisma.projects.findUnique({

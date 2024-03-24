@@ -2,7 +2,7 @@ import prisma from "@/app/utils/prisma/client";
 import { faults_severity, faults_status } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     if (req.method === 'POST') {
         const data = await req.json();
         console.log('Request data', data);
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         try {
             const fault = await prisma.faults.create({
                 data: {
-                    id: 0, // Assign a valid number value to the 'id' property
+                    id: undefined, // Add the 'id' property
                     projects: undefined, // Add the 'projects' property
                     users: undefined, // Add the 'users' property
                     title,
