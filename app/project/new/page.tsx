@@ -3,6 +3,29 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { NextResponse } from 'next/server';
 
+interface Project {
+  id: number;
+  name: string;
+  short_description: string;
+  long_description: string;
+  repository: string;
+  technologies: string;
+  created_at: string;
+  updated_at: string;
+  star_count: number;
+  contributor_count: number;
+  codebase_visibility: string;
+  fk_imagesid_images: number;
+
+  logo: string;
+  images: {
+      image: {
+          data: Buffer;
+          contentType: string;
+      }
+  }
+}
+
 const NewProjectPage = () => {
   const [projectName, setProjectName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
@@ -31,13 +54,17 @@ const NewProjectPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) return;
+
     const projectData = {
       name: projectName,
       short_description: shortDescription,
       long_description: fullDescription,
       repository,
-      technologies
+      technology: technologies,
+      codebase_visibility: "public",
+      fk_imagesid_images: 3 // TODO: upload a picture
     };
 
     try {
@@ -48,7 +75,7 @@ const NewProjectPage = () => {
       });
       if (response.ok) {
         const result = await response.json();
-        window.location.href = `/project/${result.project.id_project}`;
+        window.location.href = `/project/${result.project.id}`;
       } else {
         return new NextResponse(JSON.stringify({ message: "Error creating project" }), { status: 500, headers: {'Content-Type': 'application/json'} });
       }
