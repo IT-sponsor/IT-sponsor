@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
                     short_description,
                     long_description,
                     repository,
-                    technologies: technology, // Assuming this should be technology based on your data extraction
+                    technologies: technology,
                     created_at: new Date(),
                     updated_at: new Date(),
                     star_count: 0,
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
             return new NextResponse(JSON.stringify({ message: "Error creating project", error: error.message }), { status: 500 });
         }
     } else {
-        console.log(`Method ${req.method} Not Allowed`); // Log if a non-POST method is used
+        console.log(`Method ${req.method} Not Allowed`); 
         return new NextResponse(JSON.stringify({ message: `Method ${req.method} Not Allowed` }), { status: 405 });
     }
 }
