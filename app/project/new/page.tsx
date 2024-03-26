@@ -16,7 +16,6 @@ interface Project {
   contributor_count: number;
   codebase_visibility: string;
   fk_imagesid_images: number;
-
   logo: string;
   images: {
       image: {
@@ -35,11 +34,7 @@ const NewProjectPage = () => {
   const [formErrors, setFormErrors] = useState({});
 
   const defaultDescription = "# Apie įmonę:\n...\n# Apie projektą:\n...";
-
   fullDescription === "" && setFullDescription(defaultDescription);
-  const formattedDefaultDescription = defaultDescription.split("\n").map((item, key) => {
-    return <span key={key}>{item}<br /></span>
-});
 
   const validateForm = () => {
     const newErrors = {};
@@ -64,7 +59,7 @@ const NewProjectPage = () => {
       repository,
       technology: technologies,
       codebase_visibility: "public",
-      fk_imagesid_images: 3 // TODO: upload a picture
+      fk_imagesid_images: 3 // Placeholder for your image logic
     };
 
     try {
@@ -73,14 +68,15 @@ const NewProjectPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(projectData)
       });
+      const result = await response.json();
       if (response.ok) {
-        const result = await response.json();
         window.location.href = `/project/${result.project.id}`;
       } else {
-        return new NextResponse(JSON.stringify({ message: "Error creating project" }), { status: 500, headers: {'Content-Type': 'application/json'} });
+        // If the repository already exists, display an error message next to the repository field
+        setFormErrors({ ...formErrors, repository: result.message });
       }
     } catch (error) {
-      return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500, headers: {'Content-Type': 'application/json'} });
+      setFormErrors({ ...formErrors, apiError: "Network error. Please try again later." });
     }
   };
 
