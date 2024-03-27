@@ -3,8 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer/Footer";
 import Navigation from "./components/Navigation/Navigation";
-import { Providers } from "./api/utils/providers";
-import { RoleProvider } from './login/RoleContext';
+import Providers from "./api/utils/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +20,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
-       <RoleProvider>
           <Providers>
             <Navigation />
             <div className="flex flex-col min-h-screen justify-center">
@@ -31,7 +29,6 @@ export default function RootLayout({
               <Footer />
             </div>
           </Providers>
-        </RoleProvider>
       </body>
     </html>
   );

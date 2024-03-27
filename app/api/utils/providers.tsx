@@ -1,12 +1,13 @@
-/// Needed for client side Seesion access
-"use client";
-
+'use client';
 import { SessionProvider } from "next-auth/react";
+import { FC, ReactNode } from "react";
 
-type Props = {
-  children?: React.ReactNode;
+interface ProviderProps {
+  children: ReactNode;
+}
+
+const Providers: FC<ProviderProps> = ({ children }) => {
+  return <SessionProvider>{ children }</SessionProvider>
 };
 
-export const Providers = ({ children }: Props) => {
-  return <SessionProvider>{children}</SessionProvider>;
-};
+export default Providers;
