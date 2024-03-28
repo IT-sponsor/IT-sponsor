@@ -73,7 +73,7 @@ const ProjectDashboard = ({
                 {canAccess && (
                     <>
                     <Link href={ `/project/${id_project}/fault` } className="py-2 px-4 rounded-lg text-black bg-[#C14040] hover:bg-red-700 transition duration-150 ease-in-out">Kritinės klaidos</Link>
-                    <Link href={ `/project/${id_project}/issue/new` } className="py-2 px-4 rounded-lg text-black bg-[#ffffff] hover:bg-gray-300 transition duration-150 ease-in-out">Pridėti trūkumą</Link>
+                    <Link href={ `/project/${id_project}/issue/new` } className="py-2 px-4 rounded-lg text-black bg-[#6c6c6c] hover:bg-gray-700 transition duration-150 ease-in-out">Pridėti trūkumą</Link>
                     </>
                 )}
             </div>
