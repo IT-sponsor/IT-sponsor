@@ -158,6 +158,7 @@ export default function newFaultPage({ params }: {
                             <textarea
                                 id="description"
                                 placeholder="Atkūrimo veiksmai"
+                                rows={10}
                                 className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
                                 value={faultDescription} onChange={(e) => setFaultDescription(e.target.value)}
                             >

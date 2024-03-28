@@ -66,10 +66,15 @@ const ProjectDashboard = ({
             {/* Buttons after the project card */}
             <div className="mt-4 flex justify-center gap-2">
                 <Link href={repository} target="_blank" rel="noopener noreferrer" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Repositorija</Link>
-                <Link href="#" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Klaidos</Link>
-                <Link href={`/project/${id_project}/fault/new`} className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Pranešti apie kritinę klaidą</Link>
+                <Link href={`/project/${id_project}/issue`} className="py-2 px-4 rounded-lg text-black bg-[#ebda41] hover:bg-yellow-400 transition duration-150 ease-in-out">Trūkumai</Link>
+                {!canAccess && (
+                    <Link href={`/project/${id_project}/fault/new`} className="py-2 px-4 rounded-lg text-black bg-[#C14040] hover:bg-red-700 transition duration-150 ease-in-out">Pranešti apie kritinę klaidą</Link>
+                )}
                 {canAccess && (
-                    <Link href={`/project/${id_project}/fault`} className="py-2 px-4 rounded-lg text-black bg-[#C14040] hover:bg-red-700 transition duration-150 ease-in-out">Kritinės klaidos</Link>
+                    <>
+                    <Link href={ `/project/${id_project}/fault` } className="py-2 px-4 rounded-lg text-black bg-[#C14040] hover:bg-red-700 transition duration-150 ease-in-out">Kritinės klaidos</Link>
+                    <Link href={ `/project/${id_project}/issue/new` } className="py-2 px-4 rounded-lg text-black bg-[#ffffff] hover:bg-gray-300 transition duration-150 ease-in-out">Pridėti trūkumą</Link>
+                    </>
                 )}
             </div>
 
