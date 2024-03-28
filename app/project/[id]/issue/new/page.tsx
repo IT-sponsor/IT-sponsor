@@ -1,7 +1,6 @@
 "use client";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { NextResponse } from "next/server";
-import { title } from "process";
 import { useState, useEffect } from "react";
 
 interface Project {
@@ -27,28 +26,24 @@ interface Project {
     }
 }
 
-interface Fault {
+interface Issue {
     id: number;
     title: string;
-    created_at: string;
     description: string;
-    replication_steps: string;
-    fix_info: string;
-    severity: string;
+    visibility: string;
     status: string;
-    id_project: number; // Project that the fault is associated with
-    user_id: number;    // User that reported the fault
+    id_project: number;
 }
 
-export default function newFaultPage({ params }: {
+export default function newIssuePage({ params }: {
     params: { id: number }
 }) {
     const [project, setProject] = useState<Project>();
     const projectId = params.id;
 
-    const [faultTitle, setFaultTitle] = useState<string>("");
-    const [faultDescription, setFaultDescription] = useState<string>("");
-    const [faultSeverity, setFaultSeverity] = useState<string>("low");
+    const [issueTitle, setIssueTitle] = useState<string>("");
+    const [issueDescription, setIssueDescription] = useState<string>("");
+    const [issueVisibility, setIssueVisibility] = useState<string>("public");
     const [formErrors, setFormErrors] = useState<any>({});
 
     useEffect(() => {
@@ -75,19 +70,18 @@ export default function newFaultPage({ params }: {
         }
       }, [projectId]);
 
-    const defaultDescription = "# Atkūrimo veiksmai:\n...\n# Tikėtinas rezultatas:\n...\n# Realus rezultatas:\n...";
+    const defaultDescription = "# Aprašymas:\n...\n# Priėmimo kriterijai:\n...";
     const formattedDefaultDescription = defaultDescription.split("\n").map((item, key) => {
         return <span key={key}>{item}<br /></span>
     });
 
-    faultDescription === "" && setFaultDescription(defaultDescription);
+    issueDescription === "" && setIssueDescription(defaultDescription);
 
     const formValidated = () => {
         const errors = {};
         
-        if(!faultTitle.trim()) errors.faultTitle = "Pavadinimas negali būti tuščias.";
-        if(!faultDescription.trim()) errors.faultDescription = "Aprašymas negali būti tuščias.";
-        if(!faultSeverity.trim()) errors.faultSeverity = "Svarbumas negali būti tuščias.";
+        if(!issueTitle.trim()) errors.issueTitle = "Pavadinimas negali būti tuščias.";
+        if(!issueDescription.trim()) errors.issueDescription = "Aprašymas negali būti tuščias.";
 
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
@@ -98,27 +92,27 @@ export default function newFaultPage({ params }: {
 
         if(!formValidated()) return;
 
-        const faultData = {
-            title: faultTitle,
-            description: faultDescription,
-            severity: faultSeverity,
+        const issueData = {
+            title: issueTitle,
+            description: issueDescription,
+            visibility: issueVisibility,
             status: "open",
             id_project: Number(projectId),
             user_id: 1 // TODO: Get user id from session
         }
 
         try {
-            const response = await fetch(`/api/project/${projectId}/faults/new`, {
+            const response = await fetch(`/api/project/${projectId}/issues/new`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(faultData)
+                body: JSON.stringify(issueData)
             });
 
             if (response.ok) {
                 const result = await response.json();
-                window.location.href = `/project/${projectId}`; // TODO: Add success message
+                window.location.href = `/project/${projectId}/issue`; // TODO: Add success message
             } else {
-                return new NextResponse(JSON.stringify({ message: "Error creating fault", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+                return new NextResponse(JSON.stringify({ message: "Error creating issue", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
             }
         } catch (error) {
             return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
@@ -142,7 +136,7 @@ export default function newFaultPage({ params }: {
                     </div>
 
                     <div className="px-6 py-5 rounded-xl border-2 border-gray-100 bg-white">
-                        <h1 className="text-2xl font-bold text-gray-800 text-center">Pranešti apie klaidą</h1>
+                        <h1 className="text-2xl font-bold text-gray-800 text-center">Pridėti trūkumo aprašymą</h1>
                         <form onSubmit={handleSubmit} className="flex flex-col items-start justify-center w-[800px]">
                             <label htmlFor="title" className="block text-gray-800 font-bold">Pavadinimas</label>
                             <input
@@ -150,9 +144,9 @@ export default function newFaultPage({ params }: {
                                 id="title"
                                 placeholder="Pavadinimas"
                                 className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-                                value={faultTitle} onChange={(e) => setFaultTitle(e.target.value)}
+                                value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)}
                             />
-                            {formErrors.faultTitle && <div className="text-red-500">{formErrors.faultTitle}</div>}
+                            {formErrors.issueTitle && <div className="text-red-500">{formErrors.issueTitle}</div>}
 
                             <label htmlFor="description" className="block text-gray-800 font-bold mt-4">Aprašymas</label>
                             <textarea
@@ -160,35 +154,33 @@ export default function newFaultPage({ params }: {
                                 placeholder="Atkūrimo veiksmai"
                                 rows={10}
                                 className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-                                value={faultDescription} onChange={(e) => setFaultDescription(e.target.value)}
+                                value={issueDescription} onChange={(e) => setIssueDescription(e.target.value)}
                             >
                             </textarea>
-                            {formErrors.faultDescription && <div className="text-red-500">{formErrors.faultDescription}</div>}
+                            {formErrors.issueDescription && <div className="text-red-500">{formErrors.issueDescription}</div>}
 
 
-                            <label htmlFor="severity" className="block text-gray-800 font-bold mt-4">Svarbumas</label>
+                            <label htmlFor="severity" className="block text-gray-800 font-bold mt-4">Matomumas</label>
                             <select
                                 id="severity"
                                 className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-                                value={faultSeverity} onChange={(e) => setFaultSeverity(e.target.value)}
+                                value={issueVisibility} onChange={(e) => setIssueVisibility(e.target.value)}
                             >
-                                <option value="low">Žemas</option>
-                                <option value="medium">Vidutinis</option>
-                                <option value="high">Aukštas</option>
+                                <option value="public">Viešas</option>
+                                <option value="private">Privatus</option>
                             </select>
-                            {formErrors.faultSeverity && <div className="text-red-500">{formErrors.faultSeverity}</div>}
 
                             <button
                                 type="submit"
                                 className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out mt-4"
                             >
-                                Pranešti
+                                Pridėti
                             </button>
                         </form>
                     </div>
                 </>
             ) : (
-                <div>Loading...</div>
+                <div>Kraunama...</div>
             )}
         </div>
     );
