@@ -93,15 +93,6 @@ export default function viewIssuePage({ params }: {
             {project ? (
                 <>
                     <div className="p-2 w-[800px]">
-                        <ProjectCard
-                            image_url={project.logo}
-                            title={project.name}
-                            description={project.short_description}
-                            timeUpdated={project.updated_at}
-                            issueCount={0}
-                            volunteerCount={0}
-                            tags={project.technologies.split(" ")}
-                        />
                         {issue ? (
                             <>
                                 <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
