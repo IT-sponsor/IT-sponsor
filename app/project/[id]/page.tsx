@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import ProjectDashboard from "../../components/ProjectDashboard/ProjectDashboard";
+import MarkdownDisplay from '@/app/components/MarkdownDisplay/MarkdownDisplay';
 
 interface Project {
     id: number;
@@ -60,18 +60,9 @@ export default function ProjectPage({ params }: {
         <div>
             {project ? (
                 <>
-                    <ProjectDashboard
-                        name={project.name}
-                        short_description={project.short_description}
-                        long_description={project.long_description}
-                        repository={project.repository}
-                        logo={project.logo}
-                        tags={project.technologies.split(' ')}
-                        created_at={project.created_at}
-                        updated_at={project.updated_at}
-                        id_project={project.id}
-                    />
-
+                    <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                        <MarkdownDisplay markdownText={project.long_description} />
+                    </div>
                 </>
             ) : (
                 <p>Loading project details...</p>
