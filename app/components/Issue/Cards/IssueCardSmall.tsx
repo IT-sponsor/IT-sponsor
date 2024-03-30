@@ -35,7 +35,7 @@ const IssueCardSmall = (
     };
 
     return (
-        <Link href={`issue/${id}`} className="rounded-xl border-2 border-gray-100 bg-white w-2/3 mb-3">
+        <Link href={`issue/${id}`} className="rounded-xl border-2 border-gray-100 bg-white w-full mb-3">
             <article>
                 <div className="flex flex-col sm:flex-row items-start gap-4 p-4 sm:px-6 lg:px-8">
                     <div className="flex-grow">
