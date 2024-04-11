@@ -92,22 +92,13 @@ export default function viewFaultPage({ params }: {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center p-6">
+        <div className="flex flex-col items-center justify-center">
             {project ? (
                 <>
                     <div className="p-2 w-[800px]">
-                        <ProjectCard
-                            image_url={project.logo}
-                            title={project.name}
-                            description={project.short_description}
-                            timeUpdated={project.updated_at}
-                            issueCount={0}
-                            volunteerCount={0}
-                            tags={project.technologies.split(" ")}
-                        />
                         {fault ? (
                             <>
-                                <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
+                                <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4">
                                     <div className="px-4 py-5 sm:px-6">
                                         <h2 className="text-lg leading-6 font-medium text-gray-900">{fault.title}</h2>
                                     </div>

@@ -89,19 +89,10 @@ export default function viewIssuePage({ params }: {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center p-6">
+        <div className="flex flex-col items-center justify-center">
             {project ? (
                 <>
                     <div className="p-2 w-[800px]">
-                        <ProjectCard
-                            image_url={project.logo}
-                            title={project.name}
-                            description={project.short_description}
-                            timeUpdated={project.updated_at}
-                            issueCount={0}
-                            volunteerCount={0}
-                            tags={project.technologies.split(" ")}
-                        />
                         {issue ? (
                             <>
                                 <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">

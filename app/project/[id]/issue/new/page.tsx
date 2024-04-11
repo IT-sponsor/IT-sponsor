@@ -120,24 +120,11 @@ export default function newIssuePage({ params }: {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center p-6">
+        <div className="flex flex-col items-center justify-center w-full max-w-5xl">
             {project ? (
                 <>
-                    <div className="p-2 w-[800px] max-h-60">
-                        <ProjectCard
-                            image_url={project.logo}
-                            title={project.name}
-                            description={project.short_description}
-                            timeUpdated={project.updated_at}
-                            issueCount={0}
-                            volunteerCount={0}
-                            tags={project.technologies.split(" ")}
-                        />
-                    </div>
-
-                    <div className="px-6 py-5 rounded-xl border-2 border-gray-100 bg-white">
-                        <h1 className="text-2xl font-bold text-gray-800 text-center">Pridėti trūkumo aprašymą</h1>
-                        <form onSubmit={handleSubmit} className="flex flex-col items-start justify-center w-[800px]">
+                    <div className="px-6 py-5 rounded-xl border-2 border-gray-100 bg-white w-full">
+                        <form onSubmit={handleSubmit} className="flex flex-col items-start justify-center w-full">
                             <label htmlFor="title" className="block text-gray-800 font-bold">Pavadinimas</label>
                             <input
                                 type="text"

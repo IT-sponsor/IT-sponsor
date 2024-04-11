@@ -278,24 +278,26 @@ export default function Home() {
       </div>
 
 
-      {filteredProjects.map((project, index) => (
-        <div className="p-6 w-[800px] max-h-60" key={index}>
-          {/* link to the project page by the id*/}
-          <Link href={`/project/${project.id}`} passHref>
-            <div style={{ cursor: 'pointer' }}>
-              <ProjectCard
-                image_url={project.logo}
-                title={project.name}
-                description={project.short_description}
-                timeUpdated={project.updated_at}
-                issueCount={0}
-                volunteerCount={0}
-                tags={project.technologies.split(' ')}
-              />
-            </div>
-          </Link>
-        </div>
-      ))}
+      <div className='mb-5'>
+        {filteredProjects.map((project, index) => (
+          <div className="my-4 max-w-5xl max-h-60" key={index}>
+            {/* link to the project page by the id*/}
+            <Link href={`/project/${project.id}`} passHref>
+              <div style={{ cursor: 'pointer' }}>
+                <ProjectCard
+                  image_url={project.logo}
+                  title={project.name}
+                  description={project.short_description}
+                  timeUpdated={project.updated_at}
+                  issueCount={0}
+                  volunteerCount={0}
+                  tags={project.technologies.split(' ')}
+                />
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
