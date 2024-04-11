@@ -89,7 +89,7 @@ export default function viewIssuePage({ params }: {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center p-6">
+        <div className="flex flex-col items-center justify-center">
             {project ? (
                 <>
                     <div className="p-2 w-[800px]">

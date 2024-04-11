@@ -1,8 +1,6 @@
 "use client";
-import ProjectCard from '@/app/components/ProjectCard/ProjectCard';
 import IssueCardSmall from '@/app/components/Issue/Cards/IssueCardSmall';
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 
 interface Issue {
     id: number;
