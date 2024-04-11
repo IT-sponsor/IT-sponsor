@@ -22,7 +22,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
           <Providers>
             <Navigation />
-            <div className="flex flex-col min-h-screen justify-center">
+            <div className="flex flex-col min-h-screen justify-center pt-20">
               <main className="flex-grow">
                 {children}
               </main>

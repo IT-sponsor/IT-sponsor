@@ -3,19 +3,15 @@
 import Link from "next/link";
 import { useEffect } from "react";
 
-interface User {
-    name: string;
-    photo: string;
-}
-
 interface FaultCardSmallProps {
     id: number;
     title: string;
     description: string;
     severity: string;
     status: string;
-    reporter_id: number;
     created_at: string;
+    first_name: string;
+    last_name: string;
 }
 
 const FaultCardSmall = (
@@ -25,15 +21,15 @@ const FaultCardSmall = (
         description,
         severity,
         status,
-        reporter_id,
-        created_at
+        created_at,
+        first_name,
+        last_name
     }: FaultCardSmallProps) => {
 
     const user = {
         name: "John Doe",
         photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
     };
-
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'open':
@@ -51,12 +47,8 @@ const FaultCardSmall = (
         high: 'aukštas'
     };
 
-    useEffect(() => {
-        console.log("Get user info for reporter_id: ", reporter_id);
-    }, []);
-
     return (
-        <Link href={`fault/${id}`} className="rounded-xl border-2 border-gray-100 bg-white w-2/3 mb-3">
+        <Link href={`fault/${id}`} className="rounded-xl border-2 border-gray-100 bg-white w-full mb-3">
             <article>
                 <div className="flex flex-col sm:flex-row items-start gap-4 p-4 sm:px-6 lg:px-8">
                     <div className="flex-grow">
@@ -76,11 +68,11 @@ const FaultCardSmall = (
                 <div className="flex sm:flex-row items-center gap-3 sm:px-6 lg:px-8 pb-2">
 
                     <img
-                        alt={user.name}
+                        alt={first_name + ' ' + last_name}
                         src={user.photo}
                         className="h-6 w-6 rounded-full"
                     />
-                    <p className="hidden sm:block sm:text-xs sm:text-gray-500">{user.name}</p>
+                    <p className="hidden sm:block sm:text-xs sm:text-gray-500">{first_name + ' ' + last_name}</p>
 
                     <span className="hidden sm:block" aria-hidden="true">&middot;</span>
 

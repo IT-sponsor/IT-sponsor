@@ -7,7 +7,16 @@ export async function GET(
 ) {
     console.log(params.id);
     let faults = await prisma.faults.findMany({
-        where: { fk_projectsid: Number(params.id) }
+        where: { 
+            fk_projectsid: Number(params.id) 
+        },
+        include: {
+            users: {
+                include: {
+                    images: true
+                }
+            }
+        }
     });
     return NextResponse.json(faults);
 }
