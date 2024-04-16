@@ -3,9 +3,8 @@ import { NextResponse } from "next/server";
 
 export async function GET(
     request: Request,
-    { params }: { params: { issueId: Number, userId: number } }
+    { params }: { params: { issueId: Number, userId: Number } }
 ) {
-    console.log(params);
     let faultApplicants = await prisma.applies.findMany({
         where: { fk_issuesid: Number(params.issueId), fk_usersid: Number(params.userId)}
     });
