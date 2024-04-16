@@ -1,6 +1,7 @@
 "use client";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
+import { set } from "date-fns";
 import { useSession } from "next-auth/react";
 import { NextResponse } from "next/server";
 import { useState, useEffect } from "react";
@@ -130,6 +131,7 @@ export default function viewIssuePage({ params }: {
 
             if (response.ok) {
                 const result = await response.json();
+                setCanApply(false);
                 // Display success message
             } else {
                 return new NextResponse(JSON.stringify({ message: "Error creating applies", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
@@ -149,9 +151,13 @@ export default function viewIssuePage({ params }: {
                                 <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
                                     <div className="px-4 py-5 sm:px-6 flex items-center justify-between">
                                         <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
-                                        {canApply && (
+                                        {canApply ? (
                                             <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={volunteerApplied}>
-                                            Noriu taisyti
+                                                Noriu taisyti
+                                            </button>
+                                        ) : (
+                                            <button className="bg-gray-500 text-white font-bold py-2 px-4 rounded cursor-not-allowed" disabled>
+                                                Laukiama patvirtinimo
                                             </button>
                                         )}                           
                                     </div>
