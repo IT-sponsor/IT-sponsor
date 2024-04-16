@@ -1,6 +1,8 @@
 "use client";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
+import { useSession } from "next-auth/react";
+import { NextResponse } from "next/server";
 import { useState, useEffect } from "react";
 
 interface Project {
@@ -40,6 +42,8 @@ export default function viewIssuePage({ params }: {
 }) {
     const [project, setProject] = useState<Project>();
     const [issue, setIssue] = useState<Issue>();
+    const [canApply, setCanApply] = useState(false);
+    const { data: session } = useSession();
     const projectId = params.id;
     const issueId = params.issueId;
 
@@ -59,7 +63,6 @@ export default function viewIssuePage({ params }: {
                     } else {
                         console.error("No image data found");
 
-
                         setProject(data);
                     }
                 })
@@ -78,6 +81,31 @@ export default function viewIssuePage({ params }: {
         }
     }, [issueId]);
 
+    // TODO: check if user already applied to this issue
+    useEffect(() => {
+        const fetchAccess = async () => {
+            try {
+                let hasAccess = false;
+                let hasApplied = false;
+                const response = await fetch(`/api/controls/${projectId}`);
+                const data = await response.json();
+                if (data.length > 0) {
+                    const ownerId = data[0].fk_usersid.toString();
+                    hasAccess = ownerId === session?.user?.id;
+                }
+                const response2 = await fetch(`/api/applies/${issueId}/${session?.user?.id}`);
+                const data2 = await response2.json();
+                if (data2.length > 0) {
+                    hasApplied = true;
+                }
+                setCanApply(!hasAccess && !hasApplied);
+            } catch (error) {
+                console.error('Error fetching controls:', error);
+            }
+        };
+        fetchAccess();
+    }, [projectId, session]);
+
     const statusLocale = {
         open: 'Aktyvus',
         closed: 'Uždarytas'
@@ -88,6 +116,29 @@ export default function viewIssuePage({ params }: {
         private: 'Privatus'
     };
 
+    async function volunteerApplied () {
+        const appliesData = {
+            id_user: Number(session?.user?.id),
+            id_issue: Number(issueId)
+        }
+        try {
+            const response = await fetch(`/api/applies/new`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(appliesData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                // Display success message
+            } else {
+                return new NextResponse(JSON.stringify({ message: "Error creating applies", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+            }
+        } catch (error) {
+            return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+        }
+    }
+
     return (
         <div className="flex flex-col items-center justify-center">
             {project ? (
@@ -96,8 +147,13 @@ export default function viewIssuePage({ params }: {
                         {issue ? (
                             <>
                                 <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
-                                    <div className="px-4 py-5 sm:px-6">
+                                    <div className="px-4 py-5 sm:px-6 flex items-center justify-between">
                                         <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
+                                        {canApply && (
+                                            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={volunteerApplied}>
+                                            Noriu taisyti
+                                            </button>
+                                        )}                           
                                     </div>
                                     <div className="border-t border-gray-200">
                                         <dl>

@@ -129,17 +129,6 @@ export default function newFaultPage({ params }: {
         <div className="flex flex-col items-center justify-center p-6">
             {project ? (
                 <>
-                    <div className="p-2 w-[800px] max-h-60">
-                        <ProjectCard
-                            image_url={project.logo}
-                            title={project.name}
-                            description={project.short_description}
-                            timeUpdated={project.updated_at}
-                            issueCount={0}
-                            volunteerCount={0}
-                            tags={project.technologies.split(" ")}
-                        />
-                    </div>
 
                     <div className="px-6 py-5 rounded-xl border-2 border-gray-100 bg-white">
                         <h1 className="text-2xl font-bold text-gray-800 text-center">Pranešti apie klaidą</h1>

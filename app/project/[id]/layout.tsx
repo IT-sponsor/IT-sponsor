@@ -97,12 +97,16 @@ export default function ProjectLayout({
                 {
                     name: "Klaidos",
                     link: `/project/${projectId}/fault`
+                },
+                {
+                    name: "Naujas trūkumas",
+                    link: `/project/${projectId}/issue/new`
                 }
             ]
             : [
                 {
-                    name: "Naujas trūkumas",
-                    link: `/project/${projectId}/issue/new`
+                    name: "Nauja klaida",
+                    link: `/project/${projectId}/fault/new`
                 }
             ])
     ];
