@@ -1,43 +1,73 @@
 import prisma from "@/app/utils/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { projects_codebase_visibility } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
-    console.log('Request received', req); // incoming request
-    if (req.method === 'POST') {
-        const data = await req.json();
-        console.log('Request data', data); 
-        const { name, short_description, long_description, repository, technology } = data;
+  console.log("POST /api/project/new");
+  const formData = await req.formData();
+  
+  const name = formData.get("name") as string;
+  const short_description = formData.get("short_description") as string;
+  const long_description = formData.get("long_description") as string;
+  const repository = formData.get("repository") as string;
+  const technologies = formData.get("technologies") as string;
+  const star_count = Number(formData.get("star_count")) || 0;
+  const contributor_count = Number(formData.get("contributor_count")) || 0;
+  const codebase_visibility = formData.get("codebase_visibility") as projects_codebase_visibility || projects_codebase_visibility.public;
+  const image = formData.get("image") as File || null;
 
-        // retrieves highest current id and ++
-        try {
-            const lastProject = await prisma.projects.findFirst({
-                orderBy: {
-                    id: 'desc',
-                },
-            }); 
+  
 
-            const newId = lastProject ? lastProject.id + 1 : 1; // if there are no projects 
+  try {
+    let imageId = null;
+    if(image) {
+      const imageFormData = new FormData();
+      imageFormData.append("image", image);
+      console.log("imageFormData", imageFormData)
 
-            const project = await prisma.projects.create({
-                data: {
-                    id: newId,
-                    name,
-                    short_description,
-                    long_description,
-                    repository,
-                    technologies,
-                    created_at: new Date(),
-                    updated_at: new Date(),
-                },
-            }); // Create new project in the database
+      const imageResponse = await fetch("http://localhost:3000/api/image/upload", {
+        method: "POST",
+        body: imageFormData,
+      });
 
-            console.log('Project created', project); 
-            return new NextResponse(JSON.stringify({ message: "Project created successfully", project }), { status: 201 }); 
+      if (!imageResponse.ok) {
+        return new NextResponse(
+          JSON.stringify({ message: "Error uploading image" }),
+          { status: 500 }
+        );
+      }
 
-        } catch (error) {
-            return new NextResponse(JSON.stringify({ message: "Error creating project", error: error.message }), { status: 500 }); 
-        }
-    } else {
-        return new NextResponse(JSON.stringify({ message: `Method ${req.method} Not Allowed` }), { status: 405 });
+      const imageResponseData = await imageResponse.json();
+      imageId = imageResponseData.upload.id_images;
     }
+
+    const project = await prisma.projects.create({
+      data: {
+        name,
+        short_description,
+        long_description,
+        repository,
+        technologies,
+        star_count,
+        contributor_count,
+        codebase_visibility,
+        created_at: new Date(),
+        updated_at: new Date(),
+        fk_imagesid_images: imageId,
+      },
+    });
+
+    console.log("Project created", project);
+    return new NextResponse(
+      JSON.stringify({ message: "Project created successfully", project }),
+      { status: 201 }
+    );
+  
+  } catch (e: any) {
+    console.error("Error while trying to create project\n", e);
+    return new NextResponse(
+      JSON.stringify({ message: "Something went wrong." }),
+      { status: 500 }
+    );
+  }
 }

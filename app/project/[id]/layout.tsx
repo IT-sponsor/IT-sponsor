@@ -103,6 +103,10 @@ export default function ProjectLayout({
                 {
                     name: "Klaidos",
                     link: `/project/${projectId}/fault`
+                },
+                {
+                    name: "Redaguoti projektą",
+                    link: `/project/${projectId}/edit`
                 }
             ]
             : [
