@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import MarkdownDisplay from '@/app/components/MarkdownDisplay/MarkdownDisplay';
+import Spinner from '@/app/components/Loading/Spinner';
 
 interface Project {
     id: number;
@@ -29,6 +30,7 @@ export default function ProjectPage({ params }: {
     params: { id: number }
 }) {
     const [project, setProject] = useState<Project | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const projectId = params.id;
 
@@ -44,12 +46,15 @@ export default function ProjectPage({ params }: {
                             ...data,
                             logo: `data:image/jpeg;base64,${base64String}`
                         };
-                        setProject(modifiedProject);
+                        setTimeout(() => {
+                            setProject(modifiedProject);
+                            setLoading(false);
+                        }, 300);
+
                     } else {
                         console.error("No image data found");
-
-
                         setProject(data);
+                        setLoading(false);
                     }
                 })
                 .catch(console.error);
@@ -57,15 +62,23 @@ export default function ProjectPage({ params }: {
     }, [projectId]);
 
     return (
-        <div>
-            {project ? (
-                <>
-                    <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
-                        <MarkdownDisplay markdownText={project.long_description} />
-                    </div>
-                </>
+        <div className='w-full flex flex-col justify-center items-center'>
+            {loading ? (
+                <div className='mt-5'>
+                    <Spinner />
+                </div>
             ) : (
-                <p>Loading project details...</p>
+                <>
+                    {project ? (
+                        <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                            <MarkdownDisplay markdownText={project.long_description} />
+                        </div>
+                    ) : (
+                        <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                            <h1 className='text-2xl font-bold'>Nepavyko užkrauti duomenų. Pabandykite iš naujo</h1>
+                        </div>
+                    )}
+                </>
             )}
         </div>
 
