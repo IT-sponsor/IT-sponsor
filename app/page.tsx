@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
+
 import Link from "next/link";
 
 import ProjectCard from "./components/ProjectCard/ProjectCard";
@@ -34,6 +35,8 @@ export default function Home() {
   const [sortBy, setSortBy] = useState('newest_updated');
   const [filterBy, setFilterBy] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+
 
   const filterDropdownRef = useRef(null);
   const sortDropdownRef = useRef(null);
@@ -52,18 +55,22 @@ export default function Home() {
       .then(res => res.json())
       .then(data => {
         const modifiedData = data.map((project: Project) => {
-          // Convert buffer to base64 string
           const logoData = project.images.image.data;
           const base64String = Buffer.from(logoData).toString('base64');
           return {
             ...project,
-            logo: `data:image/jpeg;base64,${base64String}` // Assuming the logo is JPEG
+            logo: `data:image/jpeg;base64,${base64String}`
           };
         });
         setProjects(modifiedData);
+        setLoading(false);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
+  
 
   useEffect(() => {
     document.addEventListener('mousedown', closeDropdowns);
@@ -279,24 +286,31 @@ export default function Home() {
 
 
       <div className='mb-5'>
-        {filteredProjects.map((project, index) => (
-          <div className="my-4 max-w-5xl max-h-60" key={index}>
-            {/* link to the project page by the id*/}
-            <Link href={`/project/${project.id}`} passHref>
-              <div style={{ cursor: 'pointer' }}>
-                <ProjectCard
-                  image_url={project.logo}
-                  title={project.name}
-                  description={project.short_description}
-                  timeUpdated={project.updated_at}
-                  issueCount={0}
-                  volunteerCount={0}
-                  tags={project.technologies.split(' ')}
-                />
-              </div>
-            </Link>
+        {loading ? (
+          <div className="text-center text-lg text-gray-600">Kraunama...</div>
+        ) : filteredProjects.length > 0 ? (
+          filteredProjects.map((project, index) => (
+            <div className="my-4 max-w-5xl max-h-60" key={index}>
+              <Link href={`/project/${project.id}`} passHref>
+                <div style={{ cursor: 'pointer' }}>
+                  <ProjectCard
+                    image_url={project.logo}
+                    title={project.name}
+                    description={project.short_description}
+                    timeUpdated={project.updated_at}
+                    issueCount={0}
+                    volunteerCount={0}
+                    tags={project.technologies.split(' ')}
+                  />
+                </div>
+              </Link>
+            </div>
+          ))
+        ) : searchQuery.length > 0 && (
+          <div className="mt-5 text-center text-lg text-gray-600">
+            Nė vienas projektas neatitinka jūsų paieškos kriterijų. Išbandykite kitus raktinius žodžius arba filtrus.
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
