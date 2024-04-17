@@ -1,15 +1,18 @@
 "use client";
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { NextResponse } from '@/node_modules/next/server';
-//import { error } from 'console';
+
+import React from "react";
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
 const NewProjectPage = () => {
   const [projectName, setProjectName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [repository, setRepository] = useState('');
   const [technologies, setTechnologies] = useState('');
-  const [fullDescription, setFullDescription] = useState('');
+  const [fullDescription, setFullDescription] = useState('# Hello world!');
   const [formErrors, setFormErrors] = useState({});
 
   const validateForm = () => {
@@ -86,7 +89,12 @@ const NewProjectPage = () => {
 
           <div>
             <label htmlFor="fullDescription" className="block">Pilnas aprašymas</label>
-            <textarea id="fullDescription" value={fullDescription} onChange={(e) => setFullDescription(e.target.value)} className="mt-1 p-2 w-full border rounded-md"></textarea>
+            <SimpleMDE 
+              value={fullDescription} 
+              onChange={(value) => setFullDescription(value)}
+              options={{ toolbar: ["bold", "italic", "heading", "quote", "link", "image", "table", "|", "preview", "guide"] }} 
+            />
+            {/* <textarea id="fullDescription" value={fullDescription} onChange={(e) => setFullDescription(e.target.value)} className="mt-1 p-2 w-full border rounded-md"></textarea> */}
             {formErrors.fullDescription && <div className="text-red-500">{formErrors.fullDescription}</div>}
           </div>
           
