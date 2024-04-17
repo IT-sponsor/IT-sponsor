@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import MarkdownDisplay from '@/app/components/MarkdownDisplay/MarkdownDisplay';
 import Spinner from '@/app/components/Loading/Spinner';
+import CompanyDefault from '@/public/assets/CompanyDefault.png';
 
 interface Project {
     id: number;
@@ -39,23 +40,10 @@ export default function ProjectPage({ params }: {
             fetch(`/api/project/${projectId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.images.image.data) {
-                        const logoData = data.images.image.data
-                        const base64String = Buffer.from(logoData).toString('base64');
-                        const modifiedProject = {
-                            ...data,
-                            logo: `data:image/jpeg;base64,${base64String}`
-                        };
-                        setTimeout(() => {
-                            setProject(modifiedProject);
-                            setLoading(false);
-                        }, 300);
-
-                    } else {
-                        console.error("No image data found");
+                    setTimeout(() => {
                         setProject(data);
                         setLoading(false);
-                    }
+                    }, 500);
                 })
                 .catch(console.error);
         }

@@ -1,8 +1,11 @@
 "use client";
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { NextResponse } from "next/server";
 import { title } from "process";
-import { useState, useEffect } from "react";
+
+import SimpleMDE, { SimpleMdeReact } from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
 interface Project {
     id: number;
@@ -51,12 +54,88 @@ export default function newFaultPage({ params }: {
     const [faultSeverity, setFaultSeverity] = useState<string>("low");
     const [formErrors, setFormErrors] = useState<any>({});
 
+    const onMarkdownChange = useCallback((value: string) => {
+        setFaultDescription(value);
+    }, []);
+
+    const MarkdownSettings = useMemo(() => {
+        return {
+            autofocus: true,
+            status: false,
+            toolbar: [
+                {
+                    name: "bold",
+                    action: SimpleMDE.toggleBold,
+                    className: "fa fa-bold",
+                    title: "Paryškinti",
+                },
+                {
+                    name: "italic",
+                    action: SimpleMDE.toggleItalic,
+                    className: "fa fa-italic",
+                    title: "Kursyvinis",
+                },
+                {
+                    name: "heading",
+                    action: SimpleMDE.toggleHeadingSmaller,
+                    className: "fa fa-header",
+                    title: "Antraštė",
+                },
+                "|",
+                {
+                    name: "quote",
+                    action: SimpleMDE.toggleBlockquote,
+                    className: "fa fa-quote-left",
+                    title: "Citata",
+                },
+                {
+                    name: "unordered-list",
+                    action: SimpleMDE.toggleUnorderedList,
+                    className: "fa fa-list-ul",
+                    title: "Sąrašas",
+                },
+                {
+                    name: "ordered-list",
+                    action: SimpleMDE.toggleOrderedList,
+                    className: "fa fa-list-ol",
+                    title: "Numeruotas sąrašas",
+                },
+                "|",
+                {
+                    name: "link",
+                    action: SimpleMDE.drawLink,
+                    className: "fa fa-link",
+                    title: "Nuoroda",
+                },
+                {
+                    name: "image",
+                    action: SimpleMDE.drawImage,
+                    className: "fa fa-image",
+                    title: "Paveikslėlis",
+                },
+                {
+                    name: "table",
+                    action: SimpleMDE.drawTable,
+                    className: "fa fa-table",
+                    title: "Lentelė",
+                },
+                "|",
+                {
+                    name: "preview",
+                    action: SimpleMDE.togglePreview,
+                    className: "fa fa-eye no-disable",
+                    title: "Peržiūra",
+                }
+            ]
+        } as SimpleMde.Options;
+    }, []);
+
     useEffect(() => {
         if (projectId) {
           fetch(`/api/project/${projectId}`)
             .then(res => res.json())
             .then(data => {
-              if (data && data.images.image.data) {
+              if (data && data.images) {
                 const logoData = data.images.image.data
                 const base64String = Buffer.from(logoData).toString('base64');
                 const modifiedProject = {
@@ -129,18 +208,6 @@ export default function newFaultPage({ params }: {
         <div className="flex flex-col items-center justify-center p-6">
             {project ? (
                 <>
-                    <div className="p-2 w-[800px] max-h-60">
-                        <ProjectCard
-                            image_url={project.logo}
-                            title={project.name}
-                            description={project.short_description}
-                            timeUpdated={project.updated_at}
-                            issueCount={0}
-                            volunteerCount={0}
-                            tags={project.technologies.split(" ")}
-                        />
-                    </div>
-
                     <div className="px-6 py-5 rounded-xl border-2 border-gray-100 bg-white">
                         <h1 className="text-2xl font-bold text-gray-800 text-center">Pranešti apie klaidą</h1>
                         <form onSubmit={handleSubmit} className="flex flex-col items-start justify-center w-[800px]">
@@ -155,14 +222,13 @@ export default function newFaultPage({ params }: {
                             {formErrors.faultTitle && <div className="text-red-500">{formErrors.faultTitle}</div>}
 
                             <label htmlFor="description" className="block text-gray-800 font-bold mt-4">Aprašymas</label>
-                            <textarea
-                                id="description"
-                                placeholder="Atkūrimo veiksmai"
-                                rows={10}
-                                className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-                                value={faultDescription} onChange={(e) => setFaultDescription(e.target.value)}
-                            >
-                            </textarea>
+                            <SimpleMdeReact
+                                className='w-full'
+                                autoFocus={true}
+                                value={faultDescription}
+                                onChange={onMarkdownChange}
+                                options={MarkdownSettings}
+                            />
                             {formErrors.faultDescription && <div className="text-red-500">{formErrors.faultDescription}</div>}
 
 

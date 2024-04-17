@@ -1,24 +1,96 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { NextResponse } from 'next/server';
 import { error } from 'console';
+
+import SimpleMDE, { SimpleMdeReact } from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
 const NewProjectPage = () => {
   const [projectName, setProjectName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [repository, setRepository] = useState('');
   const [technologies, setTechnologies] = useState('');
-  const [fullDescription, setFullDescription] = useState('');
+  const [fullDescription, setFullDescription] = useState("# Apie įmonę:\n...\n# Apie projektą:\n...");
   const [image, setImage] = useState<File | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, any>>({});
 
-  const defaultDescription = "# Apie įmonę:\n...\n# Apie projektą:\n...";
+  const onMarkdownChange = useCallback((value: string) => {
+    setFullDescription(value);
+  }, []);
 
-  fullDescription === "" && setFullDescription(defaultDescription);
-  const formattedDefaultDescription = defaultDescription.split("\n").map((item, key) => {
-    return <span key={key}>{item}<br /></span>
-  });
+  const MarkdownSettings = useMemo(() => {
+    return {
+      autofocus: true,
+      status: false,
+      toolbar: [
+        {
+          name: "bold",
+          action: SimpleMDE.toggleBold,
+          className: "fa fa-bold",
+          title: "Paryškinti",
+        },
+        {
+          name: "italic",
+          action: SimpleMDE.toggleItalic,
+          className: "fa fa-italic",
+          title: "Kursyvinis",
+        },
+        {
+          name: "heading",
+          action: SimpleMDE.toggleHeadingSmaller,
+          className: "fa fa-header",
+          title: "Antraštė",
+        },
+        "|",
+        {
+          name: "quote",
+          action: SimpleMDE.toggleBlockquote,
+          className: "fa fa-quote-left",
+          title: "Citata",
+        },
+        {
+          name: "unordered-list",
+          action: SimpleMDE.toggleUnorderedList,
+          className: "fa fa-list-ul",
+          title: "Sąrašas",
+        },
+        {
+          name: "ordered-list",
+          action: SimpleMDE.toggleOrderedList,
+          className: "fa fa-list-ol",
+          title: "Numeruotas sąrašas",
+        },
+        "|",
+        {
+          name: "link",
+          action: SimpleMDE.drawLink,
+          className: "fa fa-link",
+          title: "Nuoroda",
+        },
+        {
+          name: "image",
+          action: SimpleMDE.drawImage,
+          className: "fa fa-image",
+          title: "Paveikslėlis",
+        },
+        {
+          name: "table",
+          action: SimpleMDE.drawTable,
+          className: "fa fa-table",
+          title: "Lentelė",
+        },
+        "|",
+        {
+          name: "preview",
+          action: SimpleMDE.togglePreview,
+          className: "fa fa-eye no-disable",
+          title: "Peržiūra",
+        }
+      ]
+    } as SimpleMde.Options;
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, any> = {};
@@ -115,25 +187,26 @@ const NewProjectPage = () => {
           {formErrors.technologies && <div className="text-red-500">{formErrors.technologies}</div>}
 
 
+
           <label htmlFor="fullDescription" className="block text-gray-800 font-bold mt-4">Pilnas aprašymas</label>
-          <textarea
-            id="fullDescription"
-            placeholder="Aprašymas"
-            className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-            value={fullDescription} onChange={(e) => setFullDescription(e.target.value)}
-          >
-          </textarea>
+          <SimpleMdeReact
+            className='w-full'
+            autoFocus={true}
+            value={fullDescription}
+            onChange={onMarkdownChange}
+            options={MarkdownSettings}
+          />
           {formErrors.fullDescription && <div className="text-red-500">{formErrors.fullDescription}</div>}
 
           <div id="image-preview" className="max-w-sm p-6 mb-4 bg-gray-100 border-dashed border-2 border-gray-400 rounded-lg items-center mx-auto text-center cursor-pointer mt-2">
-            
+
             {image && (
               <label htmlFor="upload" className='cursor-pointer'>
-              <img
-                src={URL.createObjectURL(image)}
-                alt='image-preview'
-                className="max-h-48 rounded-lg mx-auto"
-              />
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt='image-preview'
+                  className="max-h-48 rounded-lg mx-auto"
+                />
               </label>
             ) || (
                 <>

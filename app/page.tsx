@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import ProjectCard from "./components/ProjectCard/ProjectCard";
 import ProjectCardSkeleton from './components/ProjectCard/ProjectCardSkeleton';
+import CompanyDefault from '@/public/assets/CompanyDefault.png';
 
 interface Project {
   id: number;
@@ -56,12 +57,20 @@ export default function Home() {
       .then(res => res.json())
       .then(data => {
         const modifiedData = data.map((project: Project) => {
-          const logoData = project.images.image.data;
-          const base64String = Buffer.from(logoData).toString('base64');
-          return {
-            ...project,
-            logo: `data:image/jpeg;base64,${base64String}`
-          };
+          if(project.images) {
+            console.log("HEREEEEEEEEEEEEE");
+            const logoData = project.images.image.data;
+            const base64String = Buffer.from(logoData).toString('base64');
+            return {
+              ...project,
+              logo: `data:image/jpeg;base64,${base64String}`
+            };
+          } else {
+            return {
+              ...project,
+              logo: CompanyDefault.src
+            };
+          }
         });
         setTimeout(() => {
           setProjects(modifiedData);
@@ -73,7 +82,6 @@ export default function Home() {
         setLoading(false);
       });
   }, []);
-  
 
   useEffect(() => {
     document.addEventListener('mousedown', closeDropdowns);

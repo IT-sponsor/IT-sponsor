@@ -50,7 +50,7 @@ export default function viewFaultPage({ params }: {
             fetch(`/api/project/${projectId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.images.image.data) {
+                    if (data && data.images) {
                         const logoData = data.images.image.data
                         const base64String = Buffer.from(logoData).toString('base64');
                         const modifiedProject = {

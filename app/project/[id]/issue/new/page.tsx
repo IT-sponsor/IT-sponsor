@@ -1,7 +1,10 @@
 "use client";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { NextResponse } from "next/server";
-import { useState, useEffect } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+
+import SimpleMDE, { SimpleMdeReact } from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
 interface Project {
     id: number;
@@ -46,29 +49,103 @@ export default function newIssuePage({ params }: {
     const [issueVisibility, setIssueVisibility] = useState<string>("public");
     const [formErrors, setFormErrors] = useState<any>({});
 
+    const onMarkdownChange = useCallback((value: string) => {
+        setIssueDescription(value);
+    }, []);
+
+    const MarkdownSettings = useMemo(() => {
+        return {
+            autofocus: true,
+            status: false,
+            toolbar: [
+                {
+                    name: "bold",
+                    action: SimpleMDE.toggleBold,
+                    className: "fa fa-bold",
+                    title: "Paryškinti",
+                },
+                {
+                    name: "italic",
+                    action: SimpleMDE.toggleItalic,
+                    className: "fa fa-italic",
+                    title: "Kursyvinis",
+                },
+                {
+                    name: "heading",
+                    action: SimpleMDE.toggleHeadingSmaller,
+                    className: "fa fa-header",
+                    title: "Antraštė",
+                },
+                "|",
+                {
+                    name: "quote",
+                    action: SimpleMDE.toggleBlockquote,
+                    className: "fa fa-quote-left",
+                    title: "Citata",
+                },
+                {
+                    name: "unordered-list",
+                    action: SimpleMDE.toggleUnorderedList,
+                    className: "fa fa-list-ul",
+                    title: "Sąrašas",
+                },
+                {
+                    name: "ordered-list",
+                    action: SimpleMDE.toggleOrderedList,
+                    className: "fa fa-list-ol",
+                    title: "Numeruotas sąrašas",
+                },
+                "|",
+                {
+                    name: "link",
+                    action: SimpleMDE.drawLink,
+                    className: "fa fa-link",
+                    title: "Nuoroda",
+                },
+                {
+                    name: "image",
+                    action: SimpleMDE.drawImage,
+                    className: "fa fa-image",
+                    title: "Paveikslėlis",
+                },
+                {
+                    name: "table",
+                    action: SimpleMDE.drawTable,
+                    className: "fa fa-table",
+                    title: "Lentelė",
+                },
+                "|",
+                {
+                    name: "preview",
+                    action: SimpleMDE.togglePreview,
+                    className: "fa fa-eye no-disable",
+                    title: "Peržiūra",
+                }
+            ]
+        } as SimpleMde.Options;
+    }, []);
+
     useEffect(() => {
         if (projectId) {
-          fetch(`/api/project/${projectId}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data && data.images.image.data) {
-                const logoData = data.images.image.data
-                const base64String = Buffer.from(logoData).toString('base64');
-                const modifiedProject = {
-                  ...data,
-                  logo: `data:image/jpeg;base64,${base64String}`
-                };
-                setProject(modifiedProject);
-              } else {
-                console.error("No image data found");
-    
-    
-                setProject(data);
-              }
-            })
-            .catch(console.error);
+            fetch(`/api/project/${projectId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.images) {
+                        const logoData = data.images.image.data
+                        const base64String = Buffer.from(logoData).toString('base64');
+                        const modifiedProject = {
+                            ...data,
+                            logo: `data:image/jpeg;base64,${base64String}`
+                        };
+                        setProject(modifiedProject);
+                    } else {
+                        console.error("No image data found");
+                        setProject(data);
+                    }
+                })
+                .catch(console.error);
         }
-      }, [projectId]);
+    }, [projectId]);
 
     const defaultDescription = "# Aprašymas:\n...\n# Priėmimo kriterijai:\n...";
     const formattedDefaultDescription = defaultDescription.split("\n").map((item, key) => {
@@ -79,9 +156,9 @@ export default function newIssuePage({ params }: {
 
     const formValidated = () => {
         const errors = {};
-        
-        if(!issueTitle.trim()) errors.issueTitle = "Pavadinimas negali būti tuščias.";
-        if(!issueDescription.trim()) errors.issueDescription = "Aprašymas negali būti tuščias.";
+
+        if (!issueTitle.trim()) errors.issueTitle = "Pavadinimas negali būti tuščias.";
+        if (!issueDescription.trim()) errors.issueDescription = "Aprašymas negali būti tuščias.";
 
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
@@ -90,7 +167,7 @@ export default function newIssuePage({ params }: {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if(!formValidated()) return;
+        if (!formValidated()) return;
 
         const issueData = {
             title: issueTitle,
@@ -136,14 +213,13 @@ export default function newIssuePage({ params }: {
                             {formErrors.issueTitle && <div className="text-red-500">{formErrors.issueTitle}</div>}
 
                             <label htmlFor="description" className="block text-gray-800 font-bold mt-4">Aprašymas</label>
-                            <textarea
-                                id="description"
-                                placeholder="Atkūrimo veiksmai"
-                                rows={10}
-                                className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-                                value={issueDescription} onChange={(e) => setIssueDescription(e.target.value)}
-                            >
-                            </textarea>
+                            <SimpleMdeReact
+                                className='w-full'
+                                autoFocus={true}
+                                value={issueDescription}
+                                onChange={onMarkdownChange}
+                                options={MarkdownSettings}
+                            />
                             {formErrors.issueDescription && <div className="text-red-500">{formErrors.issueDescription}</div>}
 
 
