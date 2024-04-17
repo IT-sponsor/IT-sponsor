@@ -26,24 +26,22 @@ interface Project {
     }
 }
 
-interface Fault {
+interface Issue {
     id: number;
     title: string;
-    created_at: string;
     description: string;
-    severity: string;
+    visibility: string;
     status: string;
-    fk_projectid: number;
-    fk_userid: number;
+    id_project: number;
 }
 
-export default function viewFaultPage({ params }: {
-    params: { id: number, faultId: number }
+export default function viewIssuePage({ params }: {
+    params: { id: number, issueId: number }
 }) {
     const [project, setProject] = useState<Project>();
-    const [fault, setFault] = useState<Fault>();
+    const [issue, setIssue] = useState<Issue>();
     const projectId = params.id;
-    const faultId = params.faultId;
+    const issueId = params.issueId;
 
     useEffect(() => {
         if (projectId) {
@@ -70,25 +68,24 @@ export default function viewFaultPage({ params }: {
     }, [projectId]);
 
     useEffect(() => {
-        if (faultId) {
-            fetch(`/api/project/${projectId}/faults/${faultId}`)
+        if (issueId) {
+            fetch(`/api/project/${projectId}/issues/${issueId}`)
                 .then(res => res.json())
                 .then(data => {
-                    setFault(data);
+                    setIssue(data);
                 })
                 .catch(console.error);
         }
-    }, [faultId]);
-
-    const severityLocale = {
-        low: 'žemas',
-        medium: 'vidutinis',
-        high: 'aukštas'
-    };
+    }, [issueId]);
 
     const statusLocale = {
-        open: 'atviras',
-        closed: 'uždarytas'
+        open: 'Aktyvus',
+        closed: 'Uždarytas'
+    };
+
+    const visibilityLocale = {
+        public: 'Viešas',
+        private: 'Privatus'
     };
 
     return (
@@ -96,38 +93,33 @@ export default function viewFaultPage({ params }: {
             {project ? (
                 <>
                     <div className="p-2 w-[800px]">
-                        {fault ? (
+                        {issue ? (
                             <>
-                                <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4">
+                                <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
                                     <div className="px-4 py-5 sm:px-6">
-                                        <h2 className="text-lg leading-6 font-medium text-gray-900">{fault.title}</h2>
+                                        <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
                                     </div>
                                     <div className="border-t border-gray-200">
                                         <dl>
-                                            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                                <dt className="text-sm font-medium text-gray-500">Svarbumas</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{severityLocale[fault.severity as keyof typeof severityLocale]}</dd>
-                                            </div>
-                                            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                                <dt className="text-sm font-medium text-gray-500">Statusas</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{statusLocale[fault.status as keyof typeof statusLocale]}</dd>
-                                            </div>
                                             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                                <dt className="text-sm font-medium text-gray-500">Atkūrimo veiksmai</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><MarkdownDisplay markdownText={fault.description} /></dd>
+                                                <dt className="text-sm font-medium text-gray-500">Statusas</dt>
+                                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{statusLocale[issue.status as keyof typeof statusLocale]}</dd>
+                                            </div>
+                                            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                                <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><MarkdownDisplay markdownText={issue.description} /></div>
                                             </div>
                                         </dl>
                                     </div>
                                 </div>
                             </>
                         ) : (
-                            <p>Loading...</p>
+                            <p>Kraunama...</p>
                         )}
                     </div>
 
                 </>
             ) : (
-                <p>Loading...</p>
+                <p>Kraunama...</p>
             )}
         </div>
     )

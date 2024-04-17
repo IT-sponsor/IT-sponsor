@@ -80,7 +80,7 @@ model images {
 }
 
 model issues {
-  id            Int                @id
+  id            Int                @id @default(autoincrement())
   title         String?            @db.VarChar(255)
   description   String?            @db.VarChar(4000)
   status        issues_status?

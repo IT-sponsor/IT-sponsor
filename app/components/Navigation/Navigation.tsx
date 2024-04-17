@@ -1,27 +1,20 @@
 "use client";
 import Link from "next/link";
 import Logo from "@/public/assets/logo_icon.svg";
-import LogoIcon from "@/public/assets/work.svg";
 import Image from "next/image";
-import { cookies } from "next/headers";
 import { useState, useEffect } from "react";
-import { useContext } from 'react';
-import RoleContext from '@/app/login/RoleContext';
-import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
+
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const {role} = useContext(RoleContext);
- 
+  const { data: session } = useSession();
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  const router = useRouter();
-  const handleClick = () => {
-    router.push("/login");
-  }
-
+  
   const closeDropdowns = (event: MouseEvent) => {
     if (event.target !== document.getElementById("user-menu-button")) {
       setIsMenuOpen(false);
@@ -36,7 +29,7 @@ export default function Navigation() {
   }, []);
 
   return (
-    <nav className="bg-gray-800">
+    <nav className="bg-gray-800 fixed top-0 w-full z-50">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -63,10 +56,12 @@ export default function Navigation() {
             </button>
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <div className="flex flex-shrink-0 items-center">
-              <Image src={Logo} alt="Logo" className="h-8 w-auto" />
-              <span className="ml-2 text-white text-2xl font-bold ">IT Rėmėjas</span>
-            </div>
+            <Link href="/">
+              <div className="flex flex-shrink-0 items-center cursor-pointer">
+                <Image src={Logo} alt="Logo" className="h-8 w-auto" />
+                <span className="ml-2 text-white text-2xl font-bold">IT Rėmėjas</span>
+              </div>
+            </Link>
             {/* <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">
                 <a href="#" className="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Dashboard</a>
@@ -76,14 +71,10 @@ export default function Navigation() {
               </div>
             </div> */}
           </div>
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <button 
-            type="button"
-            style={{ backgroundColor: '#40C173' }}
-            className="py-0.5 px-2 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out"
-            id="login-button" 
-            onClick={handleClick}
-          >Prisijungti</button>
+          
+          {session?.user ? (
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <div className="relative ml-3 text-white font-semibold">{session?.user?.first_name}</div>
             {/* <!-- Profile dropdown --> */}
             <div className="relative ml-3">
               <div>
@@ -114,20 +105,29 @@ export default function Navigation() {
               <div 
                 className={`absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${
                   isMenuOpen ? "transition ease-out duration-100 transform opacity-100 scale-100" : "transition ease-in duration-75 transform opacity-0 scale-95"
-                }`} // Add this className attribute
-                role="menu" 
-                aria-orientation="vertical" 
-                aria-labelledby="user-menu-button" 
-                tabIndex={-1}
-                >
-                {/* <!-- Active: "bg-gray-100", Not Active: "" --> */}
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-0">Mano profilis</a>
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-1">Nustatymai</a>
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-2">Atsijungti</a>
+                  }`} // Add this className attribute
+                  role="menu" 
+                  aria-orientation="vertical" 
+                  aria-labelledby="user-menu-button" 
+                  tabIndex={-1}
+                  >
+                  {/* <!-- Active: "bg-gray-100", Not Active: "" --> */}
+                  <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-0">Mano profilis</a>
+                  <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-1">Nustatymai</a>
+                  <a onClick={() => signOut({
+                    redirect: true,
+                    callbackUrl: `${window.location.origin}/sign-in`
+                  })} href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-2">Atsijungti</a>
+                </div>
               </div>
             </div>
-          </div>
-          <span className="ml-2 text-white">{role}</span>
+            ) : ( 
+              <Link className='flex justify-center rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600' href='/sign-in'>
+                Prisijungti
+              </Link>
+            )};
+
+          
         </div>
       </div>
 
