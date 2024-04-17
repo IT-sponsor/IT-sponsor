@@ -1,30 +1,8 @@
 "use client";
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { NextResponse } from 'next/server';
-
-interface Project {
-  id: number;
-  name: string;
-  short_description: string;
-  long_description: string;
-  repository: string;
-  technologies: string;
-  created_at: string;
-  updated_at: string;
-  star_count: number;
-  contributor_count: number;
-  codebase_visibility: string;
-  fk_imagesid_images: number;
-
-  logo: string;
-  images: {
-      image: {
-          data: Buffer;
-          contentType: string;
-      }
-  }
-}
+import { error } from 'console';
 
 const NewProjectPage = () => {
   const [projectName, setProjectName] = useState('');
@@ -32,17 +10,18 @@ const NewProjectPage = () => {
   const [repository, setRepository] = useState('');
   const [technologies, setTechnologies] = useState('');
   const [fullDescription, setFullDescription] = useState('');
-  const [formErrors, setFormErrors] = useState({});
+  const [image, setImage] = useState<File | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, any>>({});
 
   const defaultDescription = "# Apie įmonę:\n...\n# Apie projektą:\n...";
 
   fullDescription === "" && setFullDescription(defaultDescription);
   const formattedDefaultDescription = defaultDescription.split("\n").map((item, key) => {
     return <span key={key}>{item}<br /></span>
-});
+  });
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Record<string, any> = {};
     if (!projectName.trim()) newErrors.projectName = "Projekto pavadinimas yra privalomas.";
     if (!shortDescription.trim()) newErrors.shortDescription = "Trumpas aprašymas yra privalomas.";
     if (!repository.trim()) newErrors.repository = "Repositorijos nuoroda yra būtina.";
@@ -52,35 +31,40 @@ const NewProjectPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setImage(file);
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
-    const projectData = {
-      name: projectName,
-      short_description: shortDescription,
-      long_description: fullDescription,
-      repository,
-      technology: technologies,
-      codebase_visibility: "public",
-      fk_imagesid_images: 3 // TODO: upload a picture
-    };
+    const projectData = new FormData();
+    projectData.append('name', projectName);
+    projectData.append('short_description', shortDescription);
+    projectData.append('long_description', fullDescription);
+    projectData.append('repository', repository);
+    projectData.append('technologies', technologies);
+    if (image) projectData.append('image', image);
 
     try {
       const response = await fetch('/api/project/new', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(projectData)
+        body: projectData
       });
+
       if (response.ok) {
         const result = await response.json();
         window.location.href = `/project/${result.project.id}`;
       } else {
-        return new NextResponse(JSON.stringify({ message: "Error creating project" }), { status: 500, headers: {'Content-Type': 'application/json'} });
+        return new NextResponse(JSON.stringify({ message: "Error creating project", error: response.statusText }), { status: 500, headers: { 'Content-Type': 'application/json' } });
       }
     } catch (error) {
-      return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500, headers: {'Content-Type': 'application/json'} });
+      return new NextResponse(JSON.stringify({ message: "Network error", error }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
   };
 
@@ -140,6 +124,34 @@ const NewProjectPage = () => {
           >
           </textarea>
           {formErrors.fullDescription && <div className="text-red-500">{formErrors.fullDescription}</div>}
+
+          <div id="image-preview" className="max-w-sm p-6 mb-4 bg-gray-100 border-dashed border-2 border-gray-400 rounded-lg items-center mx-auto text-center cursor-pointer mt-2">
+            
+            {image && (
+              <label htmlFor="upload" className='cursor-pointer'>
+              <img
+                src={URL.createObjectURL(image)}
+                alt='image-preview'
+                className="max-h-48 rounded-lg mx-auto"
+              />
+              </label>
+            ) || (
+                <>
+
+                  <label htmlFor="upload" className="cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-8 h-8 text-gray-700 mx-auto mb-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                    </svg>
+                    <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-700">Įkelti nuotrauką</h5>
+                    <p className="font-normal text-sm text-gray-400 md:px-6">Pasirinkite nuotrauką, kurios dydis būtų mažesnis nei <b className="text-gray-600">2mb</b></p>
+                    <p className="font-normal text-sm text-gray-400 md:px-6">leidžiami <b className="text-gray-600">JPG arba PNG</b> formatai.</p>
+                    <span id="filename" className="text-gray-500 bg-gray-200 z-50"></span>
+                  </label>
+                </>
+              )}
+          </div>
+          <input id="upload" type="file" accept='image/*' onChange={handleFileChange} className="hidden" />
+
 
           <div className="mt-4 flex justify-between items-center w-full">
             <Link href="/" legacyBehavior>
