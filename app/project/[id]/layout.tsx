@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import ProjectCard from '@/app/components/ProjectCard/ProjectCard';
 import Tabs from '@/app/components/Tabs/Tabs';
 import { useSession } from 'next-auth/react';
+import ProjectCardSkeleton from '@/app/components/ProjectCard/ProjectCardSkeleton';
 
 interface Project {
     id: number;
@@ -37,6 +38,7 @@ export default function ProjectLayout({
     const { data: session } = useSession();
     const [project, setProject] = useState<Project | null>(null);
     const [canAccess, setCanAccess] = useState(false);
+    const [loading, setLoading] = useState(true);
     const projectId = params.id;
 
     useEffect(() => {
@@ -51,10 +53,14 @@ export default function ProjectLayout({
                             ...data,
                             logo: `data:image/jpeg;base64,${base64String}`
                         };
-                        setProject(modifiedProject);
+                        setTimeout(() => {
+                            setProject(modifiedProject);
+                            setLoading(false);
+                        }, 500);
                     } else {
                         console.error("No image data found");
                         setProject(data);
+                        setLoading(false);
                     }
                 })
                 .catch(console.error);
@@ -97,6 +103,10 @@ export default function ProjectLayout({
                 {
                     name: "Klaidos",
                     link: `/project/${projectId}/fault`
+                },
+                {
+                    name: "Redaguoti projektą",
+                    link: `/project/${projectId}/edit`
                 }
             ]
             : [
@@ -111,27 +121,34 @@ export default function ProjectLayout({
 
     return (
         <div className="flex flex-col items-center justify-center p-6">
-            {project ? (
-                <>
-                    <div className='max-w-5xl max-h-60 mb-3'>
-                        <ProjectCard
-                            image_url={project.logo}
-                            title={project.name}
-                            description={project.short_description}
-                            timeUpdated={project.updated_at}
-                            issueCount={0}
-                            volunteerCount={0}
-                            tags={project.technologies.split(' ')}
-                        />
-                    </div>
-
-                    {/* Navigation buttons after the project card */}
-                    <Tabs panels={tabs} />
-
-                    {children}
-                </>
+            {loading ? (
+                <div className='w-full max-w-5xl max-h-60 mb-3'>
+                    <ProjectCardSkeleton />
+                </div>
             ) : (
-                <div>Loading...</div>
+                <>
+                    {project ? (
+                        <>
+                            <div className='w-full max-w-5xl max-h-60 mb-3'>
+                                <ProjectCard
+                                    image_url={project.logo}
+                                    title={project.name}
+                                    description={project.short_description}
+                                    timeUpdated={project.updated_at}
+                                    issueCount={0}
+                                    volunteerCount={0}
+                                    tags={project.technologies.split(' ')}
+                                />
+                            </div>
+
+                            <Tabs panels={tabs} />
+                            {children}
+                        </>
+
+                    ) : (
+                        <ProjectCardSkeleton />
+                    )}
+                </>
             )}
         </div>
 

@@ -2,6 +2,7 @@
 import defaultUserPhoto from '@/public/assets/defaultUser.jpg';
 import FaultCardSmall from '@/app/components/Fault/Cards/FaultCardSmall';
 import { useState, useEffect } from 'react';
+import Spinner from '@/app/components/Loading/Spinner';
 
 interface Fault {
     id: number;
@@ -29,6 +30,7 @@ export default function FaultPage({ params }: {
     params: { id: number }
 }) {
     const [faults, setFaults] = useState<Fault[] | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const projectId = params.id;
 
@@ -37,7 +39,10 @@ export default function FaultPage({ params }: {
             fetch(`/api/project/${projectId}/faults`)
                 .then(res => res.json())
                 .then(data => {
-                    setFaults(data);
+                    setTimeout(() => {
+                        setFaults(data);
+                        setLoading(false);
+                    }, 300);
                 })
                 .catch(console.error);
         }
@@ -45,23 +50,29 @@ export default function FaultPage({ params }: {
 
     return (
         <div className='flex flex-col items-center justify-center pt-6 w-full max-w-5xl'>
-            {faults?.length ? (
-                faults.map((fault, index) => (
-                    <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={index}>
-                        <FaultCardSmall
-                            id={fault.id}
-                            title={fault.title}
-                            description={fault.description}
-                            severity={fault.severity}
-                            status={fault.status}
-                            created_at={new Date(fault.created_at).toLocaleDateString()}
-                            first_name={fault.users.first_name}
-                            last_name={fault.users.last_name}
-                        />
-                    </div>
-                ))
+            {loading ? (
+                <Spinner />
             ) : (
-                <div>Projektas neturi klaidų pranešimų</div>
+                <>
+                    {faults?.length ? (
+                        faults.map((fault, index) => (
+                            <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={index}>
+                                <FaultCardSmall
+                                    id={fault.id}
+                                    title={fault.title}
+                                    description={fault.description}
+                                    severity={fault.severity}
+                                    status={fault.status}
+                                    created_at={new Date(fault.created_at).toLocaleDateString()}
+                                    first_name={fault.users.first_name}
+                                    last_name={fault.users.last_name}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <div>Projektas neturi klaidų pranešimų</div>
+                    )}
+                </>
             )}
         </div>
     );

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from "next/link";
 
 import ProjectCard from "./components/ProjectCard/ProjectCard";
+import ProjectCardSkeleton from './components/ProjectCard/ProjectCardSkeleton';
 
 interface Project {
   id: number;
@@ -62,8 +63,10 @@ export default function Home() {
             logo: `data:image/jpeg;base64,${base64String}`
           };
         });
-        setProjects(modifiedData);
-        setLoading(false);
+        setTimeout(() => {
+          setProjects(modifiedData);
+          setLoading(false);
+        }, 500);
       })
       .catch(err => {
         console.error(err);
@@ -140,9 +143,9 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center justify-center">
       {/* Search bar */}
-      <div className='flex items-center'>
+      <div className='flex items-center justify-center'>
         <div className="pt-2 relative mx-auto text-gray-600">
           <input
             className="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
@@ -285,12 +288,22 @@ export default function Home() {
       </div>
 
 
-      <div className='mb-5'>
+      <div className='mb-5 w-full flex flex-col justify-center items-center'>
         {loading ? (
-          <div className="text-center text-lg text-gray-600">Kraunama...</div>
+          <>
+            <div className='my-4 w-full max-w-5xl max-h-60'>
+              <ProjectCardSkeleton />
+            </div>
+            <div className='my-4 w-full max-w-5xl max-h-60'>
+              <ProjectCardSkeleton />
+            </div>
+            <div className='my-4 w-full max-w-5xl max-h-60'>
+              <ProjectCardSkeleton />
+            </div>
+          </>          
         ) : filteredProjects.length > 0 ? (
           filteredProjects.map((project, index) => (
-            <div className="my-4 max-w-5xl max-h-60" key={index}>
+            <div className="my-4 w-full max-w-5xl max-h-60" key={index}>
               <Link href={`/project/${project.id}`} passHref>
                 <div style={{ cursor: 'pointer' }}>
                   <ProjectCard
