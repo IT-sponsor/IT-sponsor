@@ -32,7 +32,6 @@ interface Project {
 }
 
 type UserList = {
-    fk_usersid: number;
     fk_issuesid: number;
     first_name: string;
     last_name: string;
@@ -101,6 +100,8 @@ export default function viewIssuePage({ params }: {
     }, [issueId]);
 
     // TODO: check if user already applied to this issue
+    // Check if user has been assigned to this issue
+    // Update on database changes
     useEffect(() => {
         const fetchAccess = async () => {
             try {
@@ -113,9 +114,9 @@ export default function viewIssuePage({ params }: {
                     hasAccess = ownerId === session?.user?.id;
                     setHasAccess(hasAccess);
                 }
-                const response2 = await fetch(`/api/applies/${issueId}/${session?.user?.id}`);
+                const response2 = await fetch(`/api/applies/${issueId}`);
                 const data2 = await response2.json();
-                if (data2.length > 0) {
+                if (data2.some(item => item.fk_usersid === session?.user?.id)) {
                     hasApplied = true;
                 }
                 setCanApply(!hasAccess && !hasApplied);
@@ -162,29 +163,43 @@ export default function viewIssuePage({ params }: {
 
     async function fetchUserList() {
         try {
-            const response = await fetch(`/api/applies/${issueId}`);
-            if (response.ok) {
-                const data = await response.json();
-                const userDetailsPromises = data.map(async (userList: UserList) => {
-                    const userResponse = await fetch(`/api/user/${userList.fk_usersid}`);
-                    if (userResponse.ok) {
-                        const userDetails = await userResponse.json();
-                        return userDetails;
-                    } else {
-                        console.error(`Error fetching user details for userId: ${data.fk_usersid}`);
-                        return null;
-                    }
-                });
-                const userListWithDetails = await Promise.all(userDetailsPromises);
-                setUserList(userListWithDetails);
-                setIsModalOpen(true);
-            } else {
-                return new NextResponse(JSON.stringify({ message: "Error fetching fixer list", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
-            }
+          const response = await fetch(`/api/applies/${issueId}`);
+          if (response.ok) {
+            const data = await response.json();
+            
+            try {
+                const userDetailsPromises = data.map(item => fetch(`/api/user/${item.fk_usersid}`));
+              
+                const userDetailsResponses = await Promise.all(userDetailsPromises);
+              
+                if (userDetailsResponses.every(res => res.ok)) {
+                  const userDetailsData = await Promise.all(
+                    userDetailsResponses.map(async (response) => {
+                      return await response.json();
+                    })
+                  );
+              
+                  const mergedUserList = userDetailsData.map((user, index) => ({
+                    ...user,
+                    fk_issuesid: data[index].fk_issuesid
+                  }));
+              
+                  setUserList(mergedUserList);
+                  console.log(mergedUserList);
+                  setIsModalOpen(true);
+                } else {
+                  throw new Error('Error fetching user details');
+                }
+              } catch (error) {
+                console.error(error);
+              }
+          } else {
+            throw new Error('Error fetching fixer list');
+          }
         } catch (error) {
-            return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+          console.error(error);
         }
-    }
+      }
 
     return (
         <div className="flex flex-col items-center justify-center">

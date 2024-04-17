@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
             });
             console.log('Applies created', applies);
             return new NextResponse(JSON.stringify({ message: "Applies created successfully", applies }), { status: 201 });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating applies', error);
             return new NextResponse(JSON.stringify({ message: "Error creating applies", error: error.message }), { status: 500 });
         }
