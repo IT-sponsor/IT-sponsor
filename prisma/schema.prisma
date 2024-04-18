@@ -92,7 +92,7 @@ model issues {
 }
 
 model projects {
-  id                  Int                           @id
+  id                  Int                           @id @default(autoincrement())
   name                String?                       @db.VarChar(255)
   short_description   String?                       @db.VarChar(255)
   long_description    String?                       @db.VarChar(4000)
