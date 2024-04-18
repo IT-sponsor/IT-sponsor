@@ -8,6 +8,8 @@ interface ProfileProps {
     last_name: String;
     email: String;
     github: string;
+    linkedin: string;
+    phone_number: string;
     job_title: String;
     about_me: String;
     technologies: String[];
@@ -21,6 +23,8 @@ const Profile = ({
     last_name,
     email,
     github,
+    linkedin,
+    phone_number,
     job_title,
     about_me,
     technologies,
@@ -39,15 +43,20 @@ const Profile = ({
                             </img>
                             <h1 className="text-xl font-bold">{first_name} {last_name}</h1>
                             {job_title && <p className="text-gray-700">{job_title}</p>}
+                            {phone_number && <p className="text-blue-700 pt-2">+370 {phone_number.toString()}</p>}
                             <div className="mt-6 flex flex-wrap gap-4 justify-center">
                                 <a href={`mailto:${email}`} className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Susisiekti</a>
                                 {github && <a href={`https://github.com/${github}`} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">GitHub</a>}
-                                {session?.user.id === id && (
-                                    <a href={'/profile/' + session?.user.id + '/edit'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Redaguoti</a>
-                                )}
+                                {linkedin && <a href={`${linkedin}`} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">LinkedIn</a>}
+
                             </div>
                         </div>
-                        {/* <hr className="my-6 border-t border-gray-300"></hr> */}
+                        <hr className="my-6 border-t border-gray-300"></hr>
+                        {session?.user.id === id && (
+                            <div className="flex justify-center">
+                            <a href={'/profile/' + session?.user.id + '/edit'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Redaguoti</a>
+                            </div>
+                        )}
                     </div>
                 </div>
 

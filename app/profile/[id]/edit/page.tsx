@@ -8,6 +8,8 @@ interface Profile {
     email: string;
     password: string;
     github: string;
+    linkedin: string;
+    phone_number: string;
     job_title: string;
     about_me: string;
     technologies: string;
@@ -104,6 +106,10 @@ export default function EditProfile({ params }: {
                     setErrors({ ...errors, email: "El. pašto adresas egzistuoja" });
                 } else if (message === "GitHub username already exists") {
                     setErrors({ ...errors, github: "Github paskyra egzistuoja" });
+                } else if (message === "LinkedIn already exists") {
+                    setErrors({ ...errors, linkedin: "LinkedIn paskyra egzistuoja" });
+                } else if (message === "Phone number already exists") {
+                    setErrors({ ...errors, phone_number: "Telefono numeris egzistuoja" });
                 }
             } else {
                 setSubmitSuccess(false);
@@ -224,6 +230,40 @@ export default function EditProfile({ params }: {
                                                 </div>
                                                 <p className="mt-1 text-sm leading-6 text-gray-600">Nuoroda į jūsų Github repositoriją.</p>
                                                 {errors['github'] && <p className="text-red-500 text-sm mt-1">{errors['github']}</p>}
+                                            </div>
+
+                                            <div className="sm:col-span-3">
+                                                <label htmlFor="linkedin" className="block text-sm font-medium leading-6 text-gray-900">LinkedIn</label>
+                                                <div className="mt-2">
+                                                    <input id="linkedin"
+                                                        name="linkedin"
+                                                        type="linkedin"
+                                                        autoComplete="linkedin"
+                                                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 p-2"
+                                                        defaultValue={profileData?.linkedin && profileData?.linkedin.toString()}
+                                                        onChange={handleChange}>
+                                                    </input>
+                                                    <p className="mt-1 text-sm leading-6 text-gray-600">Nuoroda į jūsų LinkedIn profilį.</p>
+                                                    {errors['linkedin'] && <p className="text-red-500 text-sm mt-1">{errors['linkedin']}</p>}
+                                                </div>
+                                            </div>
+
+                                            <div className="sm:col-span-3">
+                                                <label htmlFor="phone_number" className="block text-sm font-medium leading-6 text-gray-900">Telefono numeris</label>
+                                                <div className="mt-2">
+                                                    <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                                        <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">+370 </span>
+                                                        <input type="text"
+                                                            name="phone_number"
+                                                            id="phone_number"
+                                                            autoComplete="phone_number"
+                                                            className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                                            defaultValue={profileData?.phone_number && profileData?.phone_number.toString()}
+                                                            onChange={handleChange}>
+                                                        </input>
+                                                    </div>
+                                                </div>
+                                                {errors['phone_number'] && <p className="text-red-500 text-sm mt-1">{errors['phone_number']}</p>}
                                             </div>
 
                                         </div>

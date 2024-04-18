@@ -8,6 +8,8 @@ interface Profile {
     last_name: String;
     email: String;
     github: string;
+    linkedin: string;
+    phone_number: string;
     job_title: String;
     about_me: String;
     technologies: String;
@@ -49,6 +51,8 @@ export default function ProfilePage({ params }: {
                         last_name={user.last_name}
                         email={user.email}
                         github={user.github}
+                        linkedin={user.linkedin}
+                        phone_number={user.phone_number}
                         job_title={user.job_title}
                         about_me={user.about_me}
                         technologies={user.technologies ? user.technologies.split(' ') : null as unknown as string[]}
