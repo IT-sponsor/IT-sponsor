@@ -14,6 +14,11 @@ model users {
   email              String?         @unique @db.VarChar(255)
   password           String?         @db.VarChar(255)
   github             String?         @unique @db.VarChar(255)
+  job_title          String?         @db.VarChar(255)
+  about_me           String?         @db.VarChar(255)
+  technologies       String?         @db.VarChar(255)
+  experience         String?         @db.VarChar(255)
+  education          String?         @db.VarChar(255)
   banned_until       DateTime?       @db.Date
   role               users_role?
   fk_imagesid_images Int?            @unique(map: "fk_imagesid_images")
