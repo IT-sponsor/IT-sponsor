@@ -353,7 +353,7 @@ export default function EditProfile({ params }: {
                         </div>
                         <div className="mt-2 flex items-center justify-center gap-x-6 pb-10">
                             <button type="submit" className="rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Išsaugoti</button>
-                            <a href={'/profile/' + profileData.id} type="button" className="rounded-lg text-black bg-white px-5 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200">Grįžti</a>
+                            <a href={'/profile/' + encodeURIComponent(profileData.id)} type="button" className="rounded-lg text-black bg-white px-5 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200">Grįžti</a>
                         </div>
 
                     </div>
