@@ -1,4 +1,5 @@
 "use client";
+import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { useState, useEffect } from "react";
@@ -40,6 +41,7 @@ export default function viewIssuePage({ params }: {
 }) {
     const [project, setProject] = useState<Project>();
     const [issue, setIssue] = useState<Issue>();
+    const [loading, setLoading] = useState(true);
     const projectId = params.id;
     const issueId = params.issueId;
 
@@ -48,20 +50,10 @@ export default function viewIssuePage({ params }: {
             fetch(`/api/project/${projectId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.images) {
-                        const logoData = data.images.image.data
-                        const base64String = Buffer.from(logoData).toString('base64');
-                        const modifiedProject = {
-                            ...data,
-                            logo: `data:image/jpeg;base64,${base64String}`
-                        };
-                        setProject(modifiedProject);
-                    } else {
-                        console.error("No image data found");
-
-
+                    setTimeout(() => {
                         setProject(data);
-                    }
+                        setLoading(false);
+                    }, 500);
                 })
                 .catch(console.error);
         }
@@ -89,38 +81,49 @@ export default function viewIssuePage({ params }: {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center">
-            {project ? (
-                <>
-                    <div className="p-2 w-[800px]">
-                        {issue ? (
-                            <>
-                                <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
-                                    <div className="px-4 py-5 sm:px-6">
-                                        <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
-                                    </div>
-                                    <div className="border-t border-gray-200">
-                                        <dl>
-                                            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                                <dt className="text-sm font-medium text-gray-500">Statusas</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{statusLocale[issue.status as keyof typeof statusLocale]}</dd>
-                                            </div>
-                                            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                                <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><MarkdownDisplay markdownText={issue.description} /></div>
-                                            </div>
-                                        </dl>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <p>Kraunama...</p>
-                        )}
-                    </div>
-
-                </>
+        <div className='w-full flex flex-col justify-center items-center'>
+            {loading ? (
+                <div className='mt-5'>
+                    <Spinner />
+                </div>
             ) : (
-                <p>Kraunama...</p>
+                <>
+                    {project ? (
+                        <div className="p-2 w-[800px]">
+                            {issue ? (
+                                <>
+                                    <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
+                                        <div className="px-4 py-5 sm:px-6">
+                                            <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
+                                        </div>
+                                        <div className="border-t border-gray-200">
+                                            <dl>
+                                                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                                    <dt className="text-sm font-medium text-gray-500">Statusas</dt>
+                                                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{statusLocale[issue.status as keyof typeof statusLocale]}</dd>
+                                                </div>
+                                                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                                    <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><MarkdownDisplay markdownText={issue.description} /></div>
+                                                </div>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                                    <h1 className='text-2xl font-bold'>Nepavyko užkrauti duomenų. Pabandykite iš naujo</h1>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                            <h1 className='text-2xl font-bold'>Nepavyko užkrauti duomenų. Pabandykite iš naujo</h1>
+                        </div>
+                    )}
+                </>
             )}
         </div>
-    )
+
+
+    );
 }

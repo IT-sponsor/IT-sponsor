@@ -1,6 +1,8 @@
 "use client";
+import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 interface Project {
@@ -41,6 +43,7 @@ export default function viewFaultPage({ params }: {
     params: { id: number, faultId: number }
 }) {
     const [project, setProject] = useState<Project>();
+    const [loading, setLoading] = useState(true);
     const [fault, setFault] = useState<Fault>();
     const projectId = params.id;
     const faultId = params.faultId;
@@ -50,20 +53,10 @@ export default function viewFaultPage({ params }: {
             fetch(`/api/project/${projectId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.images) {
-                        const logoData = data.images.image.data
-                        const base64String = Buffer.from(logoData).toString('base64');
-                        const modifiedProject = {
-                            ...data,
-                            logo: `data:image/jpeg;base64,${base64String}`
-                        };
-                        setProject(modifiedProject);
-                    } else {
-                        console.error("No image data found");
-
-
+                    setTimeout(() => {
                         setProject(data);
-                    }
+                        setLoading(false);
+                    }, 500);
                 })
                 .catch(console.error);
         }
@@ -92,43 +85,57 @@ export default function viewFaultPage({ params }: {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center">
-            {project ? (
-                <>
-                    <div className="p-2 w-[800px]">
-                        {fault ? (
-                            <>
-                                <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4">
-                                    <div className="px-4 py-5 sm:px-6">
-                                        <h2 className="text-lg leading-6 font-medium text-gray-900">{fault.title}</h2>
-                                    </div>
-                                    <div className="border-t border-gray-200">
-                                        <dl>
-                                            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                                <dt className="text-sm font-medium text-gray-500">Svarbumas</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{severityLocale[fault.severity as keyof typeof severityLocale]}</dd>
-                                            </div>
-                                            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                                <dt className="text-sm font-medium text-gray-500">Statusas</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{statusLocale[fault.status as keyof typeof statusLocale]}</dd>
-                                            </div>
-                                            <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                                <dt className="text-sm font-medium text-gray-500">Atkūrimo veiksmai</dt>
-                                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><MarkdownDisplay markdownText={fault.description} /></dd>
-                                            </div>
-                                        </dl>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <p>Loading...</p>
-                        )}
-                    </div>
-
-                </>
+        <div className='w-full flex flex-col justify-center items-center'>
+            {loading ? (
+                <div className='mt-5'>
+                    <Spinner />
+                </div>
             ) : (
-                <p>Loading...</p>
+                <>
+                    {project ? (
+                        <div className="p-2 w-[800px]">
+                            {fault ? (
+                                <>
+                                    <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4">
+                                    <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
+    <h2 className="text-lg leading-6 font-medium text-gray-900">{fault.title}</h2>
+    <Link href={`${faultId}/convert`} type="button" className="rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Konvertuoti</Link>
+</div>
+
+                                        
+                                        <div className="border-t border-gray-200">
+                                            <dl>
+                                                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                                    <dt className="text-sm font-medium text-gray-500">Svarbumas</dt>
+                                                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{severityLocale[fault.severity as keyof typeof severityLocale]}</dd>
+                                                </div>
+                                                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                                    <dt className="text-sm font-medium text-gray-500">Statusas</dt>
+                                                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{statusLocale[fault.status as keyof typeof statusLocale]}</dd>
+                                                </div>
+                                                <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                                    <dt className="text-sm font-medium text-gray-500">Atkūrimo veiksmai</dt>
+                                                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><MarkdownDisplay markdownText={fault.description} /></dd>
+                                                </div>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                                    <h1 className='text-2xl font-bold'>Nepavyko užkrauti duomenų. Pabandykite iš naujo</h1>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                            <h1 className='text-2xl font-bold'>Nepavyko užkrauti duomenų. Pabandykite iš naujo</h1>
+                        </div>
+                    )}
+                </>
             )}
         </div>
-    )
+
+
+    );
 }
