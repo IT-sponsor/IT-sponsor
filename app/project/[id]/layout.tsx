@@ -4,6 +4,7 @@ import ProjectCard from '@/app/components/ProjectCard/ProjectCard';
 import Tabs from '@/app/components/Tabs/Tabs';
 import { useSession } from 'next-auth/react';
 import ProjectCardSkeleton from '@/app/components/ProjectCard/ProjectCardSkeleton';
+import CompanyDefault from '@/public/assets/CompanyDefault.png';
 
 interface Project {
     id: number;
@@ -46,7 +47,7 @@ export default function ProjectLayout({
             fetch(`/api/project/${projectId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.images.image.data) {
+                    if (data && data.images) {
                         const logoData = data.images.image.data
                         const base64String = Buffer.from(logoData).toString('base64');
                         const modifiedProject = {
@@ -59,8 +60,14 @@ export default function ProjectLayout({
                         }, 500);
                     } else {
                         console.error("No image data found");
-                        setProject(data);
-                        setLoading(false);
+                        const modifiedProject = {
+                            ...data,
+                            logo: CompanyDefault.src
+                        };
+                        setTimeout(() => {
+                            setProject(modifiedProject);
+                            setLoading(false);
+                        }, 500);
                     }
                 })
                 .catch(console.error);

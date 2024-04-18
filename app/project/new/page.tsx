@@ -1,24 +1,18 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { NextResponse } from 'next/server';
-import { error } from 'console';
+
+import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor';
 
 const NewProjectPage = () => {
   const [projectName, setProjectName] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [repository, setRepository] = useState('');
   const [technologies, setTechnologies] = useState('');
-  const [fullDescription, setFullDescription] = useState('');
+  const [fullDescription, setFullDescription] = useState("# Apie įmonę:\n...\n# Apie projektą:\n...");
   const [image, setImage] = useState<File | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, any>>({});
-
-  const defaultDescription = "# Apie įmonę:\n...\n# Apie projektą:\n...";
-
-  fullDescription === "" && setFullDescription(defaultDescription);
-  const formattedDefaultDescription = defaultDescription.split("\n").map((item, key) => {
-    return <span key={key}>{item}<br /></span>
-  });
 
   const validateForm = () => {
     const newErrors: Record<string, any> = {};
@@ -114,30 +108,22 @@ const NewProjectPage = () => {
           />
           {formErrors.technologies && <div className="text-red-500">{formErrors.technologies}</div>}
 
-
           <label htmlFor="fullDescription" className="block text-gray-800 font-bold mt-4">Pilnas aprašymas</label>
-          <textarea
-            id="fullDescription"
-            placeholder="Aprašymas"
-            className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-            value={fullDescription} onChange={(e) => setFullDescription(e.target.value)}
-          >
-          </textarea>
+          <MarkdownEditor markdownText={fullDescription} setMarkdownText={setFullDescription} />
           {formErrors.fullDescription && <div className="text-red-500">{formErrors.fullDescription}</div>}
 
           <div id="image-preview" className="max-w-sm p-6 mb-4 bg-gray-100 border-dashed border-2 border-gray-400 rounded-lg items-center mx-auto text-center cursor-pointer mt-2">
-            
+
             {image && (
               <label htmlFor="upload" className='cursor-pointer'>
-              <img
-                src={URL.createObjectURL(image)}
-                alt='image-preview'
-                className="max-h-48 rounded-lg mx-auto"
-              />
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt='image-preview'
+                  className="max-h-48 rounded-lg mx-auto"
+                />
               </label>
             ) || (
                 <>
-
                   <label htmlFor="upload" className="cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-8 h-8 text-gray-700 mx-auto mb-4">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
@@ -152,14 +138,12 @@ const NewProjectPage = () => {
           </div>
           <input id="upload" type="file" accept='image/*' onChange={handleFileChange} className="hidden" />
 
-
           <div className="mt-4 flex justify-between items-center w-full">
             <Link href="/" legacyBehavior>
               <a className="py-2 px-4 rounded-lg text-black bg-[#C14040] hover:bg-red-700 transition duration-150 ease-in-out">Atšaukti</a>
             </Link>
             <button type="submit" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">Pateikti</button>
           </div>
-
 
         </form>
       </div>
