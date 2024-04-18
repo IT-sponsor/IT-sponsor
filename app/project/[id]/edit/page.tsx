@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { NextResponse } from "next/server";
+import MarkdownEditor from "@/app/components/MarkdownEditor/MarkdownEditor";
 
 export default function EditProjectPage({ params }: { params: { id: number } }) {
     const [project, setProject] = useState({
@@ -89,13 +90,7 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
                     {formErrors.technologies && <div className="text-red-500">{formErrors.technologies}</div>}
 
                     <label htmlFor="fullDescription" className="block text-gray-700 font-bold">Pilnas aprašymas</label>
-                    <textarea
-                        id="fullDescription"
-                        placeholder="Pilnas aprašymas"
-                        className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-                        value={project.long_description}
-                        onChange={(e) => setProject({ ...project, long_description: e.target.value })}
-                    ></textarea>
+                    <MarkdownEditor markdownText={project.long_description} setMarkdownText={(value) => setProject({ ...project, long_description: value })} />
                     {formErrors.longDescription && <div className="text-red-500">{formErrors.longDescription}</div>}
 
                     <div className="mt-4 flex justify-between items-center w-full">

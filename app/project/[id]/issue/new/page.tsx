@@ -1,10 +1,8 @@
 "use client";
+import MarkdownEditor from "@/app/components/MarkdownEditor/MarkdownEditor";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { NextResponse } from "next/server";
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
-
-import SimpleMDE, { SimpleMdeReact } from "react-simplemde-editor";
-import "easymde/dist/easymde.min.css";
 
 interface Project {
     id: number;
@@ -48,82 +46,6 @@ export default function newIssuePage({ params }: {
     const [issueDescription, setIssueDescription] = useState<string>("");
     const [issueVisibility, setIssueVisibility] = useState<string>("public");
     const [formErrors, setFormErrors] = useState<any>({});
-
-    const onMarkdownChange = useCallback((value: string) => {
-        setIssueDescription(value);
-    }, []);
-
-    const MarkdownSettings = useMemo(() => {
-        return {
-            autofocus: true,
-            status: false,
-            toolbar: [
-                {
-                    name: "bold",
-                    action: SimpleMDE.toggleBold,
-                    className: "fa fa-bold",
-                    title: "Paryškinti",
-                },
-                {
-                    name: "italic",
-                    action: SimpleMDE.toggleItalic,
-                    className: "fa fa-italic",
-                    title: "Kursyvinis",
-                },
-                {
-                    name: "heading",
-                    action: SimpleMDE.toggleHeadingSmaller,
-                    className: "fa fa-header",
-                    title: "Antraštė",
-                },
-                "|",
-                {
-                    name: "quote",
-                    action: SimpleMDE.toggleBlockquote,
-                    className: "fa fa-quote-left",
-                    title: "Citata",
-                },
-                {
-                    name: "unordered-list",
-                    action: SimpleMDE.toggleUnorderedList,
-                    className: "fa fa-list-ul",
-                    title: "Sąrašas",
-                },
-                {
-                    name: "ordered-list",
-                    action: SimpleMDE.toggleOrderedList,
-                    className: "fa fa-list-ol",
-                    title: "Numeruotas sąrašas",
-                },
-                "|",
-                {
-                    name: "link",
-                    action: SimpleMDE.drawLink,
-                    className: "fa fa-link",
-                    title: "Nuoroda",
-                },
-                {
-                    name: "image",
-                    action: SimpleMDE.drawImage,
-                    className: "fa fa-image",
-                    title: "Paveikslėlis",
-                },
-                {
-                    name: "table",
-                    action: SimpleMDE.drawTable,
-                    className: "fa fa-table",
-                    title: "Lentelė",
-                },
-                "|",
-                {
-                    name: "preview",
-                    action: SimpleMDE.togglePreview,
-                    className: "fa fa-eye no-disable",
-                    title: "Peržiūra",
-                }
-            ]
-        } as SimpleMde.Options;
-    }, []);
 
     useEffect(() => {
         if (projectId) {
@@ -213,13 +135,7 @@ export default function newIssuePage({ params }: {
                             {formErrors.issueTitle && <div className="text-red-500">{formErrors.issueTitle}</div>}
 
                             <label htmlFor="description" className="block text-gray-800 font-bold mt-4">Aprašymas</label>
-                            <SimpleMdeReact
-                                className='w-full'
-                                autoFocus={true}
-                                value={issueDescription}
-                                onChange={onMarkdownChange}
-                                options={MarkdownSettings}
-                            />
+                            <MarkdownEditor markdownText={issueDescription} setMarkdownText={(value) => setIssueDescription(value)} />
                             {formErrors.issueDescription && <div className="text-red-500">{formErrors.issueDescription}</div>}
 
 
