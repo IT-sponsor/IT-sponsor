@@ -13,7 +13,6 @@ export const useMarkdownHeaders = (markdownText) => {
                 level: match[1].length,
                 text: match[2]
             });
-            console.log(`HOOK:Generated ID: ${id} for header: ${match[2]}`);  // Log each ID
         }
 
         return headers;

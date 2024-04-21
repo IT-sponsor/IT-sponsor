@@ -18,7 +18,16 @@ const TOC = ({ markdownText }) => {
     };
 
     return (
-        <div className="toc-container sticky top-0 h-screen overflow-auto bg-white pl-5 pr-5 pt-10">
+        <div className="toc-container" style={{
+            position: 'sticky',
+            top: '0',
+            height: '100vh',
+            overflowY: 'auto',
+            paddingTop: '2.5rem',
+            paddingLeft: '1.25rem',
+            paddingRight: '1.25rem',
+            zIndex: 10,
+        }}>
             <h1 className="font-medium sm:text-lg border-b">Turinys</h1>
             <ul className="list-inside">
                 {headers.map((header, index) => (
@@ -30,6 +39,7 @@ const TOC = ({ markdownText }) => {
                 ))}
             </ul>
         </div>
+        
     );
 };
 

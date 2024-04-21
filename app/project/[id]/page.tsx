@@ -53,11 +53,9 @@ export default function ProjectPage({ params }: {
     useEffect(() => {
         const handleHashChange = () => {
             const hash = window.location.hash.replace('#', '');
-            console.log(`PROJECT: Hash changed to: ${hash}`);
             if (hash) {
                 const element = document.getElementById(hash);
                 if (element) {
-                    console.log(`PROJECT: Scrolling to element with ID: ${hash}`);
                     element.scrollIntoView({ behavior: 'smooth' });
                 } else {
                     console.log(`PROJECT: Element with ID: ${hash} not found`);
