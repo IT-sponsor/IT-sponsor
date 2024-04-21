@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import MarkdownDisplay from '@/app/components/MarkdownDisplay/MarkdownDisplay';
+import TOC from '@/app/components/TableOfContents/TableOfContents';
 import Spinner from '@/app/components/Loading/Spinner';
 import CompanyDefault from '@/public/assets/CompanyDefault.png';
 
@@ -49,6 +50,29 @@ export default function ProjectPage({ params }: {
         }
     }, [projectId]);
 
+    useEffect(() => {
+        const handleHashChange = () => {
+            const hash = window.location.hash.replace('#', '');
+            console.log(`PROJECT: Hash changed to: ${hash}`);
+            if (hash) {
+                const element = document.getElementById(hash);
+                if (element) {
+                    console.log(`PROJECT: Scrolling to element with ID: ${hash}`);
+                    element.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    console.log(`PROJECT: Element with ID: ${hash} not found`);
+                }
+            }
+        };
+    
+        window.addEventListener('hashchange', handleHashChange);
+        handleHashChange();
+    
+        return () => {
+            window.removeEventListener('hashchange', handleHashChange);
+        };
+    }, []);
+
     return (
         <div className='w-full flex flex-col justify-center items-center'>
             {loading ? (
@@ -58,8 +82,13 @@ export default function ProjectPage({ params }: {
             ) : (
                 <>
                     {project ? (
-                        <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
-                            <MarkdownDisplay markdownText={project.long_description} />
+                        <div className='flex flex-row w-full max-w-5xl'>
+                            <div className='w-1/4 border-l border-gray-200'>
+                                <TOC markdownText={project.long_description} />
+                            </div>
+                            <div className='rounded-xl border-2 border-gray-100 w-3/4 pt-4 pl-10 pr-10'>
+                                <MarkdownDisplay markdownText={project.long_description} />
+                            </div>
                         </div>
                     ) : (
                         <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
@@ -69,7 +98,5 @@ export default function ProjectPage({ params }: {
                 </>
             )}
         </div>
-
-
     );
 }
