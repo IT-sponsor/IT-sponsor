@@ -1,6 +1,7 @@
 "use client";
 import IssueCardSmall from '@/app/components/Issue/Cards/IssueCardSmall';
 import Spinner from '@/app/components/Loading/Spinner';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
 interface Issue {
@@ -43,12 +44,14 @@ export default function IssuePage({ params }: {
                     {issues?.length ? (
                         issues.map((issue, index) => (
                             <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={index}>
-                                <IssueCardSmall
-                                    id={issue.id}
-                                    title={issue.title}
-                                    description={issue.description}
-                                    status={issue.status}
-                                />
+                                <Link href={`issue/${issue.id}`}>
+                                    <IssueCardSmall
+                                        id={issue.id}
+                                        title={issue.title}
+                                        description={issue.description}
+                                        status={issue.status}
+                                    />
+                                </Link>
                             </div>
                         ))
                     ) : (

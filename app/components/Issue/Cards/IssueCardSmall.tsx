@@ -1,8 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect } from "react";
-
 interface IssueCardSmallProps {
     id: number;
     title: string;
@@ -35,7 +32,7 @@ const IssueCardSmall = (
     };
 
     return (
-        <Link href={`issue/${id}`} className="rounded-xl border-2 border-gray-100 bg-white w-full mb-3">
+        <div className="rounded-xl border-2 border-gray-100 bg-white w-full mb-3">
             <article>
                 <div className="flex flex-col sm:flex-row items-start gap-4 p-4 sm:px-6 lg:px-8">
                     <div className="flex-grow">
@@ -51,7 +48,7 @@ const IssueCardSmall = (
                     </div>
                 </div>
             </article>
-        </Link>
+        </div>
     );
 };
 
