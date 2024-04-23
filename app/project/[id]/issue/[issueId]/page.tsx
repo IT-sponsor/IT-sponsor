@@ -101,13 +101,8 @@ export default function viewIssuePage({ params }: {
         fetchIssueData();
     }, [projectId, issueId, session]);
 
-    const changeProjectVisibility = async (status: string) => {
+    const updateIssue = async (updatedIssue: Issue) => {
         try {
-            const updatedIssue = issue;
-            if (updatedIssue) {
-                updatedIssue.status = status;
-            }
-
             const response = await fetch(`/api/project/${projectId}/issues/${issueId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
@@ -122,6 +117,16 @@ export default function viewIssuePage({ params }: {
         } catch (error) {
             console.error(error);
         }
+    };
+
+    const changeIssueStatus = async (status: string) => {
+        const updatedIssue = issue ? { ...issue, status } : undefined;
+        await updateIssue(updatedIssue as Issue);
+    };
+
+    const changeIssueVisibility = async (visibility: 'public' | 'private') => {
+        const updatedIssue = issue ? { ...issue, visibility } : undefined;
+        await updateIssue(updatedIssue as Issue);
     };
 
     const statusLocale = {
@@ -150,11 +155,18 @@ export default function viewIssuePage({ params }: {
                                         <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
                                         <div className="flex space-x-2">
                                             {canControl ? (
-                                                issue.status === 'open' ? (
-                                                    <button onClick={() => changeProjectVisibility("closed")} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Uždaryti</button>
-                                                ) : (
-                                                    <button onClick={() => changeProjectVisibility("open")} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Atidaryti</button>
-                                                )
+                                                <>
+                                                    {issue.status === 'open' ? (
+                                                        <button onClick={() => changeIssueStatus("closed")} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Uždaryti trūkumą</button>
+                                                    ) : (
+                                                        <button onClick={() => changeIssueStatus("open")} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Atidaryti trūkumą</button>
+                                                    )}
+                                                    {issue.visibility === 'public' ? (
+                                                        <button onClick={() => changeIssueVisibility("private")} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Padaryti privatų</button>
+                                                    ) : (
+                                                        <button onClick={() => changeIssueVisibility("public")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Padaryti viešą</button>
+                                                    )}
+                                                </>
                                             ) : null}
                                         </div>
 
