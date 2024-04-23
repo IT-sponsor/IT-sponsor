@@ -1,4 +1,5 @@
 "use client";
+import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { useState, useEffect } from "react";
@@ -38,6 +39,7 @@ interface Issue {
 export default function viewIssuePage({ params }: {
     params: { id: number, issueId: number }
 }) {
+    const [loading, setLoading] = useState(true);
     const [project, setProject] = useState<Project>();
     const [issue, setIssue] = useState<Issue>();
     const projectId = params.id;
@@ -56,11 +58,12 @@ export default function viewIssuePage({ params }: {
                             logo: `data:image/jpeg;base64,${base64String}`
                         };
                         setProject(modifiedProject);
+                        setLoading(false);
                     } else {
                         console.error("No image data found");
 
-
                         setProject(data);
+                        setLoading(false);
                     }
                 })
                 .catch(console.error);
@@ -113,7 +116,11 @@ export default function viewIssuePage({ params }: {
 
     return (
         <div className="flex flex-col items-center justify-center">
-            {project ? (
+            {loading ? (
+                <div className="mt-5">
+                    <Spinner />
+                </div>
+            ) : (
                 <>
                     <div className="p-2 w-[800px]">
                         {issue ? (
@@ -143,13 +150,12 @@ export default function viewIssuePage({ params }: {
                                 </div>
                             </>
                         ) : (
-                            <p>Kraunama...</p>
+                            <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                                <h1 className='text-2xl font-bold'>Nepavyko užkrauti duomenų. Pabandykite iš naujo</h1>
+                            </div>
                         )}
                     </div>
-
                 </>
-            ) : (
-                <p>Kraunama...</p>
             )}
         </div>
     )
