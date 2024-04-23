@@ -21,6 +21,7 @@ export default function Supporter() {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [ issue, setIssue ] = useState<any>(null);
   
   // Fetch users from API if they have assignments or registrations
   useEffect(() => {
@@ -48,15 +49,19 @@ export default function Supporter() {
     // Logic to assign user to service
   };
 
-  const handleStatusChange = (userId: number, newStatus: string) => {
-    // Logic to change user status
+  const handleRemove = (userId: number) => {
+    // Logic to remove user from service
+  };
+
+  const handleCompleted = (userId: number) => {
+    // Logic to mark user as completed
   };
 
   return (
     <div className='flex flex-col items-center justify-center pt-6 w-full max-w-5xl overflow-y-auto'>
       {/* <UserSearch setSearchTerm={setSearchTerm} /> */}
       {/* <UserFilter users={users} setFilteredUsers={setFilteredUsers} /> */}
-      <UserList users={users} onAssign={handleAssign} onStatusChange={handleStatusChange} />
+      <UserList users={users} onAssign={handleAssign} onRemove={handleRemove} onCompleted={handleCompleted} />
     </div>
   );
 };

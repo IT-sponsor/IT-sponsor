@@ -1,5 +1,6 @@
+"use client";
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FaGithub } from 'react-icons/fa';
 
 type UserCardProps = {
@@ -14,19 +15,54 @@ type UserCardProps = {
     fk_imagesid_images: number;
     gets_assigned: number[];
     applies: number[];
+    issueId: number;
+    type: string;
   };
   onAssign: (userId: number) => void;
-  onStatusChange: (userId: number, status: string) => void;
+  onRemove: (userId: number, type: string) => void;
+  onCompleted: (userId: number, type: string) => void;
 };
+interface Issue {
+  id: number;
+  title: string;
+  description: string;
+  fk_projectsid: number;
+  visibility: string;
+  status: string;
+}
 
-const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onStatusChange, issueName }) => {
-  const { id, first_name, last_name, github, images } = user;
+const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onCompleted }) => {
+  const { id, first_name, last_name, github, fk_imagesid_images: images, issueId, type } = user;
   const fullName = `${first_name} ${last_name}`;
-
   const githubUrl = `https://github.com/${github}`;
+  const [issue, setIssue] = useState({} as Issue);
+
+  // Issue is from this project
+  // Issue is open unless user already assigned
+  // 
+  useEffect(() => {
+    fetch(`/api/issue/own/${issueId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      setIssue(data);
+    })
+    .catch(error => {
+      console.error("Error fetching issue:", error.message);
+    });
+  }, []);
 
   return (
-    <div className="flex-grow px-4 py-2 w-full rounded-xl border-2 border-gray-100 bg-white">
+    <div className="flex-grow px-4 py-2 mt-2 w-full rounded-xl border-2 border-gray-100 bg-white">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4 shrink-0">
           {/* Placeholder image */}
@@ -47,11 +83,22 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onStatusChange, iss
         </div>
         <div className="flex items-center overflow-y-auto ">
           <span className="text-gray-500 font-italic mr-4 ml-8 flex-col break-words flex-wrap">
-            Issue: PlaceholderIssue
+            {issue.title}
           </span>
-          <button onClick={() => onAssign(id)} className="bg-blue-500 text-white px-4 py-2 rounded-md">
-            Priskirti
-          </button>
+          {type === 'applied' ? (
+            <button onClick={() => onAssign(id)} className="bg-blue-500 text-white px-4 py-2 rounded-md">
+              Priskirti
+            </button>
+          ) : (
+            <>
+            <button onClick={() => onRemove(id, 'assigned')} className="bg-red-500 text-white px-4 py-2 mr-2 rounded-md">
+              Pašalinti
+            </button>
+            <button onClick={() => onCompleted(id, 'assigned')} className="bg-green-500 text-white px-4 py-2 rounded-md">
+              Atliko pataisymą
+            </button>
+            </>
+          )}
         </div>
       </div>
     </div>

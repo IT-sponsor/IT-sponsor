@@ -5,7 +5,6 @@ export async function GET(
     request: NextRequest,
     { params }: { params: { id: Number } }
 ) {
-    console.log(params.id);
     let issues = await prisma.issues.findMany({
         where: { fk_projectsid: Number(params.id) }
     });
