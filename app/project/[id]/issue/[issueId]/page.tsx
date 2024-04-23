@@ -78,6 +78,29 @@ export default function viewIssuePage({ params }: {
         }
     }, [issueId]);
 
+    const changeProjectVisibility = async (status: string) => {
+        try {
+            const updatedIssue = issue;
+            if (updatedIssue) {
+                updatedIssue.status = status;
+            }
+
+            const response = await fetch(`/api/project/${projectId}/issues/${issueId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedIssue),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to update issue: ${response.statusText}`);
+            }
+
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const statusLocale = {
         open: 'Aktyvus',
         closed: 'Uždarytas'
@@ -96,8 +119,15 @@ export default function viewIssuePage({ params }: {
                         {issue ? (
                             <>
                                 <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
-                                    <div className="px-4 py-5 sm:px-6">
+                                    <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
                                         <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
+                                        <div className="flex space-x-2">
+                                            {issue.status === 'open' ? (
+                                                <button onClick={() => changeProjectVisibility("closed")} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Uždaryti</button>
+                                            ) : (
+                                                <button onClick={() => changeProjectVisibility("open")} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Atidaryti</button>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="border-t border-gray-200">
                                         <dl>
