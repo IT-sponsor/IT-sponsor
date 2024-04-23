@@ -95,6 +95,10 @@ export default function ProjectLayout({
         ...(canAccess
             ? [
                 {
+                    name: "Rėmėjai",
+                    link: `/project/${projectId}/supporter`
+                },
+                {
                     name: "Klaidos",
                     link: `/project/${projectId}/fault`
                 },
