@@ -2,6 +2,7 @@
 import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
+import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
 interface Project {
@@ -39,6 +40,8 @@ interface Issue {
 export default function viewIssuePage({ params }: {
     params: { id: number, issueId: number }
 }) {
+    const { data: session } = useSession();
+    const [canControl, setCanControl] = useState(false);
     const [loading, setLoading] = useState(true);
     const [project, setProject] = useState<Project>();
     const [issue, setIssue] = useState<Issue>();
@@ -46,40 +49,57 @@ export default function viewIssuePage({ params }: {
     const issueId = params.issueId;
 
     useEffect(() => {
-        if (projectId) {
-            fetch(`/api/project/${projectId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.images) {
-                        const logoData = data.images.image.data
-                        const base64String = Buffer.from(logoData).toString('base64');
-                        const modifiedProject = {
-                            ...data,
-                            logo: `data:image/jpeg;base64,${base64String}`
-                        };
-                        setProject(modifiedProject);
-                        setLoading(false);
-                    } else {
-                        console.error("No image data found");
+        const fetchProjectData = async () => {
+            try {
+                const projectResponse = await fetch(`/api/project/${projectId}`);
+                const projectData = await projectResponse.json();
+                if (projectData && projectData.images) {
+                    const logoData = projectData.images.image.data;
+                    const base64String = Buffer.from(logoData).toString('base64');
+                    const modifiedProject = {
+                        ...projectData,
+                        logo: `data:image/jpeg;base64,${base64String}`
+                    };
+                    setProject(modifiedProject);
+                    setLoading(false);
+                } else {
+                    console.error("No image data found");
+                    setProject(projectData);
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.error("Error fetching project data", error);
+            }
+        };
 
-                        setProject(data);
-                        setLoading(false);
-                    }
-                })
-                .catch(console.error);
-        }
-    }, [projectId]);
+        const fetchIssueData = async () => {
+            try {
+                const issueResponse = await fetch(`/api/project/${projectId}/issues/${issueId}`);
+                const issueData = await issueResponse.json();
+                setIssue(issueData);
+            } catch (error) {
+                console.error("Error fetching issue data", error);
+            }
+        };
 
-    useEffect(() => {
-        if (issueId) {
-            fetch(`/api/project/${projectId}/issues/${issueId}`)
-                .then(res => res.json())
-                .then(data => {
-                    setIssue(data);
-                })
-                .catch(console.error);
-        }
-    }, [issueId]);
+        const fetchCanControl = async () => {
+            try {
+                const controlsResponse = await fetch(`/api/controls/${projectId}`);
+                const controlsData = await controlsResponse.json();
+                if (controlsData.length > 0) {
+                    const ownerId = controlsData[0].fk_usersid.toString();
+                    const canControl = ownerId === session?.user?.id;
+                    setCanControl(canControl);
+                }
+            } catch (error) {
+                console.error("Error fetching controls", error);
+            }
+        };
+
+        fetchProjectData();
+        fetchCanControl();
+        fetchIssueData();
+    }, [projectId, issueId, session]);
 
     const changeProjectVisibility = async (status: string) => {
         try {
@@ -129,12 +149,15 @@ export default function viewIssuePage({ params }: {
                                     <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
                                         <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
                                         <div className="flex space-x-2">
-                                            {issue.status === 'open' ? (
-                                                <button onClick={() => changeProjectVisibility("closed")} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Uždaryti</button>
-                                            ) : (
-                                                <button onClick={() => changeProjectVisibility("open")} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Atidaryti</button>
-                                            )}
+                                            {canControl ? (
+                                                issue.status === 'open' ? (
+                                                    <button onClick={() => changeProjectVisibility("closed")} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Uždaryti</button>
+                                                ) : (
+                                                    <button onClick={() => changeProjectVisibility("open")} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Atidaryti</button>
+                                                )
+                                            ) : null}
                                         </div>
+
                                     </div>
                                     <div className="border-t border-gray-200">
                                         <dl>
