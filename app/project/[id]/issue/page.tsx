@@ -72,6 +72,7 @@ export default function IssuePage({ params }: {
                                                     title={issue.title}
                                                     description={issue.description}
                                                     status={issue.status}
+                                                    visibility={issue.visibility}
                                                 />
                                             </div>
                                         ) : null}
@@ -83,6 +84,7 @@ export default function IssuePage({ params }: {
                                             title={issue.title}
                                             description={issue.description}
                                             status={issue.status}
+                                            visibility={issue.visibility}
                                         />
                                     </div>
                                 )}
