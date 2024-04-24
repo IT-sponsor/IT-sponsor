@@ -17,9 +17,10 @@ type UserListProps = {
   onAssign: (userId: number) => void;
   onRemove: (userId: number) => void;
   onCompleted: (userId: number) => void
+  project_id: number;
 };
 
-const UserList: React.FC<UserListProps> = ({ users, onAssign, onRemove, onCompleted }) => {
+const UserList: React.FC<UserListProps> = ({ users, onAssign, onRemove, onCompleted, project_id }) => {
   const combinedIssues = users.flatMap(user => [
     ...user.gets_assigned.map(issueId => ({ ...user, issueId, type: 'assigned' })),
     ...user.applies.map(issueId => ({ ...user, issueId, type: 'applied' }))
@@ -33,7 +34,8 @@ const UserList: React.FC<UserListProps> = ({ users, onAssign, onRemove, onComple
           user={userWithIssue} 
           onAssign={onAssign} 
           onRemove={onRemove}
-          onCompleted={onCompleted} 
+          onCompleted={onCompleted}
+          project_id={project_id} 
         />
       ))}
     </>

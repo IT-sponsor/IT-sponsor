@@ -17,7 +17,8 @@ interface User {
   applies: number[];
 };
 
-export default function Supporter() {
+export default function Supporter( { params }: { params: { id: number } }) {
+  const project_id = params.id;
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -25,7 +26,7 @@ export default function Supporter() {
   
   // Fetch users from API if they have assignments or registrations
   useEffect(() => {
-    fetch('/api/user', {
+    fetch(`/api/user`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -61,7 +62,7 @@ export default function Supporter() {
     <div className='flex flex-col items-center justify-center pt-6 w-full max-w-5xl overflow-y-auto'>
       {/* <UserSearch setSearchTerm={setSearchTerm} /> */}
       {/* <UserFilter users={users} setFilteredUsers={setFilteredUsers} /> */}
-      <UserList users={users} onAssign={handleAssign} onRemove={handleRemove} onCompleted={handleCompleted} />
+      <UserList users={users} onAssign={handleAssign} onRemove={handleRemove} onCompleted={handleCompleted} project_id={project_id} />
     </div>
   );
 };

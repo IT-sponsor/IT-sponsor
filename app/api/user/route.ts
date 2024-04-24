@@ -4,7 +4,6 @@ import z from 'zod';
 import prisma from "@/app/utils/prisma/client";
 import { GET as getApplies } from "@/app/api/applies/route";
 import { GET as getAssigned } from "@/app/api/gets_assigned/route";
-import { User } from "next-auth";
 
 const userSchema = z
   .object({
@@ -67,7 +66,9 @@ interface User {
     applies: number[];
 }
 
-export async function GET() {
+export async function GET(
+    request: NextRequest,
+) {
     try {
         const applied = await getApplies()
         .then((response) => response.json())

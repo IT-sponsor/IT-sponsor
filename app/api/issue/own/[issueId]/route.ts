@@ -8,6 +8,5 @@ export async function GET(
     let issue = await prisma.issues.findUnique({
         where: { id: Number(params.issueId)}
     });
-    console.log(issue);
     return NextResponse.json(issue);
 }
