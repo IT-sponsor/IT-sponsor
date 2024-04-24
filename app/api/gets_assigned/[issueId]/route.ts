@@ -5,8 +5,8 @@ export async function GET(
     request: Request,
     { params }: { params: { issueId: Number} }
 ) {
-    const faultApplicants = await prisma.applies.findMany({
+    const faultAssignees = await prisma.gets_assigned.findMany({
         where: { fk_issuesid: Number(params.issueId) }
     });
-    return NextResponse.json(faultApplicants);
+    return NextResponse.json(faultAssignees);
 }

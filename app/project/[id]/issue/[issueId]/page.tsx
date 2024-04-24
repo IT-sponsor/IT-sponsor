@@ -1,9 +1,7 @@
 "use client";
-import UserModal from "@/app/components/Issue/Cards/IssueFixerModal";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import prisma from "@/app/utils/prisma/client";
-import { set } from "date-fns";
 import { useSession } from "next-auth/react";
 import { NextResponse } from "next/server";
 import { useState, useEffect } from "react";
@@ -31,18 +29,6 @@ interface Project {
     }
 }
 
-type UserList = {
-    fk_issuesid: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    password: string;
-    github: string;
-    banned_until: Date;
-    role: string;
-    fk_imagesid_images: number;
-};
-
 interface Issue {
     id: number;
     title: string;
@@ -60,8 +46,7 @@ export default function viewIssuePage({ params }: {
     const [canApply, setCanApply] = useState(false);
     const { data: session } = useSession();
     const [hasAccess, setHasAccess] = useState(false);
-    const [userList, setUserList] = useState(Array<UserList>());
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAssigned, setIsAssigned] = useState(false);
     const projectId = params.id;
     const issueId = params.issueId;
 
@@ -99,27 +84,33 @@ export default function viewIssuePage({ params }: {
         }
     }, [issueId]);
 
-    // TODO: check if user already applied to this issue
-    // Check if user has been assigned to this issue
-    // Update on database changes
+    // DONE: check if user already applied to this issue
+    // DONE: Check if user has been assigned to this issue
+    // TODO: Update on database changes
     useEffect(() => {
         const fetchAccess = async () => {
             try {
                 let hasAccess = false;
                 let hasApplied = false;
-                const response = await fetch(`/api/controls/${projectId}`);
-                const data = await response.json();
+                const isOwner = await fetch(`/api/controls/${projectId}`);
+                const data = await isOwner.json();
                 if (data.length > 0) {
                     const ownerId = data[0].fk_usersid.toString();
                     hasAccess = ownerId === session?.user?.id;
                     setHasAccess(hasAccess);
                 }
-                const response2 = await fetch(`/api/applies/${issueId}`);
-                const data2 = await response2.json();
-                if (data2.some(item => item.fk_usersid === session?.user?.id)) {
+                const response = await fetch(`/api/applies/${issueId}`);
+                const data2 = await response.json();
+                if (data.length > 0 && data2.some(item => String(item.fk_usersid) === String(session?.user?.id))) {
                     hasApplied = true;
                 }
                 setCanApply(!hasAccess && !hasApplied);
+
+                const response3 = await fetch(`/api/gets_assigned/${issueId}`);
+                const data3 = await response3.json();
+                if (data3.length > 0 && data3.some(item => String(item.fk_usersid) === String(session?.user?.id))) {
+                    setIsAssigned(true);
+                }
             } catch (error) {
                 console.error('Error fetching controls:', error);
             }
@@ -161,46 +152,6 @@ export default function viewIssuePage({ params }: {
         }
     }
 
-    async function fetchUserList() {
-        try {
-          const response = await fetch(`/api/applies/${issueId}`);
-          if (response.ok) {
-            const data = await response.json();
-            
-            try {
-                const userDetailsPromises = data.map(item => fetch(`/api/user/${item.fk_usersid}`));
-              
-                const userDetailsResponses = await Promise.all(userDetailsPromises);
-              
-                if (userDetailsResponses.every(res => res.ok)) {
-                  const userDetailsData = await Promise.all(
-                    userDetailsResponses.map(async (response) => {
-                      return await response.json();
-                    })
-                  );
-              
-                  const mergedUserList = userDetailsData.map((user, index) => ({
-                    ...user,
-                    fk_issuesid: data[index].fk_issuesid
-                  }));
-              
-                  setUserList(mergedUserList);
-                  console.log(mergedUserList);
-                  setIsModalOpen(true);
-                } else {
-                  throw new Error('Error fetching user details');
-                }
-              } catch (error) {
-                console.error(error);
-              }
-          } else {
-            throw new Error('Error fetching fixer list');
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
     return (
         <div className="flex flex-col items-center justify-center">
             {project ? (
@@ -208,26 +159,26 @@ export default function viewIssuePage({ params }: {
                     <div className="p-2 w-[800px]">
                         {issue ? (
                             <>
-                                {isModalOpen && <UserModal userList={userList} onClose={() => setIsModalOpen(false)} />}
-
                                 <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
                                     <div className="px-4 py-5 sm:px-6 flex items-center justify-between">
                                         <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
                                         {!hasAccess ? (
-                                            canApply ? (
+                                            canApply && !isAssigned ? (
                                                 <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={volunteerApplied}>
                                                     Noriu taisyti
                                                 </button>
                                             ) : (
-                                                <button className="bg-gray-500 text-white font-bold py-2 px-4 rounded cursor-not-allowed" disabled>
-                                                    Laukiama patvirtinimo
-                                                </button>
+                                                isAssigned ? (
+                                                    <button className="bg-white border-2 border-green-500 font-bold py-2 px-4 rounded cursor-not-allowed" disabled>
+                                                        Jau priskirtas
+                                                    </button>
+                                                ) : (
+                                                    <button className="bg-gray-500 text-white font-bold py-2 px-4 rounded cursor-not-allowed" disabled>
+                                                        Laukiama patvirtinimo
+                                                    </button>
+                                                )
                                             )
-                                        ) : (
-                                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={fetchUserList}>
-                                                Peržiūrėti kandidatus
-                                            </button>
-                                        )}
+                                        ) : null}
                                     </div>
                                     <div className="border-t border-gray-200">
                                         <dl>

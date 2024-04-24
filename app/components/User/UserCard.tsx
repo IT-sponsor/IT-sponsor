@@ -94,11 +94,11 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
             </button>
           ) : (
             <>
-            <button onClick={() => onRemove(id, 'assigned')} className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mr-2 rounded-md">
-              Pašalinti
-            </button>
-            <button onClick={() => onCompleted(id, 'assigned')} className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+            <button onClick={() => onCompleted(id, 'assigned')} className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 mr-2 rounded-md">
               Atliko pataisymą
+            </button>
+            <button onClick={() => onRemove(id, 'assigned')} className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-md">
+              Pašalinti
             </button>
             </>
           )}
