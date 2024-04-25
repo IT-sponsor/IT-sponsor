@@ -1,8 +1,8 @@
 "use client";
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { NextResponse } from "next/server";
-import { title } from "process";
-import { useState, useEffect } from "react";
+import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor';
 
 interface Project {
     id: number;
@@ -56,7 +56,7 @@ export default function newFaultPage({ params }: {
           fetch(`/api/project/${projectId}`)
             .then(res => res.json())
             .then(data => {
-              if (data && data.images.image.data) {
+              if (data && data.images) {
                 const logoData = data.images.image.data
                 const base64String = Buffer.from(logoData).toString('base64');
                 const modifiedProject = {
@@ -129,7 +129,6 @@ export default function newFaultPage({ params }: {
         <div className="flex flex-col items-center justify-center p-6">
             {project ? (
                 <>
-
                     <div className="px-6 py-5 rounded-xl border-2 border-gray-100 bg-white">
                         <h1 className="text-2xl font-bold text-gray-800 text-center">Pranešti apie klaidą</h1>
                         <form onSubmit={handleSubmit} className="flex flex-col items-start justify-center w-[800px]">
@@ -144,14 +143,7 @@ export default function newFaultPage({ params }: {
                             {formErrors.faultTitle && <div className="text-red-500">{formErrors.faultTitle}</div>}
 
                             <label htmlFor="description" className="block text-gray-800 font-bold mt-4">Aprašymas</label>
-                            <textarea
-                                id="description"
-                                placeholder="Atkūrimo veiksmai"
-                                rows={10}
-                                className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-                                value={faultDescription} onChange={(e) => setFaultDescription(e.target.value)}
-                            >
-                            </textarea>
+                            <MarkdownEditor markdownText={faultDescription} setMarkdownText={(value) => setFaultDescription(value)} />
                             {formErrors.faultDescription && <div className="text-red-500">{formErrors.faultDescription}</div>}
 
 

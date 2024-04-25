@@ -112,7 +112,7 @@ export default function Navigation() {
                   tabIndex={-1}
                   >
                   {/* <!-- Active: "bg-gray-100", Not Active: "" --> */}
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-0">Mano profilis</a>
+                  <a href={'/profile/' + session.user.id} className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-0">Mano profilis</a>
                   <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-1">Nustatymai</a>
                   <a onClick={() => signOut({
                     redirect: true,
@@ -125,7 +125,7 @@ export default function Navigation() {
               <Link className='flex justify-center rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600' href='/sign-in'>
                 Prisijungti
               </Link>
-            )};
+            )}
 
           
         </div>

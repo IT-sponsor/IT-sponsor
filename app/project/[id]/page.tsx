@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from 'react';
 import MarkdownDisplay from '@/app/components/MarkdownDisplay/MarkdownDisplay';
+import TOC from '@/app/components/TableOfContents/TableOfContents';
+import Spinner from '@/app/components/Loading/Spinner';
+import CompanyDefault from '@/public/assets/CompanyDefault.png';
 
 interface Project {
     id: number;
@@ -29,6 +32,7 @@ export default function ProjectPage({ params }: {
     params: { id: number }
 }) {
     const [project, setProject] = useState<Project | null>(null);
+    const [loading, setLoading] = useState(true);
 
     const projectId = params.id;
 
@@ -37,38 +41,60 @@ export default function ProjectPage({ params }: {
             fetch(`/api/project/${projectId}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.images.image.data) {
-                        const logoData = data.images.image.data
-                        const base64String = Buffer.from(logoData).toString('base64');
-                        const modifiedProject = {
-                            ...data,
-                            logo: `data:image/jpeg;base64,${base64String}`
-                        };
-                        setProject(modifiedProject);
-                    } else {
-                        console.error("No image data found");
-
-
+                    setTimeout(() => {
                         setProject(data);
-                    }
+                        setLoading(false);
+                    }, 500);
                 })
                 .catch(console.error);
         }
     }, [projectId]);
 
+    useEffect(() => {
+        const handleHashChange = () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const element = document.getElementById(hash);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    console.log(`PROJECT: Element with ID: ${hash} not found`);
+                }
+            }
+        };
+    
+        window.addEventListener('hashchange', handleHashChange);
+        handleHashChange();
+    
+        return () => {
+            window.removeEventListener('hashchange', handleHashChange);
+        };
+    }, []);
+
     return (
-        <div>
-            {project ? (
-                <>
-                    <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
-                        <MarkdownDisplay markdownText={project.long_description} />
-                    </div>
-                </>
+        <div className='w-full flex flex-col justify-center items-center'>
+            {loading ? (
+                <div className='mt-5'>
+                    <Spinner />
+                </div>
             ) : (
-                <p>Loading project details...</p>
+                <>
+                    {project ? (
+                        <div className='flex flex-row w-full max-w-5xl'>
+                            <div className='w-1/4 border-l border-gray-200'>
+                                <TOC markdownText={project.long_description} />
+                            </div>
+                            <div className='rounded-xl border-2 border-gray-100 w-3/4 pt-4 pl-10 pr-10'>
+                                <MarkdownDisplay markdownText={project.long_description} />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                            <h1 className='text-2xl font-bold'>Nepavyko užkrauti duomenų. Pabandykite iš naujo</h1>
+                        </div>
+                    )}
+                </>
             )}
         </div>
-
-
     );
 }

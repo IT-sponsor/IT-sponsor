@@ -9,7 +9,7 @@ const userSchema = z
   .object({
     first_name: z.string().min(1, 'Vardas reikalingas'),
     last_name: z.string().min(1, 'Pavarde reikalinga'),
-    email: z.string().min(1, 'E.Pastas reikalingas').email('Netinkamas e.pasto adresas'),
+    email: z.string().min(1, 'El. pastas reikalingas').email('Netinkamas el. pasto adresas'),
     password: z.string().min(1, 'Slaptazodis reikalingas').min(8, 'Slaptazodis privalo buti ilgesnis nei 8 simboliai')
     })
 
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
         });
 
         if(existingUserByEmail) {
-            return NextResponse.json({ users: null, message: "Email already exists"}, {status : 409})
+            return NextResponse.json({ users: null, message: "el. pasto adresas egzistuoja"}, {status : 409})
         }
 
         const hashPassword = await hash(password, 10);

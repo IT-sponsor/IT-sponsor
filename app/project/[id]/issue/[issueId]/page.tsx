@@ -1,4 +1,5 @@
 "use client";
+import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import prisma from "@/app/utils/prisma/client";
@@ -41,6 +42,9 @@ interface Issue {
 export default function viewIssuePage({ params }: {
     params: { id: number, issueId: number }
 }) {
+    const { data: session } = useSession();
+    const [canControl, setCanControl] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [project, setProject] = useState<Project>();
     const [issue, setIssue] = useState<Issue>();
     const [canApply, setCanApply] = useState(false);
@@ -51,38 +55,85 @@ export default function viewIssuePage({ params }: {
     const issueId = params.issueId;
 
     useEffect(() => {
-        if (projectId) {
-            fetch(`/api/project/${projectId}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.images.image.data) {
-                        const logoData = data.images.image.data
-                        const base64String = Buffer.from(logoData).toString('base64');
-                        const modifiedProject = {
-                            ...data,
-                            logo: `data:image/jpeg;base64,${base64String}`
-                        };
-                        setProject(modifiedProject);
-                    } else {
-                        console.error("No image data found");
+        const fetchProjectData = async () => {
+            try {
+                const projectResponse = await fetch(`/api/project/${projectId}`);
+                const projectData = await projectResponse.json();
+                if (projectData && projectData.images) {
+                    const logoData = projectData.images.image.data;
+                    const base64String = Buffer.from(logoData).toString('base64');
+                    const modifiedProject = {
+                        ...projectData,
+                        logo: `data:image/jpeg;base64,${base64String}`
+                    };
+                    setProject(modifiedProject);
+                    setLoading(false);
+                } else {
+                    console.error("No image data found");
+                    setProject(projectData);
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.error("Error fetching project data", error);
+            }
+        };
 
-                        setProject(data);
-                    }
-                })
-                .catch(console.error);
-        }
-    }, [projectId]);
+        const fetchIssueData = async () => {
+            try {
+                const issueResponse = await fetch(`/api/project/${projectId}/issues/${issueId}`);
+                const issueData = await issueResponse.json();
+                setIssue(issueData);
+            } catch (error) {
+                console.error("Error fetching issue data", error);
+            }
+        };
 
-    useEffect(() => {
-        if (issueId) {
-            fetch(`/api/project/${projectId}/issues/${issueId}`)
-                .then(res => res.json())
-                .then(data => {
-                    setIssue(data);
-                })
-                .catch(console.error);
+        const fetchCanControl = async () => {
+            try {
+                const controlsResponse = await fetch(`/api/controls/${projectId}`);
+                const controlsData = await controlsResponse.json();
+                if (controlsData.length > 0) {
+                    const ownerId = controlsData[0].fk_usersid.toString();
+                    const canControl = ownerId === session?.user?.id;
+                    setCanControl(canControl);
+                }
+            } catch (error) {
+                console.error("Error fetching controls", error);
+            }
+        };
+
+        fetchProjectData();
+        fetchCanControl();
+        fetchIssueData();
+    }, [projectId, issueId, session]);
+
+    const updateIssue = async (updatedIssue: Issue) => {
+        try {
+            const response = await fetch(`/api/project/${projectId}/issues/${issueId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedIssue),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to update issue: ${response.statusText}`);
+            }
+
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
         }
-    }, [issueId]);
+    };
+
+    const changeIssueStatus = async (status: string) => {
+        const updatedIssue = issue ? { ...issue, status } : undefined;
+        await updateIssue(updatedIssue as Issue);
+    };
+
+    const changeIssueVisibility = async (visibility: 'public' | 'private') => {
+        const updatedIssue = issue ? { ...issue, visibility } : undefined;
+        await updateIssue(updatedIssue as Issue);
+    };
 
     // DONE: check if user already applied to this issue
     // DONE: Check if user has been assigned to this issue
@@ -92,19 +143,13 @@ export default function viewIssuePage({ params }: {
             try {
                 let hasAccess = false;
                 let hasApplied = false;
-                const isOwner = await fetch(`/api/controls/${projectId}`);
-                const data = await isOwner.json();
-                if (data.length > 0) {
-                    const ownerId = data[0].fk_usersid.toString();
-                    hasAccess = ownerId === session?.user?.id;
-                    setHasAccess(hasAccess);
-                }
+
                 const response = await fetch(`/api/applies/${issueId}`);
                 const data2 = await response.json();
                 if (data.length > 0 && data2.some(item => String(item.fk_usersid) === String(session?.user?.id))) {
                     hasApplied = true;
                 }
-                setCanApply(!hasAccess && !hasApplied);
+                setCanApply(!canControl && !hasApplied);
 
                 const response3 = await fetch(`/api/gets_assigned/${issueId}`);
                 const data3 = await response3.json();
@@ -154,15 +199,33 @@ export default function viewIssuePage({ params }: {
 
     return (
         <div className="flex flex-col items-center justify-center">
-            {project ? (
+            {loading ? (
+                <div className="mt-5">
+                    <Spinner />
+                </div>
+            ) : (
                 <>
                     <div className="p-2 w-[800px]">
                         {issue ? (
                             <>
                                 <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4 mt-4">
-                                    <div className="px-4 py-5 sm:px-6 flex items-center justify-between">
+                                    <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
                                         <h2 className="text-lg leading-6 font-medium text-gray-900">{issue.title}</h2>
-                                        {!hasAccess ? (
+                                        <div className="flex space-x-2">
+                                            {canControl ? (
+                                                <>
+                                                    {issue.status === 'open' ? (
+                                                        <button onClick={() => changeIssueStatus("closed")} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Uždaryti trūkumą</button>
+                                                    ) : (
+                                                        <button onClick={() => changeIssueStatus("open")} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Atidaryti trūkumą</button>
+                                                    )}
+                                                    {issue.visibility === 'public' ? (
+                                                        <button onClick={() => changeIssueVisibility("private")} className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Padaryti privatų</button>
+                                                    ) : (
+                                                        <button onClick={() => changeIssueVisibility("public")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Padaryti viešą</button>
+                                                    )}
+                                                </>
+                                            ) : (
                                             canApply && !isAssigned ? (
                                                 <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={volunteerApplied}>
                                                     Noriu taisyti
@@ -178,7 +241,9 @@ export default function viewIssuePage({ params }: {
                                                     </button>
                                                 )
                                             )
-                                        ) : null}
+                                        )}
+                                        </div>
+
                                     </div>
                                     <div className="border-t border-gray-200">
                                         <dl>
@@ -194,13 +259,12 @@ export default function viewIssuePage({ params }: {
                                 </div>
                             </>
                         ) : (
-                            <p>Kraunama...</p>
+                            <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                                <h1 className='text-2xl font-bold'>Nepavyko užkrauti duomenų. Pabandykite iš naujo</h1>
+                            </div>
                         )}
                     </div>
-
                 </>
-            ) : (
-                <p>Kraunama...</p>
             )}
         </div>
     )

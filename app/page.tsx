@@ -1,8 +1,11 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
+
 import Link from "next/link";
 
 import ProjectCard from "./components/ProjectCard/ProjectCard";
+import ProjectCardSkeleton from './components/ProjectCard/ProjectCardSkeleton';
+import CompanyDefault from '@/public/assets/CompanyDefault.png';
 
 interface Project {
   id: number;
@@ -34,6 +37,8 @@ export default function Home() {
   const [sortBy, setSortBy] = useState('newest_updated');
   const [filterBy, setFilterBy] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+
 
   const filterDropdownRef = useRef(null);
   const sortDropdownRef = useRef(null);
@@ -52,17 +57,30 @@ export default function Home() {
       .then(res => res.json())
       .then(data => {
         const modifiedData = data.map((project: Project) => {
-          // Convert buffer to base64 string
-          const logoData = project.images.image.data;
-          const base64String = Buffer.from(logoData).toString('base64');
-          return {
-            ...project,
-            logo: `data:image/jpeg;base64,${base64String}` // Assuming the logo is JPEG
-          };
+          if(project.images) {
+            console.log("HEREEEEEEEEEEEEE");
+            const logoData = project.images.image.data;
+            const base64String = Buffer.from(logoData).toString('base64');
+            return {
+              ...project,
+              logo: `data:image/jpeg;base64,${base64String}`
+            };
+          } else {
+            return {
+              ...project,
+              logo: CompanyDefault.src
+            };
+          }
         });
-        setProjects(modifiedData);
+        setTimeout(() => {
+          setProjects(modifiedData);
+          setLoading(false);
+        }, 500);
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
@@ -133,9 +151,9 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center justify-center">
       {/* Search bar */}
-      <div className='flex items-center'>
+      <div className='flex items-center justify-center'>
         <div className="pt-2 relative mx-auto text-gray-600">
           <input
             className="border-2 border-gray-300 bg-white h-10 px-5 pr-16 rounded-lg text-sm focus:outline-none"
@@ -278,25 +296,42 @@ export default function Home() {
       </div>
 
 
-      <div className='mb-5'>
-        {filteredProjects.map((project, index) => (
-          <div className="my-4 max-w-5xl max-h-60" key={index}>
-            {/* link to the project page by the id*/}
-            <Link href={`/project/${project.id}`} passHref>
-              <div style={{ cursor: 'pointer' }}>
-                <ProjectCard
-                  image_url={project.logo}
-                  title={project.name}
-                  description={project.short_description}
-                  timeUpdated={project.updated_at}
-                  issueCount={0}
-                  volunteerCount={0}
-                  tags={project.technologies.split(' ')}
-                />
-              </div>
-            </Link>
+      <div className='mb-5 w-full flex flex-col justify-center items-center'>
+        {loading ? (
+          <>
+            <div className='my-4 w-full max-w-5xl max-h-60'>
+              <ProjectCardSkeleton />
+            </div>
+            <div className='my-4 w-full max-w-5xl max-h-60'>
+              <ProjectCardSkeleton />
+            </div>
+            <div className='my-4 w-full max-w-5xl max-h-60'>
+              <ProjectCardSkeleton />
+            </div>
+          </>          
+        ) : filteredProjects.length > 0 ? (
+          filteredProjects.map((project, index) => (
+            <div className="my-4 w-full max-w-5xl max-h-60" key={index}>
+              <Link href={`/project/${project.id}`} passHref>
+                <div style={{ cursor: 'pointer' }}>
+                  <ProjectCard
+                    image_url={project.logo}
+                    title={project.name}
+                    description={project.short_description}
+                    timeUpdated={project.updated_at}
+                    issueCount={0}
+                    volunteerCount={0}
+                    tags={project.technologies.split(' ')}
+                  />
+                </div>
+              </Link>
+            </div>
+          ))
+        ) : searchQuery.length > 0 && (
+          <div className="mt-5 text-center text-lg text-gray-600">
+            Nė vienas projektas neatitinka jūsų paieškos kriterijų. Išbandykite kitus raktinius žodžius arba filtrus.
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
