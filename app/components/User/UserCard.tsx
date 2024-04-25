@@ -19,9 +19,9 @@ type UserCardProps = {
     issueId: number;
     type: string;
   };
-  onAssign: (userId: number) => void;
-  onRemove: (userId: number, type: string) => void;
-  onCompleted: (userId: number, type: string) => void;
+  onAssign: (user_id: number, issue_id: number) => void;
+  onRemove: (user_id: number, issue_id: number) => void;
+  onCompleted: (user_id: number, issue_id: number) => void;
   project_id: number;
 };
 interface Issue {
@@ -38,6 +38,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
   const fullName = `${first_name} ${last_name}`;
   const githubUrl = `https://github.com/${github}`;
   const [issue, setIssue] = useState({} as Issue);
+
 
   useEffect(() => {
     fetch(`/api/project/${project_id}/issues/${issueId}`, {
@@ -89,19 +90,22 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
             </span>
           </Link>
           {type === 'applied' && issue.status === 'open' ? (
-            <button onClick={() => onAssign(id)} className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+            <button onClick={() => onAssign(id, issueId)} className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
               Priskirti
             </button>
           ) : (
+            issue.status === 'open' && (
             <>
-            <button onClick={() => onCompleted(id, 'assigned')} className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 mr-2 rounded-md">
-              Atliko pataisymą
-            </button>
-            <button onClick={() => onRemove(id, 'assigned')} className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-md">
-              Pašalinti
-            </button>
+              <button onClick={() => onCompleted(id, issueId)} className="bg-green-500 hover:bg-green-700 text-white px-4 py-2 mr-2 rounded-md">
+                Atliko pataisymą
+              </button>
+              <button onClick={() => onRemove(id, issueId)} className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-md">
+                Pašalinti
+              </button>
             </>
+          )
           )}
+          {issue.status === 'closed' && (<div>This shouldnt happen</div>)}
         </div>
       </div>
     </div>

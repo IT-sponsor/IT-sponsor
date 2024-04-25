@@ -84,16 +84,19 @@ export async function GET(
             throw new Error(error.message);
         });
 
+        const assignedUserIds = assigned.map((assign: Assigned) => assign.fk_usersid);
+        const appliedUserIds = applied.map((apply: Applied) => apply.fk_usersid);
+
+        const combinedUserIds = [...assignedUserIds, ...appliedUserIds];
+
+        const uniqueUserIds = Array.from(new Set(combinedUserIds));
+
         const assignedUsers: User[] = await prisma.users.findMany({
             where: {
                 id: {
-                    in: assigned.map((assign: Assigned) => assign.fk_usersid) && applied.map((apply: Applied) => apply.fk_usersid)
+                    in: uniqueUserIds
                 }
             },
-            include: {
-                gets_assigned: true,
-                applies: true
-            }
         });
 
         if (!assignedUsers) {

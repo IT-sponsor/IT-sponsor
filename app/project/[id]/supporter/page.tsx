@@ -25,7 +25,7 @@ export default function Supporter( { params }: { params: { id: number } }) {
   const [ issue, setIssue ] = useState<any>(null);
   
   // Fetch users from API if they have assignments or registrations
-  useEffect(() => {
+  async function fetchUsers() {
     fetch(`/api/user`, {
       method: 'GET',
       headers: {
@@ -44,25 +44,98 @@ export default function Supporter( { params }: { params: { id: number } }) {
     .catch(error => {
       console.error("Error fetching users:", error.message);
     });
+  }
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
 
-  const handleAssign = (userId: number) => {
-    // Logic to assign user to service
+  // Should be good: need to make sure BOTH of the database actions are completed successfully, otherwise, reset and throw an error
+  async function handleAssign(user_id: number, issue_id: number) {
+    try {
+        const response = await fetch(`/api/gets_assigned/new`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                issue_id: issue_id,
+                user_id: user_id,
+            }),
+        });
+
+        if (response.ok) {
+          alert('User added to issue successfully');
+          console.log('User added to issue');
+          fetchUsers();
+        } else {
+          alert('Failed to add user to issue: ' + response.statusText);
+          console.log('Failed to add user to issue' + response.statusText);
+        }
+    } catch (error) {
+      alert('An error occurred while adding user to issue');
+      console.error('Failed to add user to issue:', error);
+    }
+  }
+
+  async function handleRemove(user_id: number, issue_id: number): Promise<void> {
+    try {
+      const response = await fetch(`/api/gets_assigned/${issue_id}`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              issue_id: issue_id,
+              user_id: user_id,
+          }),
+      });
+
+      if (response.ok) {
+        alert('User removed from issue successfully');
+        console.log('User removed from issue');
+        fetchUsers();
+      } else {
+        alert('Failed to remove user from issue: ' + response.statusText);
+        console.log('Failed to remove user from issue' + response.statusText);
+      }
+    } catch (error) {
+      alert('An error occurred while removing user from issue');
+      console.error('Failed to remove user from issue:', error);
+    }
   };
 
-  const handleRemove = (userId: number) => {
-    // Logic to remove user from service
-  };
+  async function handleCompleted(user_id: number, issue_id: number): Promise<void> {
+    // Close issue
+    // Remove all users from issue
+    try {
+      const response = await fetch(`/api/gets_assigned/${issue_id}/update`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          }
+      });
 
-  const handleCompleted = (userId: number) => {
-    // Logic to mark user as completed
+      if (response.ok) {
+        alert('Issue status updated successfully');
+        console.log('Issue status updated successfully');
+        fetchUsers();
+      } else {
+        alert('Failed to update issue status: ' + response.statusText);
+        console.log('Failed to update issue status' + response.statusText);
+      }
+    } catch (error) {
+      alert('An error occurred while updating issue status');
+      console.error('Failed to update issue status:', error);
+    }
   };
-
   return (
     <div className='flex flex-col items-center justify-center pt-6 w-full max-w-5xl overflow-y-auto'>
       {/* <UserSearch setSearchTerm={setSearchTerm} /> */}
       {/* <UserFilter users={users} setFilteredUsers={setFilteredUsers} /> */}
-      <UserList users={users} onAssign={handleAssign} onRemove={handleRemove} onCompleted={handleCompleted} project_id={project_id} />
+      {users.length === 0 ? <div>Nėra rėmėjų</div> :
+        <UserList users={users} onAssign={handleAssign} onRemove={handleRemove} onCompleted={handleCompleted} project_id={project_id} />
+      }
     </div>
   );
 };

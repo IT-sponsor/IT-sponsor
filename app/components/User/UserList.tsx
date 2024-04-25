@@ -14,9 +14,9 @@ type UserListProps = {
     gets_assigned: number[];
     applies: number[];
   }[];
-  onAssign: (userId: number) => void;
-  onRemove: (userId: number) => void;
-  onCompleted: (userId: number) => void
+  onAssign: (user_id: number, issue_id: number) => void;
+  onRemove: (user_id: number, issue_id: number) => void;
+  onCompleted: (user_id: number, issue_id: number) => void
   project_id: number;
 };
 
