@@ -97,12 +97,11 @@ export default function viewFaultPage({ params }: {
                             {fault ? (
                                 <>
                                     <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4">
-                                    <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
-    <h2 className="text-lg leading-6 font-medium text-gray-900">{fault.title}</h2>
-    <Link href={`${faultId}/convert`} type="button" className="rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Konvertuoti</Link>
-</div>
+                                        <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
+                                            <h2 className="text-lg leading-6 font-medium text-gray-900">{fault.title}</h2>
+                                            <Link href={`${faultId}/convert`} type="button" className="rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Konvertuoti</Link>
+                                        </div>
 
-                                        
                                         <div className="border-t border-gray-200">
                                             <dl>
                                                 <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -135,7 +134,6 @@ export default function viewFaultPage({ params }: {
                 </>
             )}
         </div>
-
 
     );
 }

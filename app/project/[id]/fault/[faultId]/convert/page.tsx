@@ -5,6 +5,7 @@ import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { useState, useEffect } from "react";
 import { NextResponse } from "next/server";
 import Spinner from "@/app/components/Loading/Spinner";
+import Link from "next/link";
 
 interface Project {
     id: number;
@@ -128,16 +129,12 @@ export default function FaultConvertPage({ params }: {
             });
 
             if (response.ok) {
-
-                const faultIdAsNumber = parseInt(faultId, 10); // Convert faultId to a number
-                await fetch(`/api/project/${projectId}/faults/remove`, {
+                await fetch(`/api/fault/${projectId}`, {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ faultId: faultIdAsNumber })
+                    body: JSON.stringify({ faultId })
                 });
 
-
-                const result = await response.json();
                 window.location.href = `/project/${projectId}/fault`; // TODO: Add success message
             } else {
                 return new NextResponse(JSON.stringify({ message: "Error creating issue", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
@@ -216,9 +213,12 @@ export default function FaultConvertPage({ params }: {
                                 <div className="flex justify-center mb-4 mt-2">
                                     <button
                                         type="submit"
-                                        className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">
+                                        className="py-2 px-4 mr-2 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">
                                         Konvertuoti klaidą
                                     </button>
+                                    <Link href={`/project/${projectId}/fault`} passHref className="py-2 px-4 rounded-lg text-black bg-gray-400 hover:bg-green-700 transition duration-150 ease-in-out">
+                                        Atšaukti
+                                    </Link>
                                 </div>
                             </div>
                         </form>
