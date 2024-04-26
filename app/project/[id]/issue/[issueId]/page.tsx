@@ -45,6 +45,7 @@ export default function viewIssuePage({ params }: {
     const [loading, setLoading] = useState(true);
     const [project, setProject] = useState<Project>();
     const [issue, setIssue] = useState<Issue>();
+    const [loading, setLoading] = useState(true);
     const projectId = params.id;
     const issueId = params.issueId;
 
@@ -71,6 +72,7 @@ export default function viewIssuePage({ params }: {
                 console.error("Error fetching project data", error);
             }
         };
+
 
         const fetchIssueData = async () => {
             try {
@@ -181,7 +183,12 @@ export default function viewIssuePage({ params }: {
                                                 <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><MarkdownDisplay markdownText={issue.description} /></div>
                                             </div>
                                         </dl>
+
                                     </div>
+                                </>
+                            ) : (
+                                <div className='rounded-xl border-2 border-gray-100 w-full max-w-5xl p-10'>
+                                    <h1 className='text-2xl font-bold'>Nepavyko užkrauti duomenų. Pabandykite iš naujo</h1>
                                 </div>
                             </>
                         ) : (
@@ -193,5 +200,7 @@ export default function viewIssuePage({ params }: {
                 </>
             )}
         </div>
-    )
+
+
+    );
 }
