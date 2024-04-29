@@ -97,7 +97,7 @@ export default function ProjectLayout({
             link: `/project/${projectId}`
         },
         ...(project?.codebase_visibility === 'public' ? [{
-            name: "Repositorija",
+            name: "Repozitorija",
             link: `${project?.repository}`
         }] : []),
         {

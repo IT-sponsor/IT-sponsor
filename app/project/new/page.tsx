@@ -100,7 +100,7 @@ const NewProjectPage = () => {
           />
           {formErrors.repository && <div className="text-red-500">{formErrors.repository}</div>}
 
-          <label htmlFor="codebase_visibility" className="block text-gray-800 font-bold mt-4">Repositorijos matomumas</label>
+          <label htmlFor="codebase_visibility" className="block text-gray-800 font-bold mt-4">Repozitorijos matomumas</label>
           <select
             id="codebase_visibility"
             className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
