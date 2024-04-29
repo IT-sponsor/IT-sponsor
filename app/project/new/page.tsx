@@ -12,6 +12,7 @@ const NewProjectPage = () => {
   const [technologies, setTechnologies] = useState('');
   const [fullDescription, setFullDescription] = useState("# Apie įmonę:\n...\n# Apie projektą:\n...");
   const [image, setImage] = useState<File | null>(null);
+  const [codebase_visibility, setCodebaseVisibility] = useState<string>("public");
   const [formErrors, setFormErrors] = useState<Record<string, any>>({});
 
   const validateForm = () => {
@@ -43,6 +44,7 @@ const NewProjectPage = () => {
     projectData.append('long_description', fullDescription);
     projectData.append('repository', repository);
     projectData.append('technologies', technologies);
+    projectData.append('codebase_visibility', codebase_visibility);
     if (image) projectData.append('image', image);
 
     try {
@@ -97,6 +99,16 @@ const NewProjectPage = () => {
             value={repository} onChange={(e) => setRepository(e.target.value)}
           />
           {formErrors.repository && <div className="text-red-500">{formErrors.repository}</div>}
+
+          <label htmlFor="codebase_visibility" className="block text-gray-800 font-bold mt-4">Repositorijos matomumas</label>
+          <select
+            id="codebase_visibility"
+            className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
+            value={codebase_visibility} onChange={(e) => setCodebaseVisibility(e.target.value)}
+          >
+            <option value="public">Vieša</option>
+            <option value="private">Privati</option>
+          </select>
 
           <label htmlFor="technologies" className="block text-gray-700 font-bold">Technologijos (atskirkite tarpais)</label>
           <input

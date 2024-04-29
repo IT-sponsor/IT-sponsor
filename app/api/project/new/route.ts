@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   const technologies = formData.get("technologies") as string;
   const star_count = Number(formData.get("star_count")) || 0;
   const contributor_count = Number(formData.get("contributor_count")) || 0;
-  const codebase_visibility = formData.get("codebase_visibility") as projects_codebase_visibility || projects_codebase_visibility.public;
+  const codebase_visibility = formData.get("codebase_visibility") as string
   const image = formData.get("image") as File || null;
 
   
