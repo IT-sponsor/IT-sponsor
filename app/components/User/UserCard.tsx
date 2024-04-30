@@ -23,6 +23,7 @@ type UserCardProps = {
   onRemove: (user_id: number, issue_id: number) => void;
   onCompleted: (user_id: number, issue_id: number) => void;
   project_id: number;
+  searchQuery: string;
 };
 interface Issue {
   id: number;
@@ -33,7 +34,7 @@ interface Issue {
   status: string;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onCompleted, project_id }) => {
+const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onCompleted, project_id, searchQuery }) => {
   const { id, first_name, last_name, github, fk_imagesid_images: images, issueId, type } = user;
   const fullName = `${first_name} ${last_name}`;
   const githubUrl = `https://github.com/${github}`;
@@ -62,6 +63,11 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
   }, []);
 
   if(!issue) return null;
+console.log(issue);
+  if(
+    !fullName.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    !issue.title?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) return null;
 
   return (
     <div className="flex-grow px-4 py-2 mt-2 w-full rounded-xl border-2 border-gray-100 bg-white">

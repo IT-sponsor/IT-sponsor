@@ -20,9 +20,8 @@ interface User {
 export default function Supporter( { params }: { params: { id: number } }) {
   const project_id = params.id;
   const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [filter, setFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [ issue, setIssue ] = useState<any>(null);
   
   // Fetch users from API if they have assignments or registrations
   async function fetchUsers() {
@@ -130,12 +129,16 @@ export default function Supporter( { params }: { params: { id: number } }) {
     }
   };
   return (
+    <>
+    <div className='flex flex-row items-end pt-6 w-full max-w-5xl overflow-y-auto'>
+      <UserSearch setSearchTerm={setSearchQuery} />
+      <UserFilter setFilter={setFilter} />
+    </div>
     <div className='flex flex-col items-center justify-center pt-6 w-full max-w-5xl overflow-y-auto'>
-      {/* <UserSearch setSearchTerm={setSearchTerm} /> */}
-      {/* <UserFilter users={users} setFilteredUsers={setFilteredUsers} /> */}
       {users.length === 0 ? <div>Nėra rėmėjų</div> :
-        <UserList users={users} onAssign={handleAssign} onRemove={handleRemove} onCompleted={handleCompleted} project_id={project_id} />
+        <UserList users={ users } onAssign={handleAssign} onRemove={handleRemove} onCompleted={handleCompleted} project_id={project_id} filter={filter} searchQuery={searchQuery} />
       }
     </div>
+    </>
   );
 };

@@ -18,24 +18,29 @@ type UserListProps = {
   onRemove: (user_id: number, issue_id: number) => void;
   onCompleted: (user_id: number, issue_id: number) => void
   project_id: number;
+  filter: string;
+  searchQuery: string;
 };
 
-const UserList: React.FC<UserListProps> = ({ users, onAssign, onRemove, onCompleted, project_id }) => {
+const UserList: React.FC<UserListProps> = ({ users, onAssign, onRemove, onCompleted, project_id, filter, searchQuery }) => {
   const combinedIssues = users.flatMap(user => [
     ...user.gets_assigned.map(issueId => ({ ...user, issueId, type: 'assigned' })),
     ...user.applies.map(issueId => ({ ...user, issueId, type: 'applied' }))
   ]);
 
+  const filteredIssues = filter === 'all' ? combinedIssues : combinedIssues.filter(issue => issue.type === filter);
+
   return (
     <>
-      {combinedIssues.map((userWithIssue) => (
+      {filteredIssues.map((userWithIssue) => (
         <UserCard 
           key={`${userWithIssue.id}-${userWithIssue.issueId}`}
           user={userWithIssue} 
           onAssign={onAssign} 
           onRemove={onRemove}
           onCompleted={onCompleted}
-          project_id={project_id} 
+          project_id={project_id}
+          searchQuery={searchQuery}
         />
       ))}
     </>

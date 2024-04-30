@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         const existingUserByEmail = await prisma.users.findUnique({
             where: { email: email }
         });
-
+        
         if(existingUserByEmail) {
             return NextResponse.json({ users: null, message: "el. pasto adresas egzistuoja"}, {status : 409})
         }
