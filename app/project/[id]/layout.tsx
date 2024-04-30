@@ -96,10 +96,10 @@ export default function ProjectLayout({
             name: "Pagrindinis",
             link: `/project/${projectId}`
         },
-        {
+        ...(project?.codebase_visibility === 'public' ? [{
             name: "Repozitorija",
             link: `${project?.repository}`
-        },
+        }] : []),
         {
             name: "Trūkumai",
             link: `/project/${projectId}/issue`
