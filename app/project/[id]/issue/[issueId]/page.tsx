@@ -44,13 +44,13 @@ export default function viewIssuePage({ params }: {
 }) {
     const { data: session } = useSession();
     const [canControl, setCanControl] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [project, setProject] = useState<Project>();
     const [issue, setIssue] = useState<Issue>();
     const [canApply, setCanApply] = useState(false);
     const { data: session } = useSession();
     const [hasAccess, setHasAccess] = useState(false);
     const [isAssigned, setIsAssigned] = useState(false);
+    const [loading, setLoading] = useState(true);
     const projectId = params.id;
     const issueId = params.issueId;
 
@@ -77,7 +77,7 @@ export default function viewIssuePage({ params }: {
                 console.error("Error fetching project data", error);
             }
         };
-
+        
         const fetchIssueData = async () => {
             try {
                 const issueResponse = await fetch(`/api/project/${projectId}/issues/${issueId}`);
@@ -267,5 +267,5 @@ export default function viewIssuePage({ params }: {
                 </>
             )}
         </div>
-    )
+    );
 }
