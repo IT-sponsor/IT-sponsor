@@ -16,6 +16,14 @@ export async function GET(
             fk_projectsid: Number(params.id)
         }
     });
+
+    if (!issue) {
+        return new NextResponse(
+            JSON.stringify({ message: "Issue not found" }),
+            { status: 404 }
+        );
+    }
+
     return NextResponse.json(issue);
 }
 

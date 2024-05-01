@@ -23,5 +23,13 @@ export async function GET(
             }
         }
     });
+
+    if (!fault) {
+        return new NextResponse(
+            JSON.stringify({ message: "Fault not found" }),
+            { status: 404 }
+        );
+    }
+
     return NextResponse.json(fault);
 }

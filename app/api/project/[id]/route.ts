@@ -11,6 +11,13 @@ export async function GET(
             images: true, // include related image data
         },
     });
+
+    if (!project) {
+      return new NextResponse(
+        JSON.stringify({ message: "Project not found" }),
+        { status: 404 }
+      );
+    }
     return NextResponse.json(project);
 }
 
