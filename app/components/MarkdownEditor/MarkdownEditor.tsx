@@ -17,7 +17,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ markdownText, setMarkdo
 
   const MarkdownSettings = useMemo(() => {
     return {
-      autofocus: true,
+      autofocus: false,
       status: false,
       toolbar: [
         "bold",
