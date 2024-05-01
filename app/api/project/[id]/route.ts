@@ -28,6 +28,7 @@ export async function PUT(
                 long_description: data.long_description,
                 repository: data.repository,
                 technologies: data.technologies,
+                codebase_visibility: data.codebase_visibility,
             },
             include: {
                 images: true, 

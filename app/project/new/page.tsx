@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { NextResponse } from 'next/server';
 
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor';
+import { useSession } from 'next-auth/react';
 
 const NewProjectPage = () => {
   const [projectName, setProjectName] = useState('');
@@ -12,7 +13,9 @@ const NewProjectPage = () => {
   const [technologies, setTechnologies] = useState('');
   const [fullDescription, setFullDescription] = useState("# Apie įmonę:\n...\n# Apie projektą:\n...");
   const [image, setImage] = useState<File | null>(null);
+  const [codebase_visibility, setCodebaseVisibility] = useState<string>("public");
   const [formErrors, setFormErrors] = useState<Record<string, any>>({});
+  const { data: session } = useSession();
 
   const validateForm = () => {
     const newErrors: Record<string, any> = {};
@@ -43,6 +46,7 @@ const NewProjectPage = () => {
     projectData.append('long_description', fullDescription);
     projectData.append('repository', repository);
     projectData.append('technologies', technologies);
+    projectData.append('codebase_visibility', codebase_visibility);
     if (image) projectData.append('image', image);
 
     try {
@@ -53,6 +57,13 @@ const NewProjectPage = () => {
 
       if (response.ok) {
         const result = await response.json();
+
+        await fetch(`/api/controls/${result.project.id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectId: result.project.id, userId: Number(session?.user.id)})
+        });
+
         window.location.href = `/project/${result.project.id}`;
       } else {
         return new NextResponse(JSON.stringify({ message: "Error creating project", error: response.statusText }), { status: 500, headers: { 'Content-Type': 'application/json' } });
@@ -97,6 +108,16 @@ const NewProjectPage = () => {
             value={repository} onChange={(e) => setRepository(e.target.value)}
           />
           {formErrors.repository && <div className="text-red-500">{formErrors.repository}</div>}
+
+          <label htmlFor="codebase_visibility" className="block text-gray-800 font-bold mt-4">Repozitorijos matomumas</label>
+          <select
+            id="codebase_visibility"
+            className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
+            value={codebase_visibility} onChange={(e) => setCodebaseVisibility(e.target.value)}
+          >
+            <option value="public">Vieša</option>
+            <option value="private">Privati</option>
+          </select>
 
           <label htmlFor="technologies" className="block text-gray-700 font-bold">Technologijos (atskirkite tarpais)</label>
           <input
