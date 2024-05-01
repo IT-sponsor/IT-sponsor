@@ -5,6 +5,7 @@ interface IssueCardSmallProps {
     title: string;
     description: string;
     status: string;
+    visibility: string;
 }
 
 const IssueCardSmall = (
@@ -13,6 +14,7 @@ const IssueCardSmall = (
         title,
         description,
         status,
+        visibility
     }: IssueCardSmallProps) => {
 
     const getStatusColor = (status: string) => {
@@ -26,6 +28,17 @@ const IssueCardSmall = (
         }
     };
 
+    const getVisibilityColor = (visibility: string) => {
+        switch (visibility) {
+            case 'public':
+                return 'bg-white';
+            case 'private':
+                return 'bg-gray-200';
+            default:
+                return 'bg-white';
+        }
+    };
+
     const visibilityLocale = {
         public: 'viešas',
         private: 'privatus'
@@ -34,7 +47,7 @@ const IssueCardSmall = (
     return (
         <div className="rounded-xl border-2 border-gray-100 bg-white w-full mb-3">
             <article>
-                <div className="flex flex-col sm:flex-row items-start gap-4 p-4 sm:px-6 lg:px-8">
+                <div className={`flex flex-col sm:flex-row items-start gap-4 p-4 sm:px-6 lg:px-8 ${getVisibilityColor(visibility)}`}>
                     <div className="flex-grow">
                         <div className="flex items-center">
                             <span

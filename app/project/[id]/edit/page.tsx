@@ -9,6 +9,7 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
         name: '',
         short_description: '',
         long_description: '',
+        codebase_visibility: '',
         repository: '',
         technologies: '',
     });
@@ -77,6 +78,16 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
                     <label htmlFor="repository" className="block text-gray-700 font-bold">Repozitorijos nuoroda</label>
                     <input type="text" id="repository" placeholder="https://..." className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-500" value={project.repository} onChange={(e) => setProject({ ...project, repository: e.target.value })} />
                     {formErrors.repository && <div className="text-red-500">{formErrors.repository}</div>}
+
+                    <label htmlFor="codebase_visibility" className="block text-gray-800 font-bold mt-4">Repozitorijos matomumas</label>
+                    <select
+                        id="codebase_visibility"
+                        className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
+                        value={project.codebase_visibility} onChange={(e) => setProject({ ...project, codebase_visibility: e.target.value})}
+                    >
+                        <option value="public">Vieša</option>
+                        <option value="private">Privati</option>
+                    </select>
 
                     <label htmlFor="technologies" className="block text-gray-700 font-bold">Technologijos (atskirkite tarpais)</label>
                     <input
