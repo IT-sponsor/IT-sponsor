@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
@@ -40,6 +41,7 @@ interface Issue {
 export default function viewIssuePage({ params }: {
     params: { id: number, issueId: number }
 }) {
+    const router = useRouter();
     const { data: session } = useSession();
     const [canControl, setCanControl] = useState(false);
     const [project, setProject] = useState<Project>();
@@ -52,6 +54,10 @@ export default function viewIssuePage({ params }: {
         const fetchProjectData = async () => {
             try {
                 const projectResponse = await fetch(`/api/project/${projectId}`);
+                if (projectResponse.status === 404) {
+                    console.error("Project with id", projectId, "not found");
+                    router.replace('/404');
+                }
                 const projectData = await projectResponse.json();
                 if (projectData && projectData.images) {
                     const logoData = projectData.images.image.data;
@@ -75,6 +81,10 @@ export default function viewIssuePage({ params }: {
         const fetchIssueData = async () => {
             try {
                 const issueResponse = await fetch(`/api/project/${projectId}/issues/${issueId}`);
+                if (issueResponse.status === 404) {
+                    console.error("Issue with id", issueId, "not found");
+                    router.replace('/404');
+                }
                 const issueData = await issueResponse.json();
                 setIssue(issueData);
             } catch (error) {

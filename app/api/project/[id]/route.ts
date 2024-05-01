@@ -5,13 +5,20 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { id: Number } }
 ) {
-  let project = await prisma.projects.findUnique({
-    where: { id: Number(params.id) },
-    include: {
-      images: true, // include related image data
-    },
-  });
-  return NextResponse.json(project);
+    let project = await prisma.projects.findUnique({
+        where: { id: Number(params.id) },
+        include: {
+            images: true, // include related image data
+        },
+    });
+
+    if (!project) {
+      return new NextResponse(
+        JSON.stringify({ message: "Project not found" }),
+        { status: 404 }
+      );
+    }
+    return NextResponse.json(project);
 }
 
 export async function PUT(

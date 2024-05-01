@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
@@ -53,6 +54,7 @@ interface Fault {
 export default function viewFaultPage({ params }: {
     params: { id: number, faultId: number }
 }) {
+    const router = useRouter();
     const [project, setProject] = useState<Project>();
     const [loading, setLoading] = useState(true);
     const [fault, setFault] = useState<Fault>();
@@ -62,7 +64,13 @@ export default function viewFaultPage({ params }: {
     useEffect(() => {
         if (projectId) {
             fetch(`/api/project/${projectId}`)
-                .then(res => res.json())
+                .then(res => {
+                    if (res.status === 404) {
+                        console.error("Project with id", projectId, "not found");
+                        router.replace('/404');
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     setTimeout(() => {
                         setProject(data);
@@ -76,7 +84,13 @@ export default function viewFaultPage({ params }: {
     useEffect(() => {
         if (faultId) {
             fetch(`/api/project/${projectId}/faults/${faultId}`)
-                .then(res => res.json())
+                .then(res => {
+                    if (res.status === 404) {
+                        console.error("Fault with id", faultId, "not found");
+                        router.replace('/404');
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     setFault(data);
                 })
