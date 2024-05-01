@@ -67,8 +67,7 @@ export default function MyIssues({ params }: {
 
     return (
         <div className="flex flex-col items-center justify-center pt-6 w-full ">
-            <h1 className='text-xl font-bold'>Mano trūkumai</h1>
-        
+            <h1 className='text-xl font-bold'>Mano užduotys</h1>
             {issues?.length ? (
                 issues.map((issue, index) => (
                     <div className='flex flex-col items-center justify-center w-full overflow-y-auto max-w-5xl' key={index}>
@@ -83,7 +82,7 @@ export default function MyIssues({ params }: {
                     </div>
                 ))
             ) : (
-                <div>Neturite priskirtų trūkumų</div>
+                <div>Neturite priskirtų užduočių</div>
             )}
         </div>
     );
