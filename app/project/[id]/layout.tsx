@@ -5,6 +5,7 @@ import Tabs from '@/app/components/Tabs/Tabs';
 import { useSession } from 'next-auth/react';
 import ProjectCardSkeleton from '@/app/components/ProjectCard/ProjectCardSkeleton';
 import CompanyDefault from '@/public/assets/CompanyDefault.png';
+import { useRouter } from 'next/navigation';
 
 interface Project {
     id: number;
@@ -36,6 +37,8 @@ export default function ProjectLayout({
     params: { id: string };
     children: React.ReactNode;
 }) {
+    const router = useRouter();
+
     const { data: session } = useSession();
     const [project, setProject] = useState<Project | null>(null);
     const [canAccess, setCanAccess] = useState(false);
@@ -43,9 +46,15 @@ export default function ProjectLayout({
     const projectId = params.id;
 
     useEffect(() => {
-        if (projectId) {
+        if (projectId && !isNaN(Number(projectId))) {
             fetch(`/api/project/${projectId}`)
-                .then(res => res.json())
+                .then(res => {
+                    if (res.status === 404) {
+                        console.error("Project with id", projectId, "not found");
+                        router.replace('/404');
+                    }
+                    return res.json();
+                })
                 .then(data => {
                     if (data && data.images) {
                         const logoData = data.images.image.data
@@ -71,6 +80,9 @@ export default function ProjectLayout({
                     }
                 })
                 .catch(console.error);
+        } else {
+            console.error("Invalid project id:", projectId);
+            router.replace('/404');
         }
     }, [projectId]);
 
