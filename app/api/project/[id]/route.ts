@@ -39,7 +39,7 @@ export async function PUT(
       imageFormData.append("image", image);
 
       const imageResponse = await fetch(
-        "http://localhost:3000/api/image/upload",
+        `${process.env.BASE_URL}/api/image/upload`,
         {
           method: "POST",
           body: imageFormData,
