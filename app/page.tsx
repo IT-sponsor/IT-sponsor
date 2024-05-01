@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
+import { useSession } from 'next-auth/react';
 
 import Link from "next/link";
 
@@ -38,6 +39,7 @@ export default function Home() {
   const [filterBy, setFilterBy] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
 
 
   const filterDropdownRef = useRef(null);
@@ -149,6 +151,8 @@ export default function Home() {
       .sort((a, b) => b[1] - a[1])
       .map(([tech, _]) => tech);
   }
+
+  const isAuthenticated = status === "authenticated";
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -275,17 +279,17 @@ export default function Home() {
             </div>
           )}
         </div>
-        {/*
-        <div className="relative inline-block text-left mt-2 ml-2">
-          <Link href="/project/new" passHref>
-            <button
-              type="button"
-              className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out ml-4"
-            >
-              Pridėti naują projektą
-            </button>
-          </Link>
-        </div> */}
+        
+        {/* Display button for uploading project only if authenticated */}
+        {isAuthenticated && (
+          <div className="relative inline-block text-left mt-2 ml-2">
+            <Link href="/project/new" passHref>
+            <button type="button" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out ml-4 text-sm font-semibold text-gray-900">
+                Pridėti naują projektą
+              </button>
+            </Link>
+          </div>
+        )}
       </div> 
 
       {/* Display selected technologies */}
