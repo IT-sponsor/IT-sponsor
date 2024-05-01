@@ -64,15 +64,15 @@ export default function Supporter( { params }: { params: { id: number } }) {
         });
 
         if (response.ok) {
-          alert('User added to issue successfully');
+          alert('Naudotojas sėkmingai priskirtas prie trūkumo');
           console.log('User added to issue');
           fetchUsers();
         } else {
-          alert('Failed to add user to issue: ' + response.statusText);
+          alert('Nepavyko pridėti naudotojo prie trūkumo: ' + response.statusText);
           console.log('Failed to add user to issue' + response.statusText);
         }
     } catch (error) {
-      alert('An error occurred while adding user to issue');
+      alert('Įvyko klaida pridedant naudotoją prie trūkumo');
       console.error('Failed to add user to issue:', error);
     }
   }
@@ -91,15 +91,15 @@ export default function Supporter( { params }: { params: { id: number } }) {
       });
 
       if (response.ok) {
-        alert('User removed from issue successfully');
+        alert('Naudotojas pašalintas iš norinčių remti');
         console.log('User removed from issue');
         fetchUsers();
       } else {
-        alert('Failed to remove user from issue: ' + response.statusText);
+        alert('Nepavyko pašalinti naudotojo iš norinčių taisyti: ' + response.statusText);
         console.log('Failed to remove user from issue' + response.statusText);
       }
     } catch (error) {
-      alert('An error occurred while removing user from issue');
+      alert('Įvyko klaida pašalinant naudotoją iš norinčių taisyti');
       console.error('Failed to remove user from issue:', error);
     }
   };
