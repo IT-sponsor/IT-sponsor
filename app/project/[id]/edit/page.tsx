@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { NextResponse } from "next/server";
 import MarkdownEditor from "@/app/components/MarkdownEditor/MarkdownEditor";
+import { useRouter } from "next/navigation";
 
 interface Project {
     id: number;
@@ -28,6 +29,7 @@ interface Project {
 }
 
 export default function EditProjectPage({ params }: { params: { id: number } }) {
+    const router = useRouter();
     const [project, setProject] = useState<Project | null>(null);
     const [image, setImage] = useState<File | null>(null);
     const [formErrors, setFormErrors] = useState<Record<string, any>>({});
@@ -62,16 +64,31 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
         return Object.keys(errors).length === 0;
     };
 
+    const validateFile = (file: File) => {
+        if (!['image/jpeg', 'image/png'].includes(file.type)) {
+            setFormErrors({ ...formErrors, image: 'Nuotrauka turi būti JPG arba PNG formato.' });
+            return false;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            setFormErrors({ ...formErrors, image: 'Nuotrauka turi būti mažesnė nei 2mb.' });
+            return false;
+        }
+
+        return true;
+    };
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const file = e.target.files[0];
             setImage(file);
         }
-    }
+    };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         if (!validateForm()) return;
+        if (image && !validateFile(image)) return;
         if (!project) return;
 
         const projectData = new FormData();
@@ -92,7 +109,7 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
                 throw new Error(`Failed to update project: ${response.statusText}`);
             }
             const updatedProject = await response.json();
-            window.location.href = `/project/${updatedProject.id}`;
+            router.push(`/project/${updatedProject.project.id}`);
         } catch (error) {
             setFormErrors({ ...formErrors, api: error.message });
         }
@@ -107,6 +124,8 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
             <div className="px-6 py-5 rounded-xl border-2 border-gray-100 bg-white" style={{ width: '800px' }}>
                 <h1 className="text-2xl font-bold text-gray-800 text-center">Redaguoti projektą</h1>
                 <form onSubmit={handleSubmit} className="flex flex-col items-start justify-center w-full">
+
+                    {formErrors.image && <div className="text-center text-red-500">{formErrors.image}</div>}
                     <div id="image-preview" className="max-w-sm p-6 mb-4 bg-gray-100 border-dashed border-2 border-gray-400 rounded-lg items-center mx-auto text-center cursor-pointer mt-2">
                         {image && (
                             <label htmlFor="upload" className="cursor-pointer">
@@ -130,7 +149,7 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
                                 </>
                             )}
                     </div>
-                    <input id="upload" type="file" accept='image/*' onChange={handleFileChange} className="hidden" />
+                    <input id="upload" type="file" accept='image/jpeg, image/png' onChange={handleFileChange} className="hidden" />
 
                     <label htmlFor="projectName" className="block text-gray-700 font-bold">Pavadinimas</label>
                     <input type="text" id="projectName" placeholder="Pavadinimas" className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-500" value={project.name} onChange={(e) => setProject({ ...project, name: e.target.value })} />
