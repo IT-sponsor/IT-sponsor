@@ -109,7 +109,7 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
                 throw new Error(`Failed to update project: ${response.statusText}`);
             }
             const updatedProject = await response.json();
-            router.push(`/project/${updatedProject.project.id}`);
+            window.location.reload(); // This goes against the SPA principles, but it's the easiest way to refresh the whole layout
         } catch (error) {
             setFormErrors({ ...formErrors, api: error.message });
         }
