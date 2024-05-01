@@ -46,7 +46,7 @@ export default function ProjectLayout({
     const projectId = params.id;
 
     useEffect(() => {
-        if (projectId) {
+        if (projectId && !isNaN(Number(projectId))) {
             fetch(`/api/project/${projectId}`)
                 .then(res => {
                     if (res.status === 404) {
@@ -80,6 +80,9 @@ export default function ProjectLayout({
                     }
                 })
                 .catch(console.error);
+        } else {
+            console.error("Invalid project id:", projectId);
+            router.replace('/404');
         }
     }, [projectId]);
 
