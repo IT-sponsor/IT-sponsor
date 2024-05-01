@@ -14,6 +14,8 @@ model users {
   email              String?         @unique @db.VarChar(255)
   password           String?         @db.VarChar(255)
   github             String?         @unique @db.VarChar(255)
+  linkedin           String?         @unique @db.VarChar(255)
+  phone_number       String?         @unique @db.VarChar(255)
   job_title          String?         @db.VarChar(255)
   about_me           String?         @db.VarChar(255)
   technologies       String?         @db.VarChar(255)
@@ -23,6 +25,7 @@ model users {
   role               users_role?
   fk_imagesid_images Int?            @unique(map: "fk_imagesid_images")
   applies            applies[]
+  controls           controls[]
   faults             faults[]
   gets_assigned      gets_assigned[]
   images             images?         @relation(fields: [fk_imagesid_images], references: [id_images], onDelete: Restrict, onUpdate: Restrict, map: "uploads")
@@ -39,6 +42,7 @@ model applies {
 model controls {
   fk_usersid    Int
   fk_projectsid Int
+  users         users @relation(fields: [fk_usersid], references: [id], onUpdate: Restrict, map: "controls")
 
   @@id([fk_usersid, fk_projectsid])
 }
