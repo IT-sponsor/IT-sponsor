@@ -142,15 +142,15 @@ export default function viewIssuePage({ params }: {
                 let hasApplied = false;
 
                 const response = await fetch(`/api/applies/${issueId}`);
-                const data2 = await response.json();
-                if (data.length > 0 && data2.some(item => String(item.fk_usersid) === String(session?.user?.id))) {
+                const application = await response.json();
+                if (application.length > 0 && application.some((item: { fk_usersid: any; }) => String(item.fk_usersid) === String(session?.user?.id))) {
                     hasApplied = true;
                 }
                 setCanApply(!canControl && !hasApplied);
 
                 const response3 = await fetch(`/api/gets_assigned/${issueId}`);
-                const data3 = await response3.json();
-                if (data3.length > 0 && data3.some(item => String(item.fk_usersid) === String(session?.user?.id))) {
+                const assignment = await response3.json();
+                if (assignment.length > 0 && assignment.some((item: { fk_usersid: any; }) => String(item.fk_usersid) === String(session?.user?.id))) {
                     setIsAssigned(true);
                 }
             } catch (error) {
