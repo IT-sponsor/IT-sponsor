@@ -37,6 +37,17 @@ interface Fault {
     status: string;
     fk_projectid: number;
     fk_userid: number;
+    users: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        logo: string;
+        images: {
+            image: {
+                data: Buffer;
+            }
+        }
+    };
 }
 
 export default function viewFaultPage({ params }: {
@@ -104,6 +115,21 @@ export default function viewFaultPage({ params }: {
 
                                         <div className="border-t border-gray-200">
                                             <dl>
+                                                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                                    <dt className="text-sm font-medium text-gray-500">Pranešėjas</dt>
+                                                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                                        <div className="flex items-center mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                                            <a href={`/profile/${fault.users.id}`} className="flex items-center hover:bg-green-100 rounded-lg pr-1">
+                                                                <img
+                                                                    alt=''
+                                                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                                    className="h-6 w-6 rounded-full mr-2"
+                                                                />
+                                                                {fault.users.first_name + ' ' + fault.users.last_name}
+                                                            </a>
+                                                        </div>
+                                                    </dd>
+                                                </div>
                                                 <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                                     <dt className="text-sm font-medium text-gray-500">Svarbumas</dt>
                                                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{severityLocale[fault.severity as keyof typeof severityLocale]}</dd>

@@ -14,6 +14,13 @@ export async function GET(
         where: { 
             id: Number(params.faultId),
             fk_projectsid: Number(params.id)
+        },
+        include: {
+            users: {
+                include: {
+                    images: true
+                }
+            }
         }
     });
     return NextResponse.json(fault);
