@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { NextResponse } from 'next/server';
 
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor';
+import { useSession } from 'next-auth/react';
 
 const NewProjectPage = () => {
   const [projectName, setProjectName] = useState('');
@@ -14,6 +15,7 @@ const NewProjectPage = () => {
   const [image, setImage] = useState<File | null>(null);
   const [codebase_visibility, setCodebaseVisibility] = useState<string>("public");
   const [formErrors, setFormErrors] = useState<Record<string, any>>({});
+  const { data: session } = useSession();
 
   const validateForm = () => {
     const newErrors: Record<string, any> = {};
@@ -55,6 +57,13 @@ const NewProjectPage = () => {
 
       if (response.ok) {
         const result = await response.json();
+
+        await fetch(`/api/controls/${result.project.id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectId: result.project.id, userId: Number(session?.user.id)})
+        });
+
         window.location.href = `/project/${result.project.id}`;
       } else {
         return new NextResponse(JSON.stringify({ message: "Error creating project", error: response.statusText }), { status: 500, headers: { 'Content-Type': 'application/json' } });
