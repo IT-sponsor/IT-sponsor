@@ -35,10 +35,11 @@ interface Issue {
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onCompleted, project_id, searchQuery }) => {
-  const { id, first_name, last_name, github, fk_imagesid_images: images, issueId, type } = user;
+  const { id, first_name, last_name, github, fk_imagesid_images: image_id, issueId, type } = user;
   const fullName = `${first_name} ${last_name}`;
   const githubUrl = `https://github.com/${github}`;
   const [issue, setIssue] = useState({} as Issue);
+  const [image, setImage] = useState({} as string);
 
 
   useEffect(() => {
@@ -60,10 +61,32 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
     .catch(error => {
       console.error("Error fetching issue:", error.message);
     });
+
+    fetch(`/api/image/${image_id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      if (data && data.image) {
+        const logoData = data.image.data
+        const base64String = Buffer.from(logoData).toString('base64');
+        setImage(`data:image/jpeg;base64,${base64String}`);
+  }})
+    .catch(error => {
+      console.error("Error fetching issue:", error.message);
+    });
   }, []);
 
   if(!issue) return null;
-console.log(issue);
+
   if(
     !fullName.toLowerCase().includes(searchQuery.toLowerCase()) &&
     !issue.title?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -73,12 +96,11 @@ console.log(issue);
     <div className="flex-grow px-4 py-2 mt-2 w-full rounded-xl border-2 border-gray-100 bg-white">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4 shrink-0">
-          {/* Placeholder image */}
           <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-            {images ? (
-              <Image src={githubUrl} alt={fullName} width={50} height={50} className="rounded-full" />
+            {image ? (
+              <img alt={ fullName } width={ 100 } height={ 100 } className="rounded-full" src={ image } />
             ) : (
-              <span className="text-gray-500">No Image</span>
+              <span className="text-gray-500">Nėra nuotraukos</span>
             )}
           </div>
           <div className="flex flex-col">
