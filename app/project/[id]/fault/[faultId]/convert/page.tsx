@@ -1,11 +1,10 @@
 "use client";
 import MarkdownEditor from "@/app/components/MarkdownEditor/MarkdownEditor";
-import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { NextResponse } from "next/server";
 import Spinner from "@/app/components/Loading/Spinner";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Project {
     id: number;
@@ -29,7 +28,6 @@ interface Project {
         }
     }
 }
-
 interface Fault {
     id: number;
     title: string;
@@ -53,7 +51,8 @@ export default function FaultConvertPage({ params }: {
     const [formErrors, setFormErrors] = useState<any>({});
     const [issueDescription, setIssueDescription] = useState<string>("");
     const [issueVisibility, setIssueVisibility] = useState<string>("public");
-    const { data: session } = useSession();
+    const [issueSeverity, setIssueSeverity] = useState<string>("");
+    const router = useRouter();
 
     useEffect(() => {
         if (projectId) {
@@ -75,31 +74,16 @@ export default function FaultConvertPage({ params }: {
                 .then(res => res.json())
                 .then(data => {
                     setFault(data);
+                    setIssueTitle(data.title);
+                    setIssueDescription(data.description);
+                    setIssueSeverity(data.severity);
                 })
                 .catch(console.error);
         }
     }, [faultId]);
 
-    const severityLocale = {
-        low: 'žemas',
-        medium: 'vidutinis',
-        high: 'aukštas'
-    };
-
-    const statusLocale = {
-        open: 'atviras',
-        closed: 'uždarytas'
-    };
-
-    const defaultDescription = "# Aprašymas:\n...\n# Priėmimo kriterijai:\n...";
-    const formattedDefaultDescription = defaultDescription.split("\n").map((item, key) => {
-        return <span key={key}>{item}<br /></span>
-    });
-
-    issueDescription === "" && setIssueDescription(defaultDescription);
-
     const formValidated = () => {
-        const errors = {};
+        const errors: { issueTitle?: string, issueDescription?: string } = {};
 
         if (!issueTitle.trim()) errors.issueTitle = "Pavadinimas negali būti tuščias.";
         if (!issueDescription.trim()) errors.issueDescription = "Aprašymas negali būti tuščias.";
@@ -108,20 +92,52 @@ export default function FaultConvertPage({ params }: {
         return Object.keys(errors).length === 0;
     }
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSave = async () => {
+        console.log("Saving fault");
+        const faultData = {
+            title: issueTitle,
+            created_at: fault?.created_at,
+            description: issueDescription,
+            severity: issueSeverity,
+            status: "open",
+        }
 
+        try {
+            const response = await fetch(`/api/project/${projectId}/faults/${faultId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(faultData)
+            });
+
+            if (response.ok) {
+                window.location.href = `/project/${projectId}/fault`;
+                //router.push(`/project/${projectId}/fault`);
+                return new NextResponse(JSON.stringify({ message: "Fault updated" }), { status: 200 });
+            } else {
+                return new NextResponse(JSON.stringify({ message: "Error updating fault" }), { status: 500 });
+            }
+        } catch (error: any) {
+            return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500 });
+        }
+    }
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        console.log("Handling submit");
+        e.preventDefault();
         if (!formValidated()) return;
 
+        if(e.currentTarget.name === "save") {
+            handleSave();
+            return;
+        }
+        console.log("Converting fault to issue");
         const issueData = {
             title: issueTitle,
             description: issueDescription,
             visibility: issueVisibility,
             status: "open",
-            id_project: Number(projectId),
-            user_id: Number(session?.user?.id)
+            id_project: projectId,
         }
-
         try {
             const response = await fetch(`/api/project/${projectId}/issues/new`, {
                 method: "POST",
@@ -130,17 +146,20 @@ export default function FaultConvertPage({ params }: {
             });
 
             if (response.ok) {
-                await fetch(`/api/fault/${projectId}`, {
+                const res2 = await fetch(`/api/fault/${projectId}`, {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ faultId })
                 });
-
-                window.location.href = `/project/${projectId}/fault`; // TODO: Add success message
+                if (res2.ok) {
+                    window.location.href = `/project/${projectId}/fault`;
+                    //router.push(`project/${projectId}/fault`) // TODO: Add success message
+                    return new NextResponse(JSON.stringify({ message: "Fault converted to issue" }), { status: 200 });
+                }
             } else {
-                return new NextResponse(JSON.stringify({ message: "Error creating issue", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+                return new NextResponse(JSON.stringify({ message: "Error converting fault to issue" }), { status: 500, headers: { "Content-Type": "application/json" } });
             }
-        } catch (error) {
+        } catch (error: any) {
             return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
         }
     };
@@ -154,72 +173,65 @@ export default function FaultConvertPage({ params }: {
             ) : (
                 <>
                     {project && fault ? (
-                        <form onSubmit={handleSubmit}>
-                            <div className="bg-gray-200 px-1 shadow overflow-hidden sm:rounded-lg mb-4 w-[1200px] break-words">
+                        <form className="w-full flex flex-col justify-center items-center" onSubmit={handleSubmit}>
+                            <div className="border-2 border-gray-200 px-1 overflow-hidden sm:rounded-lg mb-4 w-2/3 break-words">
                                 <div className="px-4 py-5 sm:px-6 border-b border-black-800">
-                                    <h2 className="text-lg leading-6 font-medium text-gray-900 text-center">Klaidos konvertavimas į trūkumą</h2>
+                                    <h2 className=" text-4xl leading-6 font-medium text-gray-900 text-center">Klaidos redagavimas</h2>
                                 </div>
-                                <div className="flex flex-row bg-gray-200 overflow-hidden sm:rounded-lg mb-4">
+                                <div className="flex sm:rounded-lg mb-4 px-6 py-5 bg-white">
+                                    <div className="flex flex-col items-start justify-center w-full h-full">
+                                        <label htmlFor="title" className="block text-gray-800 font-bold">Pavadinimas</label>
+                                        <input
+                                            type="text"
+                                            id="title"
+                                            placeholder="Pavadinimas"
+                                            className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus-within:border-black"
+                                            value={issueTitle}
+                                            onChange={(e) => setIssueTitle(e.target.value)}
+                                        />
+                                        {formErrors.issueTitle && <div className="text-red-500">{formErrors.issueTitle}</div>}
 
-                                    <div className="bg-white px-6 py-5 rounded-xl border-2 border-gray-100 w-2/5 mr-2">
+                                        <label htmlFor="description" className="block text-gray-800 mb-2 font-bold mt-4">Aprašymas</label>
+                                        <MarkdownEditor markdownText={issueDescription} setMarkdownText={(value) => setIssueDescription(value)} />
+                                        {formErrors.issueDescription && <div className="text-red-500">{formErrors.issueDescription}</div>}
 
-                                        <div className="px-4 py-2 sm:px-6">
-                                            <h2 className="text-lg leading-6 font-medium text-gray-900">{fault.title}</h2>
-                                        </div>
-                                        <div className="border-t border-gray-200">
-
-                                            <div className="bg-white px-4 py-5 sm:gap-4 sm:px-6">
-                                                <label className="block text-gray-800 font-bold">Svarbumas</label>
-                                                <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-3">{severityLocale[fault.severity as keyof typeof severityLocale]}</div>
-                                            </div>
-                                            <div className="bg-white px-4 py-5 sm:gap-4 sm:px-6">
-                                                <label className="block text-gray-800 font-bold">Statusas</label>
-                                                <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-3">{statusLocale[fault.status as keyof typeof statusLocale]}</div>
-                                            </div>
-                                            <div className="bg-white px-4 py-5 sm:gap-4 sm:px-6">
-                                                <label className="block text-gray-800 font-bold">Atkūrimo veiksmai</label>
-                                                <div className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-3"><MarkdownDisplay markdownText={fault.description} /></div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div className="px-6 py-5 rounded-xl border-2 border-gray-100 bg-white w-3/5">
-                                        <div className="flex flex-col items-start justify-center w-full h-full">
-                                            <label htmlFor="title" className="block text-gray-800 font-bold">Pavadinimas</label>
-                                            <input
-                                                type="text"
-                                                id="title"
-                                                placeholder="Pavadinimas"
-                                                className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-                                                value={issueTitle} onChange={(e) => setIssueTitle(e.target.value)}
-                                            />
-                                            {formErrors.issueTitle && <div className="text-red-500">{formErrors.issueTitle}</div>}
-
-                                            <label htmlFor="description" className="block text-gray-800 font-bold mt-4">Aprašymas</label>
-                                            <MarkdownEditor markdownText={issueDescription} setMarkdownText={(value) => setIssueDescription(value)} />
-                                            {formErrors.issueDescription && <div className="text-red-500">{formErrors.issueDescription}</div>}
-
-                                            <label htmlFor="severity" className="block text-gray-800 font-bold mt-4">Matomumas</label>
-                                            <select
-                                                id="severity"
-                                                className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-600"
-                                                value={issueVisibility} onChange={(e) => setIssueVisibility(e.target.value)}
-                                            >
-                                                <option value="public">Viešas</option>
-                                                <option value="private">Privatus</option>
-                                            </select>
-                                        </div>
+                                        <label htmlFor="severity" className="block text-gray-800 font-bold mt-4">Klaidos svarbumas</label>
+                                        <select
+                                            id="severity"
+                                            className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus-within:border-black"
+                                            value={issueSeverity} onChange={(e) => setIssueSeverity(e.target.value)}
+                                        >
+                                            <option value="low">Mažas</option>
+                                            <option value="medium">Vidutinis</option>
+                                            <option value="high">Didelis</option>
+                                        </select>
+                                        <label htmlFor="visibility" className="block text-gray-800 font-bold mt-4">Trūkumo matomumas</label>
+                                        <select
+                                            id="visibility"
+                                            className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus-within:border-black"
+                                            value={issueVisibility} onChange={(e) => setIssueVisibility(e.target.value)}
+                                        >
+                                            <option value="public">Viešas</option>
+                                            <option value="private">Privatus</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="flex justify-center mb-4 mt-2">
                                     <button
                                         type="submit"
-                                        className="py-2 px-4 mr-2 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">
-                                        Konvertuoti klaidą
+                                        name="save"
+                                        className="py-2 px-4 mr-2 rounded-lg text-black bg-[#40C173] hover:bg-green-700">
+                                        Išsaugoti
                                     </button>
-                                    <Link href={`/project/${projectId}/fault`} passHref className="py-2 px-4 rounded-lg text-black bg-gray-400 hover:bg-red-700 transition duration-150 ease-in-out">
+                                    <Link href={`/project/${projectId}/fault`} passHref className="py-2 mr-2 px-4 rounded-lg text-black bg-gray-400 hover:bg-red-700">
                                         Atšaukti
                                     </Link>
+                                    <button
+                                        type="submit"
+                                        name="convert"
+                                        className="py-2 px-4 rounded-lg text-black bg-yellow-300 hover:bg-yellow-600">
+                                        Konvertuoti į trūkumą
+                                    </button>
                                 </div>
                             </div>
                         </form>

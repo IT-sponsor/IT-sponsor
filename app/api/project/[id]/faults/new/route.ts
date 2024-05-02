@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
                 },
             });
             return new NextResponse(JSON.stringify({ message: "Fault created successfully", fault }), { status: 201 });
-        } catch (error) {
+        } catch (error: any) {
             return new NextResponse(JSON.stringify({ message: "Error creating fault", error: error.message }), { status: 500 });
         }
     } else {

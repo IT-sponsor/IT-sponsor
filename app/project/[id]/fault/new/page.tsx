@@ -77,7 +77,7 @@ export default function newFaultPage({ params }: {
         }
       }, [projectId]);
 
-    const defaultDescription = "# Atkūrimo veiksmai:\n...\n# Tikėtinas rezultatas:\n...\n# Realus rezultatas:\n...";
+    const defaultDescription = "### Atkūrimo veiksmai:\n...\n### Tikėtinas rezultatas:\n...\n### Realus rezultatas:\n...";
     const formattedDefaultDescription = defaultDescription.split("\n").map((item, key) => {
         return <span key={key}>{item}<br /></span>
     });
