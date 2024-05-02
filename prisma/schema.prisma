@@ -67,9 +67,11 @@ model faults {
 model gets_assigned {
   fk_usersid  Int
   fk_issuesid Int
-  users       users @relation(fields: [fk_usersid], references: [id], onUpdate: Restrict, map: "gets_assigned")
+  issues      issues @relation(fields: [fk_issuesid], references: [id], onUpdate: Restrict, map: "assigned_issue")
+  users       users  @relation(fields: [fk_usersid], references: [id], onUpdate: Restrict, map: "gets_assigned")
 
   @@id([fk_usersid, fk_issuesid])
+  @@index([fk_issuesid], map: "assigned_issue")
 }
 
 model images {
@@ -93,6 +95,7 @@ model issues {
   status        issues_status?
   visibility    issues_visibility?
   fk_projectsid Int
+  gets_assigned gets_assigned[]
   projects      projects           @relation(fields: [fk_projectsid], references: [id], onUpdate: Restrict, map: "has")
 
   @@index([fk_projectsid], map: "has")
@@ -102,7 +105,7 @@ model projects {
   id                  Int                           @id @default(autoincrement())
   name                String?                       @db.VarChar(255)
   short_description   String?                       @db.VarChar(255)
-  long_description    String?                       @db.VarChar(4000)
+  long_description    String?                       @db.LongText
   repository          String?                       @unique @db.VarChar(255)
   technologies        String?                       @db.VarChar(1000)
   created_at          DateTime?                     @db.Date

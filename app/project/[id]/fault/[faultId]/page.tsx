@@ -4,6 +4,7 @@ import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 interface Project {
     id: number;
@@ -57,6 +58,8 @@ export default function viewFaultPage({ params }: {
     const [project, setProject] = useState<Project>();
     const [loading, setLoading] = useState(true);
     const [fault, setFault] = useState<Fault>();
+    const [canAccess, setCanAccess] = useState(false);
+    const { data: session } = useSession();
     const projectId = params.id;
     const faultId = params.faultId;
 
@@ -97,6 +100,23 @@ export default function viewFaultPage({ params }: {
         }
     }, [faultId]);
 
+    useEffect(() => {
+        const fetchAccess = async () => {
+            try {
+                const response = await fetch(`/api/controls/${projectId}`);
+                const data = await response.json();
+                if (data.length > 0) {
+                    const ownerId = data[0].fk_usersid.toString();
+                    const hasAccess = ownerId === session?.user?.id;
+                    setCanAccess(hasAccess);
+                }
+            } catch (error) {
+                console.error('Error fetching controls:', error);
+            }
+        };
+        fetchAccess();
+    }, [projectId, session]);
+
     const severityLocale = {
         low: 'žemas',
         medium: 'vidutinis',
@@ -123,7 +143,9 @@ export default function viewFaultPage({ params }: {
                                     <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-4">
                                         <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
                                             <h2 className="text-lg leading-6 font-medium text-gray-900">{fault.title}</h2>
-                                            <Link href={`${faultId}/convert`} type="button" className="rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Redaguoti</Link>
+
+                                            {canAccess && <Link href={`${faultId}/convert`} type="button" className="rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Redaguoti</Link>}
+
                                         </div>
 
                                         <div className="border-t border-gray-200 break-words">

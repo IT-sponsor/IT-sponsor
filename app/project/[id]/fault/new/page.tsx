@@ -44,6 +44,7 @@ interface Fault {
 export default function newFaultPage({ params }: {
     params: { id: number }
 }) {
+    const { data: session } = useSession();
     const [project, setProject] = useState<Project>();
     const projectId = params.id;
 

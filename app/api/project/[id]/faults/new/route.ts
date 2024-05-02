@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
                     severity: severity as faults_severity, // Explicitly type the 'severity' property
                     status: status as faults_status, // Explicitly type the 'status' property
                     fk_projectsid: id_project as number,
-                    fk_usersid: user_id,
+                    fk_usersid: user_id as number,
                 },
             });
             return new NextResponse(JSON.stringify({ message: "Fault created successfully", fault }), { status: 201 });
