@@ -35,9 +35,9 @@ interface Issue {
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onCompleted, project_id, searchQuery }) => {
-  const { id, first_name, last_name, github, fk_imagesid_images: image_id, issueId, type } = user;
+  const { id, first_name, last_name, fk_imagesid_images: image_id, issueId, type } = user;
   const fullName = `${first_name} ${last_name}`;
-  const githubUrl = `https://github.com/${github}`;
+  const profileUrl = `/profile/${user.id}`;
   const [issue, setIssue] = useState({} as Issue);
   const [image, setImage] = useState({} as string);
 
@@ -104,7 +104,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
             )}
           </div>
           <div className="flex flex-col">
-            <h3 className="font-semibold text-lg">{fullName}</h3>
+            <a href={profileUrl} className="font-semibold text-lg hover:bg-green-100 rounded-lg px-1">{fullName}</a>
           </div>
         </div>
         </Link>
