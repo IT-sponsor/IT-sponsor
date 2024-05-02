@@ -4,7 +4,6 @@ import UserSearch from '@/app/components/User/UserSearch';
 import UserFilter from '@/app/components/User/UserFilter';
 import UserList from '@/app/components/User/UserList';
 import Modal from '@/app/components/Navigation/Modal';
-import { set } from 'date-fns';
 
 interface User {
   id: number;

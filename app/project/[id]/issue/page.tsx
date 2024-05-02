@@ -62,38 +62,18 @@ export default function IssuePage({ params }: {
             ) : (
                 <>
                     {issues?.length ? (
-                        issues.map((issue, index) => (
-                            <>
-                                {issue.visibility === "private" ? (
-                                    <>
-                                        {canControl ? (
-                                            <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={index}>
-                                                <Link href={`issue/${issue.id}`}>
-                                                    <IssueCardSmall
-                                                        id={issue.id}
-                                                        title={issue.title}
-                                                        description={issue.description}
-                                                        status={issue.status}
-                                                        visibility={issue.visibility}
-                                                    />
-                                                </Link>
-                                            </div>
-                                        ) : null}
-                                    </>
-                                ) : (
-                                    <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={index}>
-                                        <Link href={`issue/${issue.id}`}>
-                                            <IssueCardSmall
-                                                id={issue.id}
-                                                title={issue.title}
-                                                description={issue.description}
-                                                status={issue.status}
-                                                visibility={issue.visibility}
-                                            />
-                                        </Link>
-                                    </div>
+                        issues.map((issue) => (
+                            <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={issue.id}>
+                                {issue.visibility === "private" && !canControl ? null : (
+                                    <IssueCardSmall
+                                        id={issue.id}
+                                        title={issue.title}
+                                        description={issue.description}
+                                        status={issue.status}
+                                        visibility={issue.visibility}
+                                    />
                                 )}
-                            </>
+                            </div>
                         ))
                     ) : (
                         <div>Projektas neturi trūkumų</div>

@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
     if (req.method === 'POST') {
         const data = await req.json();
-        console.log('Request data', data);
         const {
             title,
             description,
@@ -37,14 +36,11 @@ export async function POST(req: NextRequest) {
                     fk_usersid: user_id as number,
                 },
             });
-            console.log('Fault created', fault);
             return new NextResponse(JSON.stringify({ message: "Fault created successfully", fault }), { status: 201 });
-        } catch (error) {
-            console.error('Error creating fault', error);
+        } catch (error: any) {
             return new NextResponse(JSON.stringify({ message: "Error creating fault", error: error.message }), { status: 500 });
         }
     } else {
-        console.error
         return new NextResponse(JSON.stringify({ message: `Method ${req.method} Not Allowed` }), { status: 405 });
     }
 }

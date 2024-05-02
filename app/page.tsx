@@ -284,7 +284,7 @@ export default function Home() {
         {isAuthenticated && (
           <div className="relative inline-block text-left mt-2 ml-2">
             <Link href="/project/new" passHref>
-            <button type="button" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out ml-4 text-sm font-semibold text-gray-900">
+            <button type="button" className="py-2 px-4 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out ml-4 text-sm font-semibold ">
                 Pridėti naują projektą
               </button>
             </Link>

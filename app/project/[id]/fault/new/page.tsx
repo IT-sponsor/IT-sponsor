@@ -1,6 +1,5 @@
 "use client";
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
-import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
+import React, { useState, useEffect } from 'react';
 import { NextResponse } from "next/server";
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor';
 import { useSession } from 'next-auth/react';
@@ -77,7 +76,7 @@ export default function newFaultPage({ params }: {
         }
       }, [projectId]);
 
-    const defaultDescription = "# Atkūrimo veiksmai:\n...\n# Tikėtinas rezultatas:\n...\n# Realus rezultatas:\n...";
+    const defaultDescription = "### Atkūrimo veiksmai:\n...\n### Tikėtinas rezultatas:\n...\n### Realus rezultatas:\n...";
     const formattedDefaultDescription = defaultDescription.split("\n").map((item, key) => {
         return <span key={key}>{item}<br /></span>
     });
@@ -106,7 +105,7 @@ export default function newFaultPage({ params }: {
             severity: faultSeverity,
             status: "open",
             id_project: Number(projectId),
-            user_id: Number(session?.user.id)
+            user_id: Number(session?.user?.id)
         }
 
         try {
@@ -118,7 +117,7 @@ export default function newFaultPage({ params }: {
 
             if (response.ok) {
                 const result = await response.json();
-                window.location.href = `/project/${projectId}`; // TODO: Add success message
+                window.location.href = `/project/${projectId}`; // TODO: Add success message => component/navigation/modal
             } else {
                 return new NextResponse(JSON.stringify({ message: "Error creating fault", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
             }
