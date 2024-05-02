@@ -2,7 +2,6 @@
 import { useRouter } from "next/navigation";
 import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
-import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -127,7 +126,7 @@ export default function viewFaultPage({ params }: {
                                             <Link href={`${faultId}/convert`} type="button" className="rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Konvertuoti</Link>
                                         </div>
 
-                                        <div className="border-t border-gray-200">
+                                        <div className="border-t border-gray-200 break-words">
                                             <dl>
                                                 <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                                     <dt className="text-sm font-medium text-gray-500">Pranešėjas</dt>

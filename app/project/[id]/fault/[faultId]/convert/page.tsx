@@ -1,11 +1,11 @@
 "use client";
 import MarkdownEditor from "@/app/components/MarkdownEditor/MarkdownEditor";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
-import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { useState, useEffect } from "react";
 import { NextResponse } from "next/server";
 import Spinner from "@/app/components/Loading/Spinner";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 interface Project {
     id: number;
@@ -53,6 +53,7 @@ export default function FaultConvertPage({ params }: {
     const [formErrors, setFormErrors] = useState<any>({});
     const [issueDescription, setIssueDescription] = useState<string>("");
     const [issueVisibility, setIssueVisibility] = useState<string>("public");
+    const { data: session } = useSession();
 
     useEffect(() => {
         if (projectId) {
@@ -118,7 +119,7 @@ export default function FaultConvertPage({ params }: {
             visibility: issueVisibility,
             status: "open",
             id_project: Number(projectId),
-            user_id: 1 // TODO: Get user id from session
+            user_id: Number(session?.user?.id)
         }
 
         try {
@@ -145,7 +146,7 @@ export default function FaultConvertPage({ params }: {
     };
 
     return (
-        <div className='w-full flex flex-col justify-center items-center'>
+        <div className='w-full flex flex-col justify-center items-center mt-4'>
             {loading ? (
                 <div className='mt-5'>
                     <Spinner />
@@ -154,7 +155,7 @@ export default function FaultConvertPage({ params }: {
                 <>
                     {project && fault ? (
                         <form onSubmit={handleSubmit}>
-                            <div className="bg-gray-200 shadow overflow-hidden sm:rounded-lg mb-4 w-[1200px]">
+                            <div className="bg-gray-200 px-1 shadow overflow-hidden sm:rounded-lg mb-4 w-[1200px] break-words">
                                 <div className="px-4 py-5 sm:px-6 border-b border-black-800">
                                     <h2 className="text-lg leading-6 font-medium text-gray-900 text-center">Klaidos konvertavimas į trūkumą</h2>
                                 </div>
@@ -216,7 +217,7 @@ export default function FaultConvertPage({ params }: {
                                         className="py-2 px-4 mr-2 rounded-lg text-black bg-[#40C173] hover:bg-green-700 transition duration-150 ease-in-out">
                                         Konvertuoti klaidą
                                     </button>
-                                    <Link href={`/project/${projectId}/fault`} passHref className="py-2 px-4 rounded-lg text-black bg-gray-400 hover:bg-green-700 transition duration-150 ease-in-out">
+                                    <Link href={`/project/${projectId}/fault`} passHref className="py-2 px-4 rounded-lg text-black bg-gray-400 hover:bg-red-700 transition duration-150 ease-in-out">
                                         Atšaukti
                                     </Link>
                                 </div>
