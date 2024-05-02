@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { NextResponse } from "next/server";
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor';
+import { useSession } from 'next-auth/react';
 
 interface Project {
     id: number;
@@ -43,6 +44,7 @@ interface Fault {
 export default function newFaultPage({ params }: {
     params: { id: number }
 }) {
+    const { data: session } = useSession();
     const [project, setProject] = useState<Project>();
     const projectId = params.id;
 
@@ -104,7 +106,7 @@ export default function newFaultPage({ params }: {
             severity: faultSeverity,
             status: "open",
             id_project: Number(projectId),
-            user_id: 1 // TODO: Get user id from session
+            user_id: Number(session?.user.id)
         }
 
         try {
