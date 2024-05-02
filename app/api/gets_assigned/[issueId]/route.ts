@@ -8,6 +8,7 @@ export async function GET(
     const faultAssignees = await prisma.gets_assigned.findMany({
         where: { fk_issuesid: Number(params.issueId) }
     });
+    if(!faultAssignees) return new NextResponse(JSON.stringify({ message: "Fault assignees not found" }), { status: 404 });
     return NextResponse.json(faultAssignees);
 }
 

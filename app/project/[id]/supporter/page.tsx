@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import UserSearch from '@/app/components/User/UserSearch';
 import UserFilter from '@/app/components/User/UserFilter';
 import UserList from '@/app/components/User/UserList';
+import Modal from '@/app/components/Navigation/Modal';
+import { set } from 'date-fns';
 
 interface User {
   id: number;
@@ -22,6 +24,8 @@ export default function Supporter( { params }: { params: { id: number } }) {
   const [users, setUsers] = useState<User[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
   
   // Fetch users from API if they have assignments or registrations
   async function fetchUsers() {
@@ -64,18 +68,29 @@ export default function Supporter( { params }: { params: { id: number } }) {
         });
 
         if (response.ok) {
-          alert('Naudotojas sėkmingai priskirtas prie trūkumo');
+          openModal();
+          setModalMessage('Naudotojas priskirtas prie trūkumo');
           console.log('User added to issue');
           fetchUsers();
         } else {
-          alert('Nepavyko pridėti naudotojo prie trūkumo: ' + response.statusText);
+          openModal();
+          setModalMessage('Nepavyko pridėti naudotojo prie trūkumo: ' + response.statusText);
           console.log('Failed to add user to issue' + response.statusText);
         }
     } catch (error) {
-      alert('Įvyko klaida pridedant naudotoją prie trūkumo');
+      openModal();
+      setModalMessage('Įvyko klaida pridedant naudotoją prie trūkumo');
       console.error('Failed to add user to issue:', error);
     }
   }
+
+  const openModal = () => {
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
 
   async function handleRemove(user_id: number, issue_id: number): Promise<void> {
     try {
@@ -91,15 +106,18 @@ export default function Supporter( { params }: { params: { id: number } }) {
       });
 
       if (response.ok) {
-        alert('Naudotojas pašalintas iš norinčių remti');
+        openModal();
+        setModalMessage('Naudotojas pašalintas iš norinčių remti');
         console.log('User removed from issue');
         fetchUsers();
       } else {
-        alert('Nepavyko pašalinti naudotojo iš norinčių taisyti: ' + response.statusText);
+        openModal();
+        setModalMessage('Nepavyko pašalinti naudotojo iš norinčių taisyti: ' + response.statusText);
         console.log('Failed to remove user from issue' + response.statusText);
       }
     } catch (error) {
-      alert('Įvyko klaida pašalinant naudotoją iš norinčių taisyti');
+      openModal();
+      setModalMessage('Įvyko klaida pašalinant naudotoją iš norinčių taisyti');
       console.error('Failed to remove user from issue:', error);
     }
   };
@@ -116,15 +134,18 @@ export default function Supporter( { params }: { params: { id: number } }) {
       });
 
       if (response.ok) {
-        alert('Issue status updated successfully');
+        openModal();
+        setModalMessage('Trūkumas sėkmingai uždarytas');
         console.log('Issue status updated successfully');
         fetchUsers();
       } else {
-        alert('Failed to update issue status: ' + response.statusText);
+        openModal();
+        setModalMessage('Nepavyko atnaujinti trūkumo būsenos: ' + response.statusText);
         console.log('Failed to update issue status' + response.statusText);
       }
     } catch (error) {
-      alert('An error occurred while updating issue status');
+      openModal();
+      setModalMessage('Įvyko klaida atnaujinant trūkumo būseną');
       console.error('Failed to update issue status:', error);
     }
   };
@@ -135,6 +156,7 @@ export default function Supporter( { params }: { params: { id: number } }) {
       <UserFilter setFilter={setFilter} />
     </div>
     <div className='flex flex-col items-center justify-center pt-6 w-full max-w-5xl overflow-y-auto'>
+      <Modal isOpen={modalOpen} onClose={closeModal} message={modalMessage} />
       {users.length === 0 ? <div>Nėra rėmėjų</div> :
         <UserList users={ users } onAssign={handleAssign} onRemove={handleRemove} onCompleted={handleCompleted} project_id={project_id} filter={filter} searchQuery={searchQuery} />
       }

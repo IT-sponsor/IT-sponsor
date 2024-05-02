@@ -8,5 +8,6 @@ export async function GET(
     let issue = await prisma.issues.findUnique({
         where: { id: Number(params.issueId)}
     });
+    if(!issue) return new NextResponse(JSON.stringify({ message: "Issue not found" }), { status: 404 });
     return NextResponse.json(issue);
 }

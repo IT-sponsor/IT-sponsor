@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { FaGithub } from 'react-icons/fa';
+import github_icon from '@/public/assets/github_icon.svg';
 
 type UserCardProps = {
   user: {
@@ -40,7 +40,6 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
   const githubUrl = `https://github.com/${github}`;
   const [issue, setIssue] = useState({} as Issue);
   const [image, setImage] = useState({} as string);
-
 
   useEffect(() => {
     fetch(`/api/project/${project_id}/issues/${issueId}`, {
@@ -106,7 +105,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
           <div className="flex flex-col">
             <h3 className="font-semibold text-lg">{fullName}</h3>
             <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 font-medium flex items-center text-lg">
-              <FaGithub className="text-gray-500 mr-2" />
+              <Image className="text-gray-500 mr-2 h-5 w-5 bg-gray-600 rounded-full" src={ github_icon } alt={ 'Github' }/>
               <div className="hover:underline">{github}</div>
             </a>
           </div>

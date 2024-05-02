@@ -8,5 +8,6 @@ export async function GET(
     const faultApplicants = await prisma.applies.findMany({
         where: { fk_issuesid: Number(params.issueId) }
     });
+    if(!faultApplicants) return new NextResponse(JSON.stringify({ message: "Fault applicants not found" }), { status: 404 });
     return NextResponse.json(faultApplicants);
 }
