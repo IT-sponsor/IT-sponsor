@@ -120,8 +120,16 @@ export default function ProjectLayout({
         ...(canAccess
             ? [
                 {
+                    name: "Rėmėjai",
+                    link: `/project/${projectId}/supporter`
+                },
+                {
                     name: "Klaidos",
                     link: `/project/${projectId}/fault`
+                },
+                {
+                    name: "Naujas trūkumas",
+                    link: `/project/${projectId}/issue/new`
                 },
                 {
                     name: "Redaguoti projektą",
@@ -130,8 +138,8 @@ export default function ProjectLayout({
             ]
             : [
                 {
-                    name: "Naujas trūkumas",
-                    link: `/project/${projectId}/issue/new`
+                    name: "Nauja klaida",
+                    link: `/project/${projectId}/fault/new`
                 }
             ])
     ];

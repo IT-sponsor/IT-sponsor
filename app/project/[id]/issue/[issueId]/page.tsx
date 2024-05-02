@@ -3,7 +3,9 @@ import { useRouter } from "next/navigation";
 import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
+import prisma from "@/app/utils/prisma/client";
 import { useSession } from "next-auth/react";
+import { NextResponse } from "next/server";
 import { useState, useEffect } from "react";
 
 interface Project {
@@ -46,6 +48,8 @@ export default function viewIssuePage({ params }: {
     const [canControl, setCanControl] = useState(false);
     const [project, setProject] = useState<Project>();
     const [issue, setIssue] = useState<Issue>();
+    const [canApply, setCanApply] = useState(false);
+    const [isAssigned, setIsAssigned] = useState(false);
     const [loading, setLoading] = useState(true);
     const projectId = params.id;
     const issueId = params.issueId;
@@ -139,6 +143,33 @@ export default function viewIssuePage({ params }: {
         await updateIssue(updatedIssue as Issue);
     };
 
+    // DONE: check if user already applied to this issue
+    // DONE: Check if user has been assigned to this issue
+    // TODO: Update on database changes
+    useEffect(() => {
+        const fetchAccess = async () => {
+            try {
+                let hasApplied = false;
+
+                const response = await fetch(`/api/applies/${issueId}`);
+                const application = await response.json();
+                if (application.length > 0 && application.some((item: { fk_usersid: any; }) => String(item.fk_usersid) === String(session?.user?.id))) {
+                    hasApplied = true;
+                }
+                setCanApply(!canControl && !hasApplied);
+
+                const response3 = await fetch(`/api/gets_assigned/${issueId}`);
+                const assignment = await response3.json();
+                if (assignment.length > 0 && assignment.some((item: { fk_usersid: any; }) => String(item.fk_usersid) === String(session?.user?.id))) {
+                    setIsAssigned(true);
+                }
+            } catch (error) {
+                console.error('Error fetching controls:', error);
+            }
+        };
+        fetchAccess();
+    }, [projectId, session]);
+
     const statusLocale = {
         open: 'Aktyvus',
         closed: 'Uždarytas'
@@ -148,6 +179,30 @@ export default function viewIssuePage({ params }: {
         public: 'Viešas',
         private: 'Privatus'
     };
+
+    async function volunteerApplied () {
+        const appliesData = {
+            id_user: Number(session?.user?.id),
+            id_issue: Number(issueId)
+        }
+        try {
+            const response = await fetch(`/api/applies/new`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(appliesData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                setCanApply(false);
+                // Display success message
+            } else {
+                return new NextResponse(JSON.stringify({ message: "Error creating applies", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+            }
+        } catch (error) {
+            return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+        }
+    }
 
     return (
         <div className="flex flex-col items-center justify-center">
@@ -177,7 +232,23 @@ export default function viewIssuePage({ params }: {
                                                         <button onClick={() => changeIssueVisibility("public")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Padaryti viešą</button>
                                                     )}
                                                 </>
-                                            ) : null}
+                                            ) : (
+                                            canApply && !isAssigned ? (
+                                                <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={volunteerApplied}>
+                                                    Noriu taisyti
+                                                </button>
+                                            ) : (
+                                                isAssigned ? (
+                                                    <button className="bg-white border-2 border-green-500 font-bold py-2 px-4 rounded cursor-not-allowed" disabled>
+                                                        Jau priskirtas
+                                                    </button>
+                                                ) : (
+                                                    <button className="bg-gray-500 text-white font-bold py-2 px-4 rounded cursor-not-allowed" disabled>
+                                                        Laukiama patvirtinimo
+                                                    </button>
+                                                )
+                                            )
+                                        )}
                                         </div>
 
                                     </div>
