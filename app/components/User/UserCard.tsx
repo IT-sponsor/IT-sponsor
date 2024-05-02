@@ -38,6 +38,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
   const { id, first_name, last_name, github, fk_imagesid_images: image_id, issueId, type } = user;
   const fullName = `${first_name} ${last_name}`;
   const githubUrl = `https://github.com/${github}`;
+  const profileUrl = `/profile/${user.id}`;
   const [issue, setIssue] = useState({} as Issue);
   const [image, setImage] = useState({} as string);
 
@@ -103,7 +104,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
             )}
           </div>
           <div className="flex flex-col">
-            <h3 className="font-semibold text-lg">{fullName}</h3>
+            <a href={profileUrl} className="font-semibold text-lg hover:bg-green-100 rounded-lg px-1">{fullName}</a>
             <a href={githubUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 font-medium flex items-center text-lg">
               <Image className="text-gray-500 mr-2 h-5 w-5 bg-gray-600 rounded-full" src={ github_icon } alt={ 'Github' }/>
               <div className="hover:underline">{github}</div>

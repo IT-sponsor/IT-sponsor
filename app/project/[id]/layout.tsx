@@ -138,6 +138,10 @@ export default function ProjectLayout({
             ]
             : [
                 {
+                    name: "Mano praneštos klaidos",
+                    link: `/project/${projectId}/fault`
+                },
+                {
                     name: "Nauja klaida",
                     link: `/project/${projectId}/fault/new`
                 }
