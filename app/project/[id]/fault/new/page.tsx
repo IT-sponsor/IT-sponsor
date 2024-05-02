@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
 import { NextResponse } from "next/server";
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor';
+import { useSession } from 'next-auth/react';
 
 interface Project {
     id: number;
@@ -50,6 +51,7 @@ export default function newFaultPage({ params }: {
     const [faultDescription, setFaultDescription] = useState<string>("");
     const [faultSeverity, setFaultSeverity] = useState<string>("low");
     const [formErrors, setFormErrors] = useState<any>({});
+    const { data: session } = useSession();
 
     useEffect(() => {
         if (projectId) {
@@ -104,7 +106,7 @@ export default function newFaultPage({ params }: {
             severity: faultSeverity,
             status: "open",
             id_project: Number(projectId),
-            user_id: 1 // TODO: Get user id from session
+            user_id: Number(session?.user?.id)
         }
 
         try {
@@ -116,7 +118,7 @@ export default function newFaultPage({ params }: {
 
             if (response.ok) {
                 const result = await response.json();
-                window.location.href = `/project/${projectId}`; // TODO: Add success message
+                window.location.href = `/project/${projectId}`; // TODO: Add success message => component/navigation/modal
             } else {
                 return new NextResponse(JSON.stringify({ message: "Error creating fault", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
             }
