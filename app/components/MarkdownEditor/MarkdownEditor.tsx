@@ -19,6 +19,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ markdownText, setMarkdo
     return {
       autofocus: false,
       status: false,
+      spellChecker: false,
       toolbar: [
         "bold",
         "italic",
