@@ -1,6 +1,5 @@
 "use client";
-import React, { useCallback, useMemo, useState, useEffect } from 'react';
-import ProjectCard from "@/app/components/ProjectCard/ProjectCard";
+import React, { useState, useEffect } from 'react';
 import { NextResponse } from "next/server";
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor';
 import { useSession } from 'next-auth/react';
@@ -52,7 +51,6 @@ export default function newFaultPage({ params }: {
     const [faultDescription, setFaultDescription] = useState<string>("");
     const [faultSeverity, setFaultSeverity] = useState<string>("low");
     const [formErrors, setFormErrors] = useState<any>({});
-    const { data: session } = useSession();
 
     useEffect(() => {
         if (projectId) {
