@@ -94,7 +94,8 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
   return (
     <div className="flex-grow px-4 py-2 mt-2 w-full rounded-xl border-2 border-gray-100 bg-white">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4 shrink-0">
+        <Link href={`/profile/${user.id}`}>
+        <div className="flex items-center space-x-4 shrink-0 hover:bg-green-100 rounded-lg pr-1">
           <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
             {image ? (
               <img alt={ fullName } width={ 100 } height={ 100 } className="rounded-full" src={ image } />
@@ -106,6 +107,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, onAssign, onRemove, onComplet
             <a href={profileUrl} className="font-semibold text-lg hover:bg-green-100 rounded-lg px-1">{fullName}</a>
           </div>
         </div>
+        </Link>
         <div className="flex items-center overflow-y-auto ">
           <Link href={`/project/${project_id}/issue/${issueId}`}>
             <span className="text-gray-700 hover:underline font-italic mr-4 ml-8 flex-col break-words flex-wrap">
