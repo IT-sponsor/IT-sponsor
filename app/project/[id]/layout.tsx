@@ -167,7 +167,7 @@ export default function ProjectLayout({
                                     description={project.short_description}
                                     timeUpdated={project.updated_at}
                                     issueCount={0}
-                                    volunteerCount={0}
+                                    volunteerCount={project.contributor_count}
                                     tags={project.technologies.split(' ')}
                                 />
                             </div>

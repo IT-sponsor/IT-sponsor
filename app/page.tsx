@@ -60,7 +60,6 @@ export default function Home() {
       .then(data => {
         const modifiedData = data.map((project: Project) => {
           if(project.images) {
-            console.log("HEREEEEEEEEEEEEE");
             const logoData = project.images.image.data;
             const base64String = Buffer.from(logoData).toString('base64');
             return {
@@ -335,7 +334,7 @@ export default function Home() {
                     description={project.short_description}
                     timeUpdated={project.updated_at}
                     issueCount={0}
-                    volunteerCount={0}
+                    volunteerCount={project.contributor_count}
                     tags={project.technologies.split(' ')}
                   />
                 </div>

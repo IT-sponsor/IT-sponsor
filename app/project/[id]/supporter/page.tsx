@@ -41,6 +41,7 @@ export default function Supporter( { params }: { params: { id: number } }) {
       return res.json();
     })
     .then(data => {
+      console.log(data.users);
       setUsers(data.users);
     })
     .catch(error => {
