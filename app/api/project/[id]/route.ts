@@ -113,3 +113,41 @@ export async function PUT(
   //     return new NextResponse(JSON.stringify({ message: "Error updating project", error: error.message }), { status: 500 });
   // }
 }
+
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: { id: Number } }
+) {
+    const projectId = Number(params.id);
+
+    try {
+        const transaction = await prisma.$transaction(async (prisma) => {
+            await prisma.controls.deleteMany({
+                where: { fk_projectsid: projectId }
+            });
+
+            await prisma.faults.deleteMany({
+                where: { fk_projectsid: projectId }
+            });
+
+            await prisma.issues.deleteMany({
+                where: { fk_projectsid: projectId }
+            });
+
+            await prisma.projects.delete({
+                where: { id: projectId }
+            });
+        });
+
+        return new NextResponse(
+            JSON.stringify({ message: "Project deleted successfully" }),
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Deletion error:", error);
+        return new NextResponse(
+            JSON.stringify({ message: "Error deleting project", error: error.message }),
+            { status: 500 }
+        );
+    }
+}
