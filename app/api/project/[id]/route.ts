@@ -91,25 +91,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-
-  // const data = await request.json();
-  // try {
-  //     const updatedProject = await prisma.projects.update({
-  //         where: { id: Number(params.id) },
-  //         data: {
-  //             name: data.name,
-  //             short_description: data.short_description,
-  //             long_description: data.long_description,
-  //             repository: data.repository,
-  //             technologies: data.technologies,
-  //             codebase_visibility: data.codebase_visibility,
-  //         },
-  //         include: {
-  //             images: true,
-  //         },
-  //     });
-  //     return NextResponse.json(updatedProject);
-  // } catch (error) {
-  //     return new NextResponse(JSON.stringify({ message: "Error updating project", error: error.message }), { status: 500 });
-  // }
 }
