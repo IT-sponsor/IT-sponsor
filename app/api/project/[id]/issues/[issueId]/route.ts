@@ -50,7 +50,15 @@ export async function PATCH(
                 visibility: data.visibility,
                 status: data.status
             }
-        })
+        });
+
+        const updateProject = await prisma.projects.update({
+            where: { id: Number(params.id) },
+            data: {
+              updated_at: new Date(),
+            },
+        });
+
         return NextResponse.json(updatedIssue);
     } catch (error) {
         return new NextResponse(JSON.stringify({ message: "Error updating issue", error: error }), { status: 500 });

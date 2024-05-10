@@ -29,6 +29,14 @@ export async function POST(req: NextRequest) {
                     fk_projectsid: Number(id_project),
                 },
             });
+
+            const updateProject = await prisma.projects.update({
+                where: { id: Number(id_project) },
+                data: {
+                  updated_at: new Date(),
+                },
+            });
+
             return new NextResponse(JSON.stringify({ message: "Issue created successfully", issue }), { status: 201 });
         } catch (error: any) {
             return new NextResponse(JSON.stringify({ message: "Error creating issue", error: error.message }), { status: 500 });
