@@ -121,7 +121,7 @@ export default function ProjectLayout({
             ? [
                 {
                     name: "Rėmėjai",
-                    link: `/project/${projectId}/supporter`
+                    link: `/project/${projectId}/users/supporter`
                 },
                 {
                     name: "Klaidos",
@@ -134,6 +134,10 @@ export default function ProjectLayout({
                 {
                     name: "Redaguoti projektą",
                     link: `/project/${projectId}/edit`
+                },
+                {
+                    name: "Administratoriai",
+                    link: `/project/${projectId}/users/admin`
                 }
             ]
             : [
