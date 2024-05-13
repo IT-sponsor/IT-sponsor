@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Toaster, toast } from 'sonner';
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "./components/Footer/Footer";
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
           <Providers>
+            <Toaster closeButton richColors />
             <Navigation />
             <div className="flex flex-col min-h-screen justify-center pt-16">
               <main className="flex-grow">
