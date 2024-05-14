@@ -108,8 +108,8 @@ model projects {
   long_description    String?                       @db.LongText
   repository          String?                       @unique @db.VarChar(255)
   technologies        String?                       @db.VarChar(1000)
-  created_at          DateTime?                     @db.Date
-  updated_at          DateTime?                     @db.Date
+  created_at          DateTime?                     @db.DateTime(0)
+  updated_at          DateTime?                     @db.DateTime(0)
   star_count          Int?
   contributor_count   Int?
   codebase_visibility projects_codebase_visibility?
