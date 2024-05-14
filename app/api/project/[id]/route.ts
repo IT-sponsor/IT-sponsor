@@ -111,21 +111,18 @@ export async function DELETE(
               select: { id: true }
           })).map(fault => fault.id);
 
-          // Delete related records from 'gets_assigned'
           await prisma.gets_assigned.deleteMany({
               where: {
                   fk_issuesid: { in: issueIds }
               }
           });
 
-          // Delete related records from 'applies'
           await prisma.applies.deleteMany({
               where: {
                   fk_issuesid: { in: issueIds }
               }
           });
 
-          // Delete related records from 'images'
           await prisma.images.deleteMany({
               where: {
                   OR: [
@@ -135,22 +132,18 @@ export async function DELETE(
               }
           });
 
-          // Delete related faults
           await prisma.faults.deleteMany({
               where: { fk_projectsid: projectId }
           });
 
-          // Delete related issues
           await prisma.issues.deleteMany({
               where: { fk_projectsid: projectId }
           });
 
-          // Delete related controls
           await prisma.controls.deleteMany({
               where: { fk_projectsid: projectId }
           });
 
-          // Delete the project itself
           await prisma.projects.delete({
               where: { id: projectId }
           });
