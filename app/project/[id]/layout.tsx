@@ -90,11 +90,12 @@ export default function ProjectLayout({
         const fetchAccess = async () => {
             try {
                 const response = await fetch(`/api/controls/${projectId}`);
-                const data = await response.json();
-                if (data.length > 0) {
-                    const ownerId = data[0].fk_usersid.toString();
-                    const hasAccess = ownerId === session?.user?.id;
+                const admins = await response.json();
+                if (admins.length > 0) {
+                    const hasAccess = admins.some((item: { fk_usersid: { toString: () => string | undefined; }; }) => item.fk_usersid.toString() === session?.user?.id.toString());
                     setCanAccess(hasAccess);
+                } else {
+
                 }
             } catch (error) {
                 console.error('Error fetching controls:', error);
