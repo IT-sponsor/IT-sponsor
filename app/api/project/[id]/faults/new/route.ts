@@ -24,9 +24,6 @@ export async function POST(req: NextRequest) {
         try {
             const fault = await prisma.faults.create({
                 data: {
-                    id: undefined, // Add the 'id' property
-                    projects: undefined, // Add the 'projects' property
-                    users: undefined, // Add the 'users' property
                     title,
                     created_at: new Date(),
                     description,
@@ -36,6 +33,14 @@ export async function POST(req: NextRequest) {
                     fk_usersid: user_id as number,
                 },
             });
+
+            const updateProject = await prisma.projects.update({
+                where: { id: Number(id_project) },
+                data: {
+                  updated_at: new Date(),
+                },
+            });
+            
             return new NextResponse(JSON.stringify({ message: "Fault created successfully", fault }), { status: 201 });
         } catch (error: any) {
             return new NextResponse(JSON.stringify({ message: "Error creating fault", error: error.message }), { status: 500 });
