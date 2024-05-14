@@ -92,3 +92,79 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: Number } }
+) {
+  const projectId = Number(params.id);
+
+  try {
+      await prisma.$transaction(async (prisma) => {
+          const issueIds = (await prisma.issues.findMany({
+              where: { fk_projectsid: projectId },
+              select: { id: true }
+          })).map(issue => issue.id);
+
+          const faultIds = (await prisma.faults.findMany({
+              where: { fk_projectsid: projectId },
+              select: { id: true }
+          })).map(fault => fault.id);
+
+          // Delete related records from 'gets_assigned'
+          await prisma.gets_assigned.deleteMany({
+              where: {
+                  fk_issuesid: { in: issueIds }
+              }
+          });
+
+          // Delete related records from 'applies'
+          await prisma.applies.deleteMany({
+              where: {
+                  fk_issuesid: { in: issueIds }
+              }
+          });
+
+          // Delete related records from 'images'
+          await prisma.images.deleteMany({
+              where: {
+                  OR: [
+                      { fk_faultsid: { in: faultIds } },
+                      { fk_issuesid: { in: issueIds } }
+                  ]
+              }
+          });
+
+          // Delete related faults
+          await prisma.faults.deleteMany({
+              where: { fk_projectsid: projectId }
+          });
+
+          // Delete related issues
+          await prisma.issues.deleteMany({
+              where: { fk_projectsid: projectId }
+          });
+
+          // Delete related controls
+          await prisma.controls.deleteMany({
+              where: { fk_projectsid: projectId }
+          });
+
+          // Delete the project itself
+          await prisma.projects.delete({
+              where: { id: projectId }
+          });
+      });
+
+      return new NextResponse(
+          JSON.stringify({ message: "Project deleted successfully" }),
+          { status: 200 }
+      );
+  } catch (error) {
+      console.error("Deletion error:", error);
+      return new NextResponse(
+          JSON.stringify({ message: "Error deleting project", error: error.message }),
+          { status: 500 }
+      );
+  }
+}
