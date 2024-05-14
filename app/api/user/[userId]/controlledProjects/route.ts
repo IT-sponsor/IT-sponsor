@@ -3,18 +3,32 @@ import { NextResponse } from "next/server";
 
 export async function GET(
     request: Request,
-    { params }: { params: { userId: Number } }
+    { params }: { params: { userId: number } }
 ) {
-    let controls = await prisma.controls.findMany({
-        where: {
-            fk_usersid: Number(params.userId)
-        },
-        include: {
-            projects: true,
-        }
-    })
+    try {
+        const controls = await prisma.controls.findMany({
+            where: {
+                fk_usersid: Number(params.userId),
+            },
+            select: {
+                fk_projectsid: true,
+            },
+        });
 
-    let projects = controls.map(controls => controls.projects);
+        const projectIds = controls.map(control => control.fk_projectsid);
 
-    return NextResponse.json(projects);
+        const projects = await prisma.projects.findMany({
+            where: {
+                id: { in: projectIds },
+            },
+            include: {
+                images: true,
+            },
+        });
+
+        return NextResponse.json({ projects });
+    } catch (error) {
+        console.error("Error fetching controlled projects:", error);
+        return NextResponse.json({ error: "Error fetching controlled projects" }, { status: 500 });
+    }
 }
