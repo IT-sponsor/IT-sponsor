@@ -54,9 +54,10 @@ const Profile = ({
                         </div>
                         <hr className="my-6 border-t border-gray-300"></hr>
                         {session?.user.id === id && (
-                            <div className="flex justify-center">
+                            <div className="flex justify-center flex-wrap gap-4">
                             <a href={'/profile/' + session?.user.id + '/edit'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Redaguoti</a>
                             <Link href={'/profile/' + session?.user.id + '/issues'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano užduotys</Link>
+                            <Link href={'/profile/' + session?.user.id + '/projects'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano valdomi projektai</Link>
                             </div>
                         )}
                     </div>
