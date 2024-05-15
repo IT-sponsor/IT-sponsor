@@ -38,6 +38,7 @@ export default function FaultPage({ params }: { params: { id: number } }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredFaults, setFilteredFaults] = useState<Fault[] | null>(null)
   const [filter, setFilter] = useState('all')
+  const [userFaults, setUserFaults] = useState<Fault[] | null>(null)
 
   const projectId = params.id
 
@@ -73,21 +74,29 @@ export default function FaultPage({ params }: { params: { id: number } }) {
   }, [projectId, session])
 
   useEffect(() => {
-    let filteredResult = faults;
+    let filteredResult = faults
     if (searchQuery) {
-        filteredResult = filteredResult?.filter(
-            (fault) =>
-                fault.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                fault.description.toLowerCase().includes(searchQuery.toLowerCase())
-        ) || [];
+      filteredResult =
+        filteredResult?.filter(
+          (fault) =>
+            fault.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            fault.description.toLowerCase().includes(searchQuery.toLowerCase()),
+        ) || []
     }
     if (filter !== 'all') {
-        filteredResult = filteredResult?.filter(
-            (fault) => fault.severity === filter
-        ) || [];
+      filteredResult =
+        filteredResult?.filter((fault) => fault.severity === filter) || []
     }
-    setFilteredFaults(filteredResult);
-  }, [searchQuery, faults, filter]);
+    setFilteredFaults(filteredResult)
+  }, [searchQuery, faults, filter])
+
+  useEffect(() => {
+    setUserFaults(
+      filteredFaults?.filter(
+        (fault) => fault?.users?.id === Number(session?.user?.id),
+      ) ?? null,
+    )
+  }, [filteredFaults, session])
 
   return (
     <>
@@ -122,30 +131,28 @@ export default function FaultPage({ params }: { params: { id: number } }) {
                     />
                   </div>
                 ))
+              ) : userFaults?.length ? (
+                userFaults.map((fault, index) => (
+                  <div
+                    className="flex flex-col items-center justify-center w-full overflow-y-auto"
+                    key={index}
+                  >
+                    <FaultCardSmall
+                      id={fault.id}
+                      title={fault.title}
+                      description={fault.description}
+                      severity={fault.severity}
+                      status={fault.status}
+                      created_at={new Date(
+                        fault.created_at,
+                      ).toLocaleDateString()}
+                      first_name={fault.users.first_name}
+                      last_name={fault.users.last_name}
+                    />
+                  </div>
+                ))
               ) : (
-                filteredFaults
-                  .filter(
-                    (fault) => fault?.users?.id === Number(session?.user?.id),
-                  )
-                  .map((fault, index) => (
-                    <div
-                      className="flex flex-col items-center justify-center w-full overflow-y-auto"
-                      key={index}
-                    >
-                      <FaultCardSmall
-                        id={fault.id}
-                        title={fault.title}
-                        description={fault.description}
-                        severity={fault.severity}
-                        status={fault.status}
-                        created_at={new Date(
-                          fault.created_at,
-                        ).toLocaleDateString()}
-                        first_name={fault.users.first_name}
-                        last_name={fault.users.last_name}
-                      />
-                    </div>
-                  ))
+                <div>Jūs neturite klaidų pranešimų</div>
               )
             ) : searchQuery ? (
               <div>Nėra klaidų pranešimų atitinkančių paieškos užklausą</div>
