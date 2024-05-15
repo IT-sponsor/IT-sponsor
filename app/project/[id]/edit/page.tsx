@@ -4,6 +4,7 @@ import Link from "next/link";
 import { NextResponse } from "next/server";
 import MarkdownEditor from "@/app/components/MarkdownEditor/MarkdownEditor";
 import { useRouter } from "next/navigation";
+import ConfirmationPopup from '@/app/components/ConfirmationPopup/ConfirmationPopup'; 
 
 interface Project {
     id: number;
@@ -33,6 +34,7 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
     const [project, setProject] = useState<Project | null>(null);
     const [image, setImage] = useState<File | null>(null);
     const [formErrors, setFormErrors] = useState<Record<string, any>>({});
+    const [showPopup, setShowPopup] = useState(false);
     const projectId = params.id;
 
     useEffect(() => {
@@ -44,7 +46,7 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
                 // This is the easiest way I could think of converting Buffer data to a File object
                 // NOTE: This is dumb, we need to stop saving images in the database
                 const blob = new Blob([new Uint8Array(projectData.images.image.data)], { type: projectData.images.image.contentType });
-                const file = new File([blob], 'ProjectImage.png', { type: projectData.images.image.contentType });
+                const file = new File([blob], 'ProjectImage.png', { type: 'image/png' });
 
                 setImage(file);
             }
@@ -85,10 +87,29 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
         }
     };
 
+    const deleteProject = async () => {
+        setShowPopup(false);  
+        
+        try {
+            const response = await fetch(`/api/project/${projectId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                router.push('/');  
+            } else {
+                return new NextResponse(JSON.stringify({ message: "Failed to delete the project ", error: response.statusText }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+            }
+        } catch (error) {
+            return new NextResponse(JSON.stringify({ message: "Network error", error }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+        }
+    };
+
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         if (!validateForm()) return;
-        if (image && !validateFile(image)) return;
+        console.log(image);
+        if (image) if(!validateFile(image)) return;
         if (!project) return;
 
         const projectData = new FormData();
@@ -122,6 +143,25 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
     return (
         <div className="flex flex-col items-center justify-center p-6">
             <div className="px-6 py-5 rounded-xl border-2 border-gray-100 bg-white" style={{ width: '800px' }}>
+
+                <div className="flex justify-between items-center bg-red-100 p-4 rounded-md mb-6">
+                    <ConfirmationPopup
+                        isOpen={showPopup}
+                        onClose={() => setShowPopup(false)}
+                        onConfirm={deleteProject}
+                        title="Projekto šalinimas"
+                        message="Ar tikrai norite ištrinti projektą? Šis veiksmas negali būti atšauktas."
+                    />
+                    <p className="text-red-800">Ištrinti projektą</p>
+
+                    <button
+                        onClick={() => setShowPopup(true)}
+                        className="py-2 px-4 rounded-lg text-black bg-[#C14040] hover:bg-red-700 transition duration-150 ease-in-out"
+                    >
+                        Ištrinti
+                    </button>
+                </div>
+
                 <h1 className="text-2xl font-bold text-gray-800 text-center">Redaguoti projektą</h1>
                 <form onSubmit={handleSubmit} className="flex flex-col items-start justify-center w-full">
 
