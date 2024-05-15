@@ -71,6 +71,14 @@ export async function POST(
                     status: status as faults_status,
                 },
             });
+
+            const updateProject = await prisma.projects.update({
+                where: { id: Number(params.id) },
+                data: {
+                  updated_at: new Date(),
+                },
+            });
+
             return new NextResponse(JSON.stringify({ message: "Fault updated successfully", fault }), { status: 201 });
         } catch (error: any) {
             return new NextResponse(JSON.stringify({ message: "Error updating fault", error: error.message }), { status: 500 });

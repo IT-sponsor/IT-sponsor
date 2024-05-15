@@ -91,63 +91,73 @@ export async function PUT(
       { status: 500 }
     );
   }
-
-  // const data = await request.json();
-  // try {
-  //     const updatedProject = await prisma.projects.update({
-  //         where: { id: Number(params.id) },
-  //         data: {
-  //             name: data.name,
-  //             short_description: data.short_description,
-  //             long_description: data.long_description,
-  //             repository: data.repository,
-  //             technologies: data.technologies,
-  //             codebase_visibility: data.codebase_visibility,
-  //         },
-  //         include: {
-  //             images: true,
-  //         },
-  //     });
-  //     return NextResponse.json(updatedProject);
-  // } catch (error) {
-  //     return new NextResponse(JSON.stringify({ message: "Error updating project", error: error.message }), { status: 500 });
-  // }
 }
 
 export async function DELETE(
-    request: NextRequest,
-    { params }: { params: { id: Number } }
+  request: NextRequest,
+  { params }: { params: { id: Number } }
 ) {
-    const projectId = Number(params.id);
+  const projectId = Number(params.id);
 
-    try {
-        const transaction = await prisma.$transaction(async (prisma) => {
-            await prisma.controls.deleteMany({
-                where: { fk_projectsid: projectId }
-            });
+  try {
+      await prisma.$transaction(async (prisma) => {
+          const issueIds = (await prisma.issues.findMany({
+              where: { fk_projectsid: projectId },
+              select: { id: true }
+          })).map(issue => issue.id);
 
-            await prisma.faults.deleteMany({
-                where: { fk_projectsid: projectId }
-            });
+          const faultIds = (await prisma.faults.findMany({
+              where: { fk_projectsid: projectId },
+              select: { id: true }
+          })).map(fault => fault.id);
 
-            await prisma.issues.deleteMany({
-                where: { fk_projectsid: projectId }
-            });
+          await prisma.gets_assigned.deleteMany({
+              where: {
+                  fk_issuesid: { in: issueIds }
+              }
+          });
 
-            await prisma.projects.delete({
-                where: { id: projectId }
-            });
-        });
+          await prisma.applies.deleteMany({
+              where: {
+                  fk_issuesid: { in: issueIds }
+              }
+          });
 
-        return new NextResponse(
-            JSON.stringify({ message: "Project deleted successfully" }),
-            { status: 200 }
-        );
-    } catch (error) {
-        console.error("Deletion error:", error);
-        return new NextResponse(
-            JSON.stringify({ message: "Error deleting project", error: error.message }),
-            { status: 500 }
-        );
-    }
+          await prisma.images.deleteMany({
+              where: {
+                  OR: [
+                      { fk_faultsid: { in: faultIds } },
+                      { fk_issuesid: { in: issueIds } }
+                  ]
+              }
+          });
+
+          await prisma.faults.deleteMany({
+              where: { fk_projectsid: projectId }
+          });
+
+          await prisma.issues.deleteMany({
+              where: { fk_projectsid: projectId }
+          });
+
+          await prisma.controls.deleteMany({
+              where: { fk_projectsid: projectId }
+          });
+
+          await prisma.projects.delete({
+              where: { id: projectId }
+          });
+      });
+
+      return new NextResponse(
+          JSON.stringify({ message: "Project deleted successfully" }),
+          { status: 200 }
+      );
+  } catch (error) {
+      console.error("Deletion error:", error);
+      return new NextResponse(
+          JSON.stringify({ message: "Error deleting project", error: error.message }),
+          { status: 500 }
+      );
+  }
 }

@@ -46,7 +46,7 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
                 // This is the easiest way I could think of converting Buffer data to a File object
                 // NOTE: This is dumb, we need to stop saving images in the database
                 const blob = new Blob([new Uint8Array(projectData.images.image.data)], { type: projectData.images.image.contentType });
-                const file = new File([blob], 'ProjectImage.png', { type: projectData.images.image.contentType });
+                const file = new File([blob], 'ProjectImage.png', { type: 'image/png' });
 
                 setImage(file);
             }
@@ -108,7 +108,8 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         if (!validateForm()) return;
-        if (image && !validateFile(image)) return;
+        console.log(image);
+        if (image) if(!validateFile(image)) return;
         if (!project) return;
 
         const projectData = new FormData();
