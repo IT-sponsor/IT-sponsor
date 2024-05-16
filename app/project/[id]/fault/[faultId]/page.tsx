@@ -1,4 +1,5 @@
 "use client";
+import UserDefault from '@/public/assets/defaultUser.jpg';
 import { useRouter } from "next/navigation";
 import Spinner from "@/app/components/Loading/Spinner";
 import MarkdownDisplay from "@/app/components/MarkdownDisplay/MarkdownDisplay";
@@ -43,11 +44,6 @@ interface Fault {
         first_name: string;
         last_name: string;
         logo: string;
-        images: {
-            image: {
-                data: Buffer;
-            }
-        }
     };
 }
 
@@ -94,9 +90,18 @@ export default function viewFaultPage({ params }: {
                     return res.json();
                 })
                 .then(data => {
+                    if (data.users.images && data.users.images.image && data.users.images.image.data) {
+                        const logoData = data.users.images.image.data;
+                        const base64String = Buffer.from(logoData).toString('base64');
+                        data.users.logo = `data:image/jpeg;base64,${base64String}`;
+                    } else {
+                        data.users.logo = UserDefault.src;
+                    }
                     setFault(data);
                 })
-                .catch(console.error);
+                .catch(error => {
+                    console.error(error);
+                });
         }
     }, [faultId]);
 
@@ -157,7 +162,7 @@ export default function viewFaultPage({ params }: {
                                                             <a href={`/profile/${fault.users.id}`} className="flex items-center hover:bg-green-100 rounded-lg pr-1">
                                                                 <img
                                                                     alt=''
-                                                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                                                    src={fault.users.logo}
                                                                     className="h-6 w-6 rounded-full mr-2"
                                                                 />
                                                                 {fault.users.first_name + ' ' + fault.users.last_name}

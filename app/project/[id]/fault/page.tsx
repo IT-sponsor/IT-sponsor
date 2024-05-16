@@ -1,5 +1,5 @@
 "use client";
-import defaultUserPhoto from '@/public/assets/defaultUser.jpg';
+import UserDefault from '@/public/assets/defaultUser.jpg';
 import FaultCardSmall from '@/app/components/Fault/Cards/FaultCardSmall';
 import { useState, useEffect } from 'react';
 import Spinner from '@/app/components/Loading/Spinner';
@@ -14,24 +14,19 @@ interface Fault {
     fix_info: string;
     severity: string;
     status: string;
-    id_project: number; // Project that the fault is associated with
+    id_project: number;
     users: {
         id: number;
         first_name: string;
         last_name: string;
         logo: string;
-        images: {
-            image: {
-                data: Buffer;
-            }
-        }
     };
 }
 
 export default function FaultPage({ params }: {
     params: { id: number }
 }) {
-    const [faults, setFaults] = useState<Fault[] | null>(null);
+    const [faults, setFaults] = useState<Fault[]>([]);
     const [loading, setLoading] = useState(true);
     const [canAccessAll, setCanAccessAll] = useState(false);
     const { data: session } = useSession();
@@ -43,12 +38,25 @@ export default function FaultPage({ params }: {
             fetch(`/api/project/${projectId}/faults`)
                 .then(res => res.json())
                 .then(data => {
-                    setTimeout(() => {
-                        setFaults(data);
-                        setLoading(false);
-                    }, 300);
+                    const processedFaults = data.map((fault: Fault) => {
+                        const user = fault.users;
+                        if (user.images && user.images.image && user.images.image.data) {
+                            const logoData = user.images.image.data;
+                            const base64String = Buffer.from(logoData).toString('base64');
+                            user.logo = `data:image/jpeg;base64,${base64String}`;
+                        } else {
+                            user.logo = UserDefault.src;
+                        }
+                        return fault;
+                    });
+
+                    setFaults(processedFaults);
+                    setLoading(false);
                 })
-                .catch(console.error);
+                .catch(error => {
+                    console.error(error);
+                    setLoading(false);
+                });
         }
     }, [projectId]);
 
@@ -75,10 +83,10 @@ export default function FaultPage({ params }: {
                 <Spinner />
             ) : (
                 <>
-                    {faults?.length ? (
+                    {faults.length > 0 ? (
                         canAccessAll ? (
-                            faults.map((fault, index) => (
-                                <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={index}>
+                            faults.map(fault => (
+                                <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={fault.id}>
                                     <FaultCardSmall
                                         id={fault.id}
                                         title={fault.title}
@@ -88,14 +96,15 @@ export default function FaultPage({ params }: {
                                         created_at={new Date(fault.created_at).toLocaleDateString()}
                                         first_name={fault.users.first_name}
                                         last_name={fault.users.last_name}
+                                        profile_picture={fault.users.logo}
                                     />
                                 </div>
                             ))
                         ) : (
                             faults
-                            .filter(fault => fault?.users?.id === Number(session?.user?.id))
-                            .map((fault, index) => (
-                                <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={index}>
+                            .filter(fault => fault.users.id === Number(session?.user?.id))
+                            .map(fault => (
+                                <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={fault.id}>
                                     <FaultCardSmall
                                         id={fault.id}
                                         title={fault.title}
@@ -105,6 +114,7 @@ export default function FaultPage({ params }: {
                                         created_at={new Date(fault.created_at).toLocaleDateString()}
                                         first_name={fault.users.first_name}
                                         last_name={fault.users.last_name}
+                                        profile_picture={fault.users.logo}
                                     />
                                 </div>
                             ))
