@@ -5,7 +5,7 @@ import { useState } from 'react'
 import LogoGray from "@/public/assets/logo_icon_gray.svg";
 import Image from "next/image";
 
-export default function page() {
+export default function SignUpPage() {
   const [first_name, setFirstName] = useState('');
   const [last_name, setLastName] = useState('');
   const [email, setEmail] = useState('');
