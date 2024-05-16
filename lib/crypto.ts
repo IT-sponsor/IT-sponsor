@@ -1,6 +1,6 @@
 import * as CryptoJS from 'crypto-js';
 
-const secret = process.env.RESET_SECRET || 'defaultSecret';
+const secret = process.env.RESET_SECRET;
 
 export const generateResetHash = (userId: string) => {
   const timestamp = Date.now();
