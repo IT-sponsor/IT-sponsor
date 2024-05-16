@@ -108,37 +108,68 @@ const NewProjectPage = () => {
             </div>
             <div className="flex mb-4 px-6 bg-white">
               <div className="flex flex-col items-start justify-center w-full h-full">
-                <label
-                  htmlFor="projectName"
-                  className="block text-gray-700 font-bold mt-3"
-                >
-                  Pavadinimas
-                </label>
-                <input
-                  type="text"
-                  id="projectName"
-                  placeholder="Pavadinimas"
-                  className="w-full border border-gray-300 py-2 pl-3 rounded outline-none focus-within:border-black"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
-                />
-                {formErrors.projectName && (
-                  <div className="text-red-500">{formErrors.projectName}</div>
-                )}
 
-                <label
-                  htmlFor="shortDescription"
-                  className="block text-gray-700 font-bold mt-3"
-                >
-                  Trumpas aprašymas
-                </label>
-                <input
-                  type="text"
-                  id="shortDescription"
-                  placeholder="Trumpas aprašymas"
-                  className="w-full border border-gray-300 py-2 pl-3 rounded outline-none focus-within:border-black"
-                  value={shortDescription}
-                  onChange={(e) => setShortDescription(e.target.value)}
+          <label htmlFor="projectName" className="block text-gray-700 font-bold mt-3">Pavadinimas</label>
+          <input
+            type="text"
+            id="projectName"
+            placeholder="Pavadinimas"
+            className="w-full border border-gray-300 py-2 pl-3 rounded outline-none focus-within:border-black"
+            value={projectName} onChange={(e) => setProjectName(e.target.value)}
+          />
+          {formErrors.projectName && <div className="text-red-500">{formErrors.projectName}</div>}
+
+          <label htmlFor="shortDescription" className="block text-gray-700 font-bold mt-3">Trumpas aprašymas</label>
+          <textarea 
+            id="shortDescription" 
+            placeholder="Trumpas aprašymas" 
+            className="w-full border border-gray-300 py-2 pl-3 rounded outline-none focus-within:border-black" 
+            value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} />
+          {formErrors.shortDescription && <div className="text-red-500">{formErrors.shortDescription}</div>}
+
+
+          <label htmlFor="repository" className="block text-gray-700 font-bold mt-3">Repozitorijos nuoroda</label>
+          <input
+            type="text"
+            id="repository"
+            placeholder="https://..."
+            className="w-full border border-gray-300 py-2 pl-3 rounded outline-none focus-within:border-black"
+            value={repository} onChange={(e) => setRepository(e.target.value)}
+          />
+          {formErrors.repository && <div className="text-red-500">{formErrors.repository}</div>}
+
+          <label htmlFor="codebase_visibility" className="block text-gray-700 font-bold mt-3">Repozitorijos matomumas</label>
+          <select
+            id="codebase_visibility"
+            className="w-full border border-gray-300 py-2 pl-3 rounded outline-none focus-within:border-black"
+            value={codebase_visibility} onChange={(e) => setCodebaseVisibility(e.target.value)}
+          >
+            <option value="public">Vieša</option>
+            <option value="private">Privati</option>
+          </select>
+
+          <label htmlFor="technologies" className="block text-gray-700 font-bold mt-3">Technologijos (atskirkite tarpais)</label>
+          <input
+            type="text"
+            id="technologies"
+            placeholder="Technologijos"
+            className="w-full border border-gray-300 py-2 pl-3 rounded outline-none focus-within:border-black"
+            value={technologies} onChange={(e) => setTechnologies(e.target.value)}
+          />
+          {formErrors.technologies && <div className="text-red-500">{formErrors.technologies}</div>}
+
+          <label htmlFor="fullDescription" className="block text-gray-700 font-bold mt-3">Pilnas aprašymas</label>
+          <MarkdownEditor markdownText={fullDescription} setMarkdownText={setFullDescription} />
+          {formErrors.fullDescription && <div className="text-red-500">{formErrors.fullDescription}</div>}
+
+          <div id="image-preview" className="max-w-sm p-6 mb-4 bg-gray-100 border-dashed border-2 border-gray-400 rounded-lg items-center mx-auto text-center cursor-pointer mt-2">
+
+            {image && (
+              <label htmlFor="upload" className='cursor-pointer'>
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt='image-preview'
+                  className="max-h-48 rounded-lg mx-auto"
                 />
                 {formErrors.shortDescription && (
                   <div className="text-red-500">
