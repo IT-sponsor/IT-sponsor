@@ -196,7 +196,7 @@ export default function EditProjectPage({ params }: { params: { id: number } }) 
                     {formErrors.name && <div className="text-red-500">{formErrors.name}</div>}
 
                     <label htmlFor="shortDescription" className="block text-gray-700 font-bold">Trumpas aprašymas</label>
-                    <input type="text" id="shortDescription" placeholder="Trumpas aprašymas" className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-500" value={project.short_description} onChange={(e) => setProject({ ...project, short_description: e.target.value })} />
+                    <textarea id="shortDescription" placeholder="Trumpas aprašymas" className="w-full border border-gray-300 py-2 pl-3 rounded mt-2 outline-none focus:ring-indigo-500" value={project.short_description} onChange={(e) => setProject({ ...project, short_description: e.target.value })} />
                     {formErrors.shortDescription && <div className="text-red-500">{formErrors.shortDescription}</div>}
 
                     <label htmlFor="repository" className="block text-gray-700 font-bold">Repozitorijos nuoroda</label>
