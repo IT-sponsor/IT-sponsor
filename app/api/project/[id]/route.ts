@@ -55,8 +55,6 @@ export async function get_volunteer_count() {
       projectUsersMap[projectId].push(fk_usersid)
     }
   })
-  console.log(projectFaultsMap)
-  console.log(projectUsersMap)
   const mergedMap: { [projectId: number]: number[] } = {}
 
   for (const projectId in projectFaultsMap) {
@@ -75,7 +73,6 @@ export async function get_volunteer_count() {
       volunteerCount[projectId] = uniqueUserIds.size
     }
   }
-  console.log(volunteerCount)
   return volunteerCount
 }
 
@@ -118,9 +115,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: Number } },
 ) {
-  console.log(request.body)
   const formData = await request.formData()
-  console.log(formData)
 
   const name = formData.get('name') as string
   const short_description = formData.get('short_description') as string
@@ -173,7 +168,6 @@ export async function PUT(
       },
     })
 
-    console.log('Project updated', project)
     return new NextResponse(
       JSON.stringify({ message: 'Project updated successfully', project }),
       { status: 200 },
