@@ -1,7 +1,6 @@
 "use client";
 import IssueCardSmall from '@/app/components/Issue/Cards/IssueCardSmall';
 import Spinner from '@/app/components/Loading/Spinner';
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 
