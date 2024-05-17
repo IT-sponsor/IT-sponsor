@@ -50,7 +50,7 @@ const FaultCardSmall = (
     };
 
     return (
-        <Link href={`fault/${id}`} className="rounded-xl border-2 border-gray-100 bg-white w-full mb-3">
+        <div className="rounded-xl border-2 border-gray-100 bg-white w-full mb-3">
             <article>
                 <div className="flex flex-col sm:flex-row items-start gap-4 p-4 sm:px-6 lg:px-8">
                     <div className="flex-grow">
@@ -85,7 +85,7 @@ const FaultCardSmall = (
                     <p className="hidden sm:block sm:text-xs sm:text-gray-500"> {created_at} </p>
                 </div>
             </article>
-        </Link>
+        </div>
     );
 };
 

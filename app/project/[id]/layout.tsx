@@ -90,11 +90,12 @@ export default function ProjectLayout({
         const fetchAccess = async () => {
             try {
                 const response = await fetch(`/api/controls/${projectId}`);
-                const data = await response.json();
-                if (data.length > 0) {
-                    const ownerId = data[0].fk_usersid.toString();
-                    const hasAccess = ownerId === session?.user?.id;
+                const admins = await response.json();
+                if (admins.length > 0) {
+                    const hasAccess = admins.some((item: { fk_usersid: { toString: () => string | undefined; }; }) => item.fk_usersid.toString() === session?.user?.id.toString());
                     setCanAccess(hasAccess);
+                } else {
+
                 }
             } catch (error) {
                 console.error('Error fetching controls:', error);
@@ -121,7 +122,7 @@ export default function ProjectLayout({
             ? [
                 {
                     name: "Rėmėjai",
-                    link: `/project/${projectId}/supporter`
+                    link: `/project/${projectId}/users/supporter`
                 },
                 {
                     name: "Klaidos",
@@ -134,6 +135,10 @@ export default function ProjectLayout({
                 {
                     name: "Redaguoti projektą",
                     link: `/project/${projectId}/edit`
+                },
+                {
+                    name: "Administratoriai",
+                    link: `/project/${projectId}/users/admin`
                 }
             ]
             : [
@@ -167,7 +172,7 @@ export default function ProjectLayout({
                                     description={project.short_description}
                                     timeUpdated={project.updated_at}
                                     issueCount={0}
-                                    volunteerCount={0}
+                                    volunteerCount={project.contributor_count}
                                     tags={project.technologies.split(' ')}
                                 />
                             </div>
