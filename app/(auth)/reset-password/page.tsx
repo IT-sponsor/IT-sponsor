@@ -1,95 +1,3 @@
-/* 'use client'
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-
-const ResetPassword = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [timestamp, setTimestamp] = useState<string | null>(null);
-  const [hash, setHash] = useState<string | null>(null);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    const userId = searchParams.get('userId');
-    const timestamp = searchParams.get('timestamp');
-    const hash = searchParams.get('hash');
-
-    if (userId && timestamp && hash) {
-      setUserId(userId);
-      setTimestamp(timestamp);
-      setHash(hash);
-    }
-  }, [searchParams]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    const res = await fetch('/api/auth/reset-password', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ userId, timestamp, hash, newPassword }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.message || 'Something went wrong');
-    } else {
-      setMessage(data.message);
-      setError('');
-      setTimeout(() => {
-        router.push('/sign-in');
-      }, 2000);
-    }
-  };
-
-  if (!userId || !timestamp || !hash) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <div>
-      <h1>Reset Password</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="newPassword">New Password</label>
-          <input
-            type="password"
-            id="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {message && <p style={{ color: 'green' }}>{message}</p>}
-        <button type="submit">Reset Password</button>
-      </form>
-    </div>
-  );
-};
-
-export default ResetPassword; */
-
 'use client';
 import { useEffect, useState } from 'react'
 import LogoGray from "@/public/assets/logo_icon_gray.svg";
@@ -111,33 +19,6 @@ export default function ResetPasswordPage() {
 
     const router = useRouter();
 
-    /* const validatePassword = () => {
-      if (newPassword.length < 8) {
-        setPasswordError('Slaptažodis turi būti bent 8 simbolių ilgio');
-        return false;
-      } else if (newPassword !== confirmPassword) {
-        setPasswordError('Slaptažodžiai nesutampa');
-        return false;
-      }
-      setPasswordError('');
-      return true;
-    }; */
-    /* const validatePassword = () => {
-      if (newPassword.length < 8) {
-        setNewPasswordError('Slaptažodis turi būti bent 8 simbolių ilgio');
-        return false;
-      } else if (confirmPassword.length < 8) {
-        setConfirmPasswordError('Slaptažodis turi būti bent 8 simbolių ilgio');
-        return false;
-      } else if (newPassword !== confirmPassword) {
-        setConfirmPasswordError('Slaptažodžiai nesutampa');
-        return false;
-      }
-      setNewPasswordError('');
-      setConfirmPasswordError('');
-      return true;
-    }; */
-
     const validateNewPassword = () => {
         if (newPassword.length < 8) {
             setNewPasswordError('Įveskite bent 8 simbolių slaptažodį');
@@ -149,7 +30,7 @@ export default function ResetPasswordPage() {
 
     const validateConfirmPassword = () => {
         if (!(confirmPassword === newPassword)) {
-            setConfirmPasswordError('Slaptažodis nesutampa');
+            setConfirmPasswordError('Slaptažodžiai nesutampa');
             return false;
         }
         setConfirmPasswordError('');

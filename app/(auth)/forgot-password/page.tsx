@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react'
 import LogoGray from "@/public/assets/logo_icon_gray.svg";
 import Image from "next/image";
+import { toast } from 'sonner'
 
 export default function ForgotPasswordPage() {
 
@@ -37,7 +38,7 @@ export default function ForgotPasswordPage() {
 
             if (response.ok) {
                 setEmail('');
-                alert('Slaptažodžio atstatymo laiškas nusiųstas į nurodytą el. paštą!'); ///
+                toast.success('Slaptažodžio atstatymo laiškas nusiųstas į nurodytą el. paštą!')
             } else {
                 setEmailError('El. pašto adresas neegzistuoja');
             }
