@@ -1,11 +1,12 @@
 'use client'
-import defaultUserPhoto from '@/public/assets/defaultUser.jpg'
+import UserDefault from '@/public/assets/defaultUser.jpg'
 import FaultCardSmall from '@/app/components/Fault/Cards/FaultCardSmall'
 import { useState, useEffect } from 'react'
 import Spinner from '@/app/components/Loading/Spinner'
 import { useSession } from 'next-auth/react'
 import UserSearch from '@/app/components/User/UserSearch'
 import IssueFilter from '@/app/components/Issue/IssueFilter'
+import Link from 'next/link'
 
 interface Fault {
   id: number
@@ -113,7 +114,7 @@ export default function FaultPage({ params }: { params: { id: number } }) {
             {filteredFaults?.length ? (
               canAccessAll ? (
                 filteredFaults.map((fault, index) => (
-                  <div
+                  <Link href={`fault/${fault.id}`}
                     className="flex flex-col items-center justify-center w-full overflow-y-auto"
                     key={index}
                   >
@@ -129,11 +130,11 @@ export default function FaultPage({ params }: { params: { id: number } }) {
                       first_name={fault.users.first_name}
                       last_name={fault.users.last_name}
                     />
-                  </div>
+                  </Link>
                 ))
               ) : userFaults?.length ? (
                 userFaults.map((fault, index) => (
-                  <div
+                  <Link href={`fault/${fault.id}`}
                     className="flex flex-col items-center justify-center w-full overflow-y-auto"
                     key={index}
                   >
@@ -149,7 +150,7 @@ export default function FaultPage({ params }: { params: { id: number } }) {
                       first_name={fault.users.first_name}
                       last_name={fault.users.last_name}
                     />
-                  </div>
+                  </Link>
                 ))
               ) : (
                 <div>Jūs neturite klaidų pranešimų</div>
