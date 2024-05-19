@@ -4,17 +4,19 @@ import Logo from "@/public/assets/logo_icon.svg";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { signOut, useSession } from "next-auth/react";
+import userDefault from '@/public/assets/defaultUser.jpg';
 
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const [image, setImage] = useState('');
+  const [user, setUser] = useState(null);
   const { data: session } = useSession();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  
+
   const closeDropdowns = (event: MouseEvent) => {
     if (event.target !== document.getElementById("user-menu-button")) {
       setIsMenuOpen(false);
@@ -27,6 +29,26 @@ export default function Navigation() {
       window.removeEventListener("mousedown", closeDropdowns);
     };
   }, []);
+
+  useEffect(() => {
+    if (session?.user?.id && !isNaN(Number(session.user.id))) {
+      fetch(`/api/profile/${session.user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.images && data.images.image && data.images.image.data) {
+            const logoData = data.images.image.data;
+            const base64String = Buffer.from(logoData).toString('base64');
+            const logoUrl = `data:image/jpeg;base64,${base64String}`;
+            setImage(logoUrl);
+          } else {
+            console.error("No image data found");
+            setImage(userDefault.src);
+          }
+          setUser(data);
+        })
+        .catch(console.error);
+    }
+  }, [session?.user?.id]);
 
   return (
     <nav className="bg-gray-800 fixed top-0 w-full z-50">
@@ -71,28 +93,28 @@ export default function Navigation() {
               </div>
             </div> */}
           </div>
-          
+
           {session?.user ? (
             <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <div className="relative ml-3 text-white font-semibold">{session?.user?.first_name}</div>
-            {/* <!-- Profile dropdown --> */}
-            <div className="relative ml-3">
-              <div>
-                <button 
-                  type="button" 
-                  className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" 
-                  id="user-menu-button" 
-                  aria-expanded={isMenuOpen}
-                  aria-haspopup="true"
-                  onClick={toggleMenu}
-                >
-                  <span className="absolute -inset-1.5"></span>
-                  <span className="sr-only">Open user menu</span>
-                  <img className="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt=""></img>
-                </button>
-              </div>
+              <div className="relative ml-3 text-white font-semibold">{session?.user?.first_name}</div>
+              {/* <!-- Profile dropdown --> */}
+              <div className="relative ml-3">
+                <div>
+                  <button
+                    type="button"
+                    className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    id="user-menu-button"
+                    aria-expanded={isMenuOpen}
+                    aria-haspopup="true"
+                    onClick={toggleMenu}
+                  >
+                    <span className="absolute -inset-1.5"></span>
+                    <span className="sr-only">Open user menu</span>
+                    <img className="h-8 w-8 rounded-full" src={image} alt=""></img>
+                  </button>
+                </div>
 
-              {/* <!--
+                {/* <!--
                 Dropdown menu, show/hide based on menu state.
 
                 Entering: "transition ease-out duration-100"
@@ -102,18 +124,17 @@ export default function Navigation() {
                   From: "transform opacity-100 scale-100"
                   To: "transform opacity-0 scale-95"
               --> */}
-              <div 
-                className={`absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${
-                  isMenuOpen ? "transition ease-out duration-100 transform opacity-100 scale-100" : "transition ease-in duration-75 transform opacity-0 scale-95"
-                  }`} // Add this className attribute
-                  role="menu" 
-                  aria-orientation="vertical" 
-                  aria-labelledby="user-menu-button" 
+                <div
+                  className={`absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${isMenuOpen ? "transition ease-out duration-100 transform opacity-100 scale-100" : "transition ease-in duration-75 transform opacity-0 scale-95"
+                    }`} // Add this className attribute
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="user-menu-button"
                   tabIndex={-1}
-                  >
+                >
                   {/* <!-- Active: "bg-gray-100", Not Active: "" --> */}
-                  <a href={'/profile/' + session.user.id} className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-0">Mano profilis</a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-1">Nustatymai</a>
+                  <a href={`/profile/${session.user.id}`} className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-0">Mano profilis</a>
+                  <a href={`/profile/${session.user.id}/edit`} className="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabIndex={-1} id="user-menu-item-1">Nustatymai</a>
                   <a onClick={() => signOut({
                     redirect: true,
                     callbackUrl: `${window.location.origin}/sign-in`
@@ -121,13 +142,13 @@ export default function Navigation() {
                 </div>
               </div>
             </div>
-            ) : ( 
-              <Link className='flex justify-center rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600' href='/sign-in'>
-                Prisijungti
-              </Link>
-            )}
+          ) : (
+            <Link className='flex justify-center rounded-lg text-black bg-[#40C173] px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600' href='/sign-in'>
+              Prisijungti
+            </Link>
+          )}
 
-          
+
         </div>
       </div>
 
