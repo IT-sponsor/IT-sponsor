@@ -24,29 +24,30 @@ const AdminCard: React.FC<AdminCardProps> = ({ admin, onAdd, onRemove, project_i
     const [image, setImage] = useState({} as string);
 
     useEffect(() => {
-        console.log(image_id);
+        if (!image_id) return;
+
         fetch(`/api/image/${image_id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! Status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (data && data.image) {
-                    const imageData = data.image.data;
-                    const base64String = Buffer.from(imageData).toString('base64');
-                    setImage(`data:image/png;base64,${base64String}`);
-                }
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! Status: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (data && data.image) {
+                const imageData = data.image.data;
+                const base64String = Buffer.from(imageData).toString('base64');
+                setImage(`data:image/png;base64,${base64String}`);
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
     }, [image_id]);
 
 
@@ -56,7 +57,7 @@ const AdminCard: React.FC<AdminCardProps> = ({ admin, onAdd, onRemove, project_i
                 <Link href={`/profile/${admin.id}`}>
                     <div className="flex items-center space-x-4 shrink-0 hover:bg-green-100 rounded-lg pr-1">
                         <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-                            {image ? (
+                            {image.length ? (
                                 <img alt={fullName} width={100} height={100} className="rounded-full" src={image} />
                             ) : (
                                 <img alt={fullName} width={100} height={100} className="rounded-full" src={UserDefault.src} />
