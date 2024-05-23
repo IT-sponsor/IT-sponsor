@@ -64,6 +64,14 @@ const Profile = ({
                             <Link href={'/profile/' + session?.user.id + '/faults'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano sukurtos klaidos</Link>
                             <Link href={'/profile/' + session?.user.id + '/projects'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano valdomi projektai</Link>
                             </div>
+                        ) ||
+                        (
+                            <div className="flex justify-center flex-wrap gap-4">
+                            <Link href={'/profile/' + id + '/issues'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Vartotojo užduotys</Link>
+                            <Link href={'/profile/' + id + '/faults'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Sukurtos klaidos</Link>
+                            <Link href={'/profile/' + id + '/projects'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Valdomi projektai</Link>
+                            </div>
+                        
                         )}
                     </div>
                 </div>
