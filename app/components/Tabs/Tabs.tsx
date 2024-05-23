@@ -9,7 +9,8 @@ interface TabProps {
 
 interface TabPanelProps {
     name: string;
-    link: string;    
+    link: string;
+    newPage?: boolean;    
 }
 
 const Tabs = ({ panels }: TabProps) => {
@@ -36,6 +37,8 @@ const Tabs = ({ panels }: TabProps) => {
                                 href={panel.link}
                                 className={pathname === panel.link ? "shrink-0 rounded-t-lg border border-gray-300 border-b-white p-3 text-sm font-medium text-sky-600" : "shrink-0 border border-transparent p-3 text-sm font-medium text-gray-500 hover:text-gray-700"}
                                 key={index}
+                                rel={panel.newPage ? "noopener noreferrer" : undefined}
+                                target={panel.newPage ? "_blank" : undefined}
                             >
                                 {panel.name}
                             </Link>
