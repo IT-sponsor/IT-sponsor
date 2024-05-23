@@ -3,6 +3,7 @@ import IssueCardSmall from '@/app/components/Issue/Cards/IssueCardSmall';
 import Spinner from '@/app/components/Loading/Spinner';
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 interface Issue {
     id: number;
@@ -64,13 +65,15 @@ export default function IssuePage({ params }: {
                         issues.map((issue) => (
                             <div className='flex flex-col items-center justify-center w-full overflow-y-auto' key={issue.id}>
                                 {issue.visibility === "private" && !canControl ? null : (
-                                    <IssueCardSmall
-                                        id={issue.id}
-                                        title={issue.title}
-                                        description={issue.description}
-                                        status={issue.status}
-                                        visibility={issue.visibility}
-                                    />
+                                    <Link href={`issue/${issue.id}`}>
+                                        <IssueCardSmall
+                                            id={issue.id}
+                                            title={issue.title}
+                                            description={issue.description}
+                                            status={issue.status}
+                                            visibility={issue.visibility}
+                                        />
+                                    </Link>
                                 )}
                             </div>
                         ))

@@ -1,6 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import UserDefault from '@/public/assets/defaultUser.jpg';
 
 type AdminCardProps = {
     admin: {
@@ -48,6 +49,7 @@ const AdminCard: React.FC<AdminCardProps> = ({ admin, onAdd, onRemove, project_i
             });
     }, [image_id]);
 
+
     return (
         <div key={admin.id} className="flex-grow px-4 py-2 mt-2 w-full rounded-xl border-2 border-gray-100 bg-white">
             <div className="flex items-center justify-between">
@@ -57,7 +59,7 @@ const AdminCard: React.FC<AdminCardProps> = ({ admin, onAdd, onRemove, project_i
                             {image ? (
                                 <img alt={fullName} width={100} height={100} className="rounded-full" src={image} />
                             ) : (
-                                <span className="text-gray-500">Nėra nuotraukos</span>
+                                <img alt={fullName} width={100} height={100} className="rounded-full" src={UserDefault.src} />
                             )}
                         </div>
                         <div className="flex flex-col">

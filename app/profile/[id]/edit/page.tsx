@@ -136,8 +136,8 @@ export default function EditProfile({ params }: {
                     // Omit the password field from the fetched data
                     const { password, ...userDataWithoutPassword } = userData;
 
-                    setCountryCode(userDataWithoutPassword.phone_number.toString().substring(0, 3));
                     if (userDataWithoutPassword.phone_number) {
+                        setCountryCode(userDataWithoutPassword.phone_number.toString().substring(0, 3));
                         userDataWithoutPassword.phone_number = userDataWithoutPassword.phone_number.toString().substring(3);
                     }
 
