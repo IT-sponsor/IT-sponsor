@@ -2,6 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import IssueCardSmall from "../Issue/Cards/IssueCardSmall";
+import { useEffect, useState } from "react";
 
 interface ProfileProps {
     id: Number;
@@ -17,6 +19,15 @@ interface ProfileProps {
     experience: String[];
     education: String[];
     profile_picture: string
+}
+
+interface Issue {
+    id: number;
+    title: string;
+    description: string;
+    visibility: string;
+    status: string;
+    fk_projectsid: number;
 }
 
 const Profile = ({
@@ -38,11 +49,32 @@ const Profile = ({
     let formattedPhoneNumber = null;
     if (phone_number) {
         formattedPhoneNumber = `+${phone_number.slice(0, 3)} ${phone_number.slice(3, 6)}  ${phone_number.slice(6, 8)}  ${phone_number.slice(8)}`;
-      }
+    }
+
+    const [issues, setIssues] = useState<Issue[] | null>(null);
+
+    useEffect(() => {
+        const fetchUserAssignedIssues = async () => {
+            try {
+                const response = await fetch(`/api/user/${id}/assignedIssues`);
+                if (response.ok) {
+                    const assignedIssues = await response.json();
+                    setIssues(assignedIssues);
+                } else {
+                    console.error('Failed to fetch assigned issues');
+                }
+            } catch (error) {
+                console.error('Error fetching assigned issues:', error);
+            }
+        };
+
+        fetchUserAssignedIssues();
+    }, []);
+
     return (
-        <div className="container mx-auto py-8 px-8">
-            <div className="grid grid-cols-4 sm:grid-cols-12 gap-6 px-4">
-                <div className="col-span-4 sm:col-span-3">
+        <div className="container mx-auto py-8 px-8 max-w-7xl">
+            <div className="grid grid-cols-4 md:grid-cols-12 gap-6 px-4">
+                <div className="col-span-4 md:col-span-3">
                     <div className="bg-white shadow rounded-lg p-6">
                         <div className="flex flex-col items-center">
                             <img src={profile_picture} alt={`${first_name} ${last_name}`} className="content-center w-32 h-32 bg-gray-300 rounded-full mb-4 shrink-0">
@@ -59,24 +91,24 @@ const Profile = ({
                         <hr className="my-6 border-t border-gray-300"></hr>
                         {session?.user.id === id && (
                             <div className="flex justify-center flex-wrap gap-4">
-                            <Link href={'/profile/' + session?.user.id + '/edit'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Redaguoti</Link>
-                            <Link href={'/profile/' + session?.user.id + '/issues'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano užduotys</Link>
-                            <Link href={'/profile/' + session?.user.id + '/faults'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano sukurtos klaidos</Link>
-                            <Link href={'/profile/' + session?.user.id + '/projects'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano valdomi projektai</Link>
+                                <Link href={'/profile/' + session?.user.id + '/edit'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Redaguoti</Link>
+                                <Link href={'/profile/' + session?.user.id + '/issues'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano užduotys</Link>
+                                <Link href={'/profile/' + session?.user.id + '/faults'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano sukurtos klaidos</Link>
+                                <Link href={'/profile/' + session?.user.id + '/projects'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano valdomi projektai</Link>
                             </div>
                         ) ||
-                        (
-                            <div className="flex justify-center flex-wrap gap-4">
-                            <Link href={'/profile/' + id + '/issues'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Vartotojo užduotys</Link>
-                            <Link href={'/profile/' + id + '/faults'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Sukurtos klaidos</Link>
-                            <Link href={'/profile/' + id + '/projects'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Valdomi projektai</Link>
-                            </div>
-                        
-                        )}
+                            (
+                                <div className="flex justify-center flex-wrap gap-4">
+                                    <Link href={'/profile/' + id + '/issues'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Vartotojo užduotys</Link>
+                                    <Link href={'/profile/' + id + '/faults'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Sukurtos klaidos</Link>
+                                    <Link href={'/profile/' + id + '/projects'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Valdomi projektai</Link>
+                                </div>
+
+                            )}
                     </div>
                 </div>
 
-                <div className="col-span-4 sm:col-span-9">
+                <div className="col-span-4 md:col-span-9">
                     <div className="bg-white shadow rounded-lg p-6">
                         <h2 className="text-xl font-bold mb-4">Apie mane</h2>
                         {about_me ? (
@@ -85,7 +117,9 @@ const Profile = ({
                             <p className="text-gray-700">Šis vartotojas dar nėra pateikęs savo aprašymo.</p>
                         )}
                     </div>
+
                     <div className="my-4"></div>
+
                     <div className="bg-white shadow rounded-lg p-6">
                         <div className="mb-4">
                             <span className="text-xl font-bold mb-4">Įgūdžiai</span>
@@ -102,6 +136,29 @@ const Profile = ({
                             <div className="text-gray-700">Šis vartotojas dar nėra pateikęs technologijų, kurias išmano.</div>
                         )}
                     </div>
+
+                    <div className="my-4"></div>
+
+                    {(issues?.length ?? 0) > 0 && (
+                        <div className="bg-white shadow rounded-lg p-6">
+                            <span className="text-xl font-bold">Užduotys</span>
+                            <div className="mt-3">
+                                {issues?.map((issue, index) => (
+                                    <div key={index} className="flex flex-col items-center justify-center w-full overflow-y-auto max-w-5xl">
+                                        <Link href={`/project/${issue.fk_projectsid}/issue/${issue.id}`}>
+                                            <IssueCardSmall
+                                                id={issue.id}
+                                                title={issue.title}
+                                                description={issue.description}
+                                                status={issue.status}
+                                                visibility={issue.visibility}
+                                            />
+                                        </Link>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="my-4"></div>
 
