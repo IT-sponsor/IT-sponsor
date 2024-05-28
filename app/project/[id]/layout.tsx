@@ -111,7 +111,8 @@ export default function ProjectLayout({
         },
         ...(project?.codebase_visibility === 'public' ? [{
             name: "Repozitorija",
-            link: `${project?.repository}`
+            link: `${project?.repository}`,
+            newPage: true
         }] : []),
         {
             name: "Trūkumai",

@@ -60,7 +60,7 @@ export default function EditProjectAdministrators({ params }: { params: { id: nu
         };
 
         const fetchUsers = async () => {
-            const response = await fetch(`/api/user`);
+            const response = await fetch(`/api/user/all`);
             if (response.ok) {
                 const users = await response.json();
                 setAllUsers(users.users);
