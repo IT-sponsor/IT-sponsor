@@ -109,7 +109,7 @@ export async function GET(
         });
 
         return NextResponse.json({ users: assignedUsers, message: "Assigned users fetched" }, { status: 200 });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in GET /api/user:", error.message);
       return NextResponse.json({ message: error.message || "Something went wrong" }, { status: 500 });
     }

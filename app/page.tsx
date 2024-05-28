@@ -60,7 +60,6 @@ export default function Home() {
       .then(data => {
         const modifiedData = data.map((project: Project) => {
           if(project.images) {
-            console.log("HEREEEEEEEEEEEEE");
             const logoData = project.images.image.data;
             const base64String = Buffer.from(logoData).toString('base64');
             return {
@@ -114,6 +113,8 @@ export default function Home() {
       return projects.slice().sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
     } else if (sortBy === 'oldest_created') {
       return projects.slice().sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    } else if (sortBy === 'codebase_public') {
+      return projects.filter(project => project.codebase_visibility === 'public');
     } else {
       return projects;
     }
@@ -275,6 +276,7 @@ export default function Home() {
                 <button onClick={() => handleSort('newest_created')} className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" id="menu-item-1">Naujausiai sukurtą</button>
                 <button onClick={() => handleSort('oldest_updated')} className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" id="menu-item-2">Seniausiai atnaujintą</button>
                 <button onClick={() => handleSort('oldest_created')} className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" id="menu-item-3">Seniausiai sukurtą</button>
+                <button onClick={() => handleSort('codebase_public')} className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" id="menu-item-4">Repozitorija vieša</button>
               </div>
             </div>
           )}
@@ -335,7 +337,7 @@ export default function Home() {
                     description={project.short_description}
                     timeUpdated={project.updated_at}
                     issueCount={0}
-                    volunteerCount={0}
+                    volunteerCount={project.contributor_count}
                     tags={project.technologies.split(' ')}
                   />
                 </div>

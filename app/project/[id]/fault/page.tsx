@@ -1,11 +1,12 @@
 'use client'
-import defaultUserPhoto from '@/public/assets/defaultUser.jpg'
+import UserDefault from '@/public/assets/defaultUser.jpg'
 import FaultCardSmall from '@/app/components/Fault/Cards/FaultCardSmall'
 import { useState, useEffect } from 'react'
 import Spinner from '@/app/components/Loading/Spinner'
 import { useSession } from 'next-auth/react'
 import UserSearch from '@/app/components/User/UserSearch'
 import IssueFilter from '@/app/components/Issue/IssueFilter'
+import Link from 'next/link'
 
 interface Fault {
   id: number
@@ -22,16 +23,11 @@ interface Fault {
     first_name: string
     last_name: string
     logo: string
-    images: {
-      image: {
-        data: Buffer
-      }
-    }
   }
 }
 
 export default function FaultPage({ params }: { params: { id: number } }) {
-  const [faults, setFaults] = useState<Fault[] | null>(null)
+  const [faults, setFaults] = useState<Fault[]>([]);
   const [loading, setLoading] = useState(true)
   const [canAccessAll, setCanAccessAll] = useState(false)
   const { data: session } = useSession()
@@ -43,35 +39,48 @@ export default function FaultPage({ params }: { params: { id: number } }) {
   const projectId = params.id
 
   useEffect(() => {
-    if (projectId) {
-      fetch(`/api/project/${projectId}/faults`)
-        .then((res) => res.json())
-        .then((data) => {
-          setTimeout(() => {
-            setFaults(data)
-            setLoading(false)
-          }, 300)
-        })
-        .catch(console.error)
-    }
-  }, [projectId])
+        if (projectId) {
+            fetch(`/api/project/${projectId}/faults`)
+                .then(res => res.json())
+                .then(data => {
+                    const processedFaults = data.map((fault: Fault) => {
+                        const user = fault.users;
+                        if (user.images && user.images.image && user.images.image.data) {
+                            const logoData = user.images.image.data;
+                            const base64String = Buffer.from(logoData).toString('base64');
+                            user.logo = `data:image/jpeg;base64,${base64String}`;
+                        } else {
+                            user.logo = UserDefault.src;
+                        }
+                        return fault;
+                    });
 
-  useEffect(() => {
-    const fetchAccess = async () => {
-      try {
-        const response = await fetch(`/api/controls/${projectId}`)
-        const data = await response.json()
-        if (data.length > 0) {
-          const ownerId = data[0].fk_usersid.toString()
-          const hasAccess = ownerId === session?.user?.id
-          setCanAccessAll(hasAccess)
+                    setFaults(processedFaults);
+                    setLoading(false);
+                })
+                .catch(error => {
+                    console.error(error);
+                    setLoading(false);
+                });
         }
-      } catch (error) {
-        console.error('Error fetching controls:', error)
-      }
-    }
-    fetchAccess()
-  }, [projectId, session])
+    }, [projectId]);
+
+    useEffect(() => {
+        const fetchAccess = async () => {
+            try {
+                const response = await fetch(`/api/controls/${projectId}`);
+                const data = await response.json();
+                if (data.length > 0) {
+                    const ownerId = data[0].fk_usersid.toString();
+                    const hasAccess = ownerId === session?.user?.id;
+                    setCanAccessAll(hasAccess);
+                }
+            } catch (error) {
+                console.error('Error fetching controls:', error);
+            }
+        };
+        fetchAccess();
+    }, [projectId, session]);
 
   useEffect(() => {
     let filteredResult = faults
@@ -113,7 +122,7 @@ export default function FaultPage({ params }: { params: { id: number } }) {
             {filteredFaults?.length ? (
               canAccessAll ? (
                 filteredFaults.map((fault, index) => (
-                  <div
+                  <Link href={`fault/${fault.id}`}
                     className="flex flex-col items-center justify-center w-full overflow-y-auto"
                     key={index}
                   >
@@ -128,12 +137,13 @@ export default function FaultPage({ params }: { params: { id: number } }) {
                       ).toLocaleDateString()}
                       first_name={fault.users.first_name}
                       last_name={fault.users.last_name}
+                      profile_picture={fault.users.logo}
                     />
-                  </div>
+                  </Link>
                 ))
               ) : userFaults?.length ? (
                 userFaults.map((fault, index) => (
-                  <div
+                  <Link href={`fault/${fault.id}`}
                     className="flex flex-col items-center justify-center w-full overflow-y-auto"
                     key={index}
                   >
@@ -148,8 +158,9 @@ export default function FaultPage({ params }: { params: { id: number } }) {
                       ).toLocaleDateString()}
                       first_name={fault.users.first_name}
                       last_name={fault.users.last_name}
+                      profile_picture={fault.users.logo}
                     />
-                  </div>
+                  </Link>
                 ))
               ) : (
                 <div>Jūs neturite klaidų pranešimų</div>

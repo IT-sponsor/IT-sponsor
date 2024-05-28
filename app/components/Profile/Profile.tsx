@@ -16,6 +16,7 @@ interface ProfileProps {
     technologies: String[];
     experience: String[];
     education: String[];
+    profile_picture: string
 }
 
 const Profile = ({
@@ -30,33 +31,37 @@ const Profile = ({
     about_me,
     technologies,
     experience,
-    education
+    education,
+    profile_picture
 }: ProfileProps) => {
     const { data: session } = useSession();
+    let formattedPhoneNumber = null;
+    if (phone_number) {
+        formattedPhoneNumber = `+${phone_number.slice(0, 3)} ${phone_number.slice(3, 6)}  ${phone_number.slice(6, 8)}  ${phone_number.slice(8)}`;
+      }
     return (
-
         <div className="container mx-auto py-8 px-8">
             <div className="grid grid-cols-4 sm:grid-cols-12 gap-6 px-4">
                 <div className="col-span-4 sm:col-span-3">
                     <div className="bg-white shadow rounded-lg p-6">
                         <div className="flex flex-col items-center">
-                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" className="w-32 h-32 bg-gray-300 rounded-full mb-4 shrink-0">
+                            <img src={profile_picture} alt={`${first_name} ${last_name}`} className="content-center w-32 h-32 bg-gray-300 rounded-full mb-4 shrink-0">
                             </img>
                             <h1 className="text-xl font-bold">{first_name} {last_name}</h1>
                             {job_title && <p className="text-gray-700">{job_title}</p>}
-                            {phone_number && <p className="text-blue-700 pt-2">+370 {phone_number.toString()}</p>}
+                            {formattedPhoneNumber && <p className="text-blue-700 pt-2">{formattedPhoneNumber}</p>}
                             <div className="mt-6 flex flex-wrap gap-4 justify-center">
                                 <a href={`mailto:${email}`} className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">Susisiekti</a>
-                                {github && <a href={`https://github.com/${github}`} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">GitHub</a>}
-                                {linkedin && <a href={`${linkedin}`} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">LinkedIn</a>}
-
+                                {github && <a href={`https://github.com/${github}`} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded" target="_blank" rel="noopener noreferrer">GitHub</a>}
+                                {linkedin && <a href={`https://linkedin.com/in/${linkedin}`} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded" target="_blank" rel="noopener noreferrer">LinkedIn</a>}
                             </div>
                         </div>
                         <hr className="my-6 border-t border-gray-300"></hr>
                         {session?.user.id === id && (
                             <div className="flex justify-center flex-wrap gap-4">
-                            <a href={'/profile/' + session?.user.id + '/edit'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Redaguoti</a>
+                            <Link href={'/profile/' + session?.user.id + '/edit'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Redaguoti</Link>
                             <Link href={'/profile/' + session?.user.id + '/issues'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano užduotys</Link>
+                            <Link href={'/profile/' + session?.user.id + '/faults'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano sukurtos klaidos</Link>
                             <Link href={'/profile/' + session?.user.id + '/projects'} className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 mx-2 rounded">Mano valdomi projektai</Link>
                             </div>
                         )}

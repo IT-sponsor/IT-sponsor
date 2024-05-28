@@ -6,7 +6,7 @@ import { useState } from 'react'
 import LogoGray from "@/public/assets/logo_icon_gray.svg";
 import Image from "next/image";
 
-export default function page() {
+export default function LoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -144,6 +144,9 @@ export default function page() {
           *
         </div>
         <p className='text-center text-sm text-gray-600 mt-2'>
+          <Link className='text-blue-700' href='/forgot-password'> Užmiršau slaptažodį</Link>
+        </p>
+        <p className='text-center text-sm text-gray-600 mt-3'>
           Jei neturite paskyros - 
           <Link className='text-blue-700' href='/sign-up'> Užsiregistruokite</Link>
         </p>

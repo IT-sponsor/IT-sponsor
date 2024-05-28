@@ -12,6 +12,7 @@ interface FaultCardSmallProps {
     created_at: string;
     first_name: string;
     last_name: string;
+    profile_picture: string
 }
 
 const FaultCardSmall = (
@@ -23,7 +24,8 @@ const FaultCardSmall = (
         status,
         created_at,
         first_name,
-        last_name
+        last_name,
+        profile_picture
     }: FaultCardSmallProps) => {
 
     const user = {
@@ -48,7 +50,7 @@ const FaultCardSmall = (
     };
 
     return (
-        <Link href={`fault/${id}`} className="rounded-xl border-2 border-gray-100 bg-white w-full mb-3">
+        <div className="rounded-xl border-2 border-gray-100 bg-white w-full mb-3">
             <article>
                 <div className="flex flex-col sm:flex-row items-start gap-4 p-4 sm:px-6 lg:px-8">
                     <div className="flex-grow">
@@ -69,7 +71,7 @@ const FaultCardSmall = (
 
                     <img
                         alt={first_name + ' ' + last_name}
-                        src={user.photo}
+                        src={profile_picture}
                         className="h-6 w-6 rounded-full"
                     />
                     <p className="hidden sm:block sm:text-xs sm:text-gray-500">{first_name + ' ' + last_name}</p>
@@ -83,7 +85,7 @@ const FaultCardSmall = (
                     <p className="hidden sm:block sm:text-xs sm:text-gray-500"> {created_at} </p>
                 </div>
             </article>
-        </Link>
+        </div>
     );
 };
 
