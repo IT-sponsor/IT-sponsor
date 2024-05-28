@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import Spinner from '@/app/components/Loading/Spinner'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface Project {
   id: number
@@ -125,18 +126,20 @@ export default function FaultConvertPage({
       )
 
       if (response.ok) {
+        toast.success('Klaida atnaujinta sėkmingai')
         window.location.href = `/project/${projectId}/fault`
-        //router.push(`/project/${projectId}/fault`);
         return new NextResponse(JSON.stringify({ message: 'Fault updated' }), {
           status: 200,
         })
       } else {
+        toast.error('Klaidos atnaujinti nepavyko')
         return new NextResponse(
           JSON.stringify({ message: 'Error updating fault' }),
           { status: 500 },
         )
       }
     } catch (error: any) {
+      toast.error('Klaida atnaujinant klaidą')
       return new NextResponse(
         JSON.stringify({ message: 'Network error', error: error.message }),
         { status: 500 },
@@ -175,20 +178,22 @@ export default function FaultConvertPage({
           body: JSON.stringify({ faultId }),
         })
         if (res2.ok) {
+          toast.success('Klaida konvertuota į trūkumą')
           window.location.href = `/project/${projectId}/fault`
-          //router.push(`project/${projectId}/fault`) // TODO: Add success message
           return new NextResponse(
             JSON.stringify({ message: 'Fault converted to issue' }),
             { status: 200 },
           )
         }
       } else {
+        toast.error('Nepavyko konvertuoti klaidą į trūkumą')
         return new NextResponse(
           JSON.stringify({ message: 'Error converting fault to issue' }),
           { status: 500, headers: { 'Content-Type': 'application/json' } },
         )
       }
     } catch (error: any) {
+      toast.error('Įvyko klaida konvertuojant klaidą į trūkumą')
       return new NextResponse(
         JSON.stringify({ message: 'Network error', error: error.message }),
         { status: 500, headers: { 'Content-Type': 'application/json' } },

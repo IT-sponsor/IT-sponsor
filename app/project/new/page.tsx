@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor'
 import { useSession } from 'next-auth/react'
+import { toast } from 'sonner'
 
 export default function NewProjectPage() {
   const [projectName, setProjectName] = useState('')
@@ -74,9 +75,10 @@ export default function NewProjectPage() {
             userId: Number(session?.user.id),
           }),
         })
-
+        toast.success('Projektas sukurtas sėkmingai')
         window.location.href = `/project/${result.project.id}`
       } else {
+        toast.error('Klaida kuriant projektą')
         return new NextResponse(
           JSON.stringify({
             message: 'Error creating project',

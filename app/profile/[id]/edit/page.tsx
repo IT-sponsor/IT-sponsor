@@ -112,7 +112,7 @@ export default function EditProfile({ params }: {
         }
 
         if (file.type && file.size > 2 * 1024 * 1024) {
-            setErrors({ ...errors, image: 'Nuotrauka turi būti mažesnė nei 2mb.' });
+            setErrors({ ...errors, image: 'Nuotrauka turi būti mažesnė nei 2 MB.' });
             return false;
         }
 

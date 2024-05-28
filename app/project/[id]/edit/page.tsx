@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor'
 import { useRouter } from 'next/navigation'
 import ConfirmationPopup from '@/app/components/ConfirmationPopup/ConfirmationPopup'
+import { toast } from 'sonner'
 
 interface Project {
   id: number
@@ -113,8 +114,10 @@ export default function EditProjectPage({
       })
 
       if (response.ok) {
+        toast.success('Projektas sėkmingai ištrintas')
         router.push('/')
       } else {
+        toast.error('Nepavyko ištrinti projekto')
         return new NextResponse(
           JSON.stringify({
             message: 'Failed to delete the project ',
@@ -124,6 +127,7 @@ export default function EditProjectPage({
         )
       }
     } catch (error) {
+      toast.error('Įvyko klaida ištrinant projektą')
       return new NextResponse(
         JSON.stringify({ message: 'Network error', error }),
         { status: 500, headers: { 'Content-Type': 'application/json' } },
@@ -153,11 +157,14 @@ export default function EditProjectPage({
         body: projectData,
       })
       if (!response.ok) {
+        toast.error('Nepavyko atnaujinti projekto')
         throw new Error(`Failed to update project: ${response.statusText}`)
       }
+      toast.success('Projektas sėkmingai atnaujintas')
       const updatedProject = await response.json()
       window.location.reload() // This goes against the SPA principles, but it's the easiest way to refresh the whole layout
     } catch (error: any) {
+      toast.error('Įvyko klaida atnaujinant projektą')
       setFormErrors({ ...formErrors, api: error.message })
     }
   }

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import UserSearch from '@/app/components/User/UserSearch';
 import UserFilter from '@/app/components/User/UserFilter';
 import UserList from '@/app/components/User/UserList';
-import Modal from '@/app/components/Navigation/Modal';
+import { toast } from 'sonner';
 
 interface User {
   id: number;
@@ -23,10 +23,7 @@ export default function Supporter( { params }: { params: { id: number } }) {
   const [users, setUsers] = useState<User[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
   
-  // Fetch users from API if they have assignments or registrations
   async function fetchUsers() {
     fetch(`/api/user`, {
       method: 'GET',
@@ -52,7 +49,6 @@ export default function Supporter( { params }: { params: { id: number } }) {
     fetchUsers();
   }, []);
 
-  // Should be good: need to make sure BOTH of the database actions are completed successfully, otherwise, reset and throw an error
   async function handleAssign(user_id: number, issue_id: number) {
     try {
         const response = await fetch(`/api/gets_assigned/new`, {
@@ -67,29 +63,15 @@ export default function Supporter( { params }: { params: { id: number } }) {
         });
 
         if (response.ok) {
-          openModal();
-          setModalMessage('Naudotojas priskirtas prie trūkumo');
-          console.log('User added to issue');
+          toast.success('Naudotojas pridėtas prie trūkumo');
           fetchUsers();
         } else {
-          openModal();
-          setModalMessage('Nepavyko pridėti naudotojo prie trūkumo: ' + response.statusText);
-          console.log('Failed to add user to issue' + response.statusText);
+          toast.error('Nepavyko pridėti naudotojo prie trūkumo');
         }
     } catch (error) {
-      openModal();
-      setModalMessage('Įvyko klaida pridedant naudotoją prie trūkumo');
-      console.error('Failed to add user to issue:', error);
+      toast.error('Įvyko klaida pridedant naudotoją prie trūkumo');
     }
   }
-
-  const openModal = () => {
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-  };
 
   async function handleRemove(user_id: number, issue_id: number): Promise<void> {
     try {
@@ -105,25 +87,17 @@ export default function Supporter( { params }: { params: { id: number } }) {
       });
 
       if (response.ok) {
-        openModal();
-        setModalMessage('Naudotojas pašalintas iš norinčių remti');
-        console.log('User removed from issue');
+        toast.success('Naudotojas pašalintas iš trūkumo');
         fetchUsers();
       } else {
-        openModal();
-        setModalMessage('Nepavyko pašalinti naudotojo iš norinčių taisyti: ' + response.statusText);
-        console.log('Failed to remove user from issue' + response.statusText);
+        toast.error('Nepavyko pašalinti naudotojo iš trūkumo');
       }
     } catch (error) {
-      openModal();
-      setModalMessage('Įvyko klaida pašalinant naudotoją iš norinčių taisyti');
-      console.error('Failed to remove user from issue:', error);
+      toast.error('Įvyko klaida pašalinant naudotoją iš trūkumo');
     }
   };
 
   async function handleCompleted(user_id: number, issue_id: number): Promise<void> {
-    // Close issue
-    // Remove all users from issue
     try {
       const response = await fetch(`/api/gets_assigned/${issue_id}/update`, {
           method: 'POST',
@@ -133,19 +107,13 @@ export default function Supporter( { params }: { params: { id: number } }) {
       });
 
       if (response.ok) {
-        openModal();
-        setModalMessage('Trūkumas sėkmingai uždarytas');
-        console.log('Issue status updated successfully');
+        toast.success('Trūkumas pažymėtas kaip išspręstas');
         fetchUsers();
       } else {
-        openModal();
-        setModalMessage('Nepavyko atnaujinti trūkumo būsenos: ' + response.statusText);
-        console.log('Failed to update issue status' + response.statusText);
+        toast.error('Nepavyko pažymėti trūkumo kaip išspręsto');
       }
     } catch (error) {
-      openModal();
-      setModalMessage('Įvyko klaida atnaujinant trūkumo būseną');
-      console.error('Failed to update issue status:', error);
+      toast.error('Įvyko klaida pažymint trūkumą kaip išspręstą');
     }
   };
   return (
@@ -155,7 +123,6 @@ export default function Supporter( { params }: { params: { id: number } }) {
       <UserFilter setFilter={setFilter} />
     </div>
     <div className='flex flex-col items-center justify-center pt-6 w-full max-w-5xl overflow-y-auto'>
-      <Modal isOpen={modalOpen} onClose={closeModal} message={modalMessage} />
       {users.length === 0 ? <div>Nėra rėmėjų</div> :
         <UserList users={ users } onAssign={handleAssign} onRemove={handleRemove} onCompleted={handleCompleted} project_id={project_id} filter={filter} searchQuery={searchQuery} />
       }
