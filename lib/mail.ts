@@ -30,8 +30,7 @@ export const sendFaultNotifEmail = async (email: string[], projectId: number, fa
 
   const faultUrl = `${process.env.BASE_URL}/project/${projectId}/fault/${faultId}`;
   const emails = email.join(', ');
-console.log(emails);
-console.log(faultUrl);
+
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: emails,
