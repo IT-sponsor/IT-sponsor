@@ -66,9 +66,11 @@ export default function Supporter( { params }: { params: { id: number } }) {
           toast.success('Naudotojas pridėtas prie trūkumo');
           fetchUsers();
         } else {
+          console.error('Failed to add user to issue' + response.status);
           toast.error('Nepavyko pridėti naudotojo prie trūkumo');
         }
     } catch (error) {
+      console.log('Error adding user to issue:', error);
       toast.error('Įvyko klaida pridedant naudotoją prie trūkumo');
     }
   }
@@ -90,9 +92,11 @@ export default function Supporter( { params }: { params: { id: number } }) {
         toast.success('Naudotojas pašalintas iš trūkumo');
         fetchUsers();
       } else {
+        console.log('Failed to remove user from issue' + response.status);
         toast.error('Nepavyko pašalinti naudotojo iš trūkumo');
       }
     } catch (error) {
+      console.log('Error removing user from issue:', error);
       toast.error('Įvyko klaida pašalinant naudotoją iš trūkumo');
     }
   };
@@ -110,9 +114,11 @@ export default function Supporter( { params }: { params: { id: number } }) {
         toast.success('Trūkumas pažymėtas kaip išspręstas');
         fetchUsers();
       } else {
+        console.log('Failed to mark issue as completed' + response.status);
         toast.error('Nepavyko pažymėti trūkumo kaip išspręsto');
       }
     } catch (error) {
+      console.log('Error marking issue as completed:', error);
       toast.error('Įvyko klaida pažymint trūkumą kaip išspręstą');
     }
   };
