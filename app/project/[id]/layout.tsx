@@ -32,10 +32,12 @@ interface Project {
 
 export default function ProjectLayout({
     params,
-    children
+    children,
+    descriptionDisplayMode = 'hideDescription'
 }: {
     params: { id: string };
     children: React.ReactNode;
+    descriptionDisplayMode?: 'showDescription' | 'hideDescription'
 }) {
     const router = useRouter();
 
@@ -175,6 +177,7 @@ export default function ProjectLayout({
                                     issueCount={0}
                                     volunteerCount={project.contributor_count}
                                     tags={project.technologies.split(' ')}
+                                    descriptionDisplayMode={descriptionDisplayMode}
                                 />
                             </div>
 
