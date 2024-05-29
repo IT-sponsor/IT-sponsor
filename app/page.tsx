@@ -40,6 +40,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const { data: session, status } = useSession();
+  const [descriptionDisplayMode, setDisplayMode] = useState<'showDescription' | 'hideDescription'>('showDescription');
 
 
   const filterDropdownRef = useRef(null);
@@ -339,6 +340,7 @@ export default function Home() {
                     issueCount={0}
                     volunteerCount={project.contributor_count}
                     tags={project.technologies.split(' ')}
+                    descriptionDisplayMode={descriptionDisplayMode}
                   />
                 </div>
               </Link>
