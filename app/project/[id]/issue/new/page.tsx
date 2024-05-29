@@ -3,6 +3,7 @@ import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor'
 import ProjectCard from '@/app/components/ProjectCard/ProjectCard'
 import { NextResponse } from 'next/server'
 import React, { useCallback, useMemo, useState, useEffect } from 'react'
+import { toast } from 'sonner'
 
 interface Project {
   id: number
@@ -114,9 +115,11 @@ export default function NewIssuePage({ params }: { params: { id: number } }) {
       })
 
       if (response.ok) {
+        toast.success('Trūkumas sėkmingai sukurtas')
         const result = await response.json()
         window.location.href = `/project/${projectId}/issue` // TODO: Add success message
       } else {
+        toast.error('Trūkumo sukurti nepavyko')
         return new NextResponse(
           JSON.stringify({
             message: 'Error creating issue',
@@ -126,6 +129,7 @@ export default function NewIssuePage({ params }: { params: { id: number } }) {
         )
       }
     } catch (error: any) {
+      toast.error('Įvyko klaida kuriant trūkumą')
       return new NextResponse(
         JSON.stringify({ message: 'Network error', error: error.message }),
         { status: 500, headers: { 'Content-Type': 'application/json' } },

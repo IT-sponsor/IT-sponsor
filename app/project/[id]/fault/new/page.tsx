@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { NextResponse } from 'next/server'
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor'
 import { useSession } from 'next-auth/react'
+import { toast } from 'sonner'
 
 interface Project {
   id: number
@@ -129,8 +130,10 @@ export default function NewFaultPage({ params }: { params: { id: number } }) {
 
       if (response.ok) {
         const result = await response.json()
-        window.location.href = `/project/${projectId}` // TODO: Add success message => component/navigation/modal
+        toast.success('Klaidos pranešimas sėkmingai pridėtas')
+        window.location.href = `/project/${projectId}`
       } else {
+        toast.error('Klaidos pranešimo pridėti nepavyko')
         return new NextResponse( // whats the point of returning a NextResponse to the API?
           JSON.stringify({
             message: 'Error creating fault',
@@ -140,6 +143,7 @@ export default function NewFaultPage({ params }: { params: { id: number } }) {
         )
       }
     } catch (error: any) {
+      toast.error('Klaida pridedant klaidos pranešimą')
       return new NextResponse(
         JSON.stringify({ message: 'Network error', error: error.message }),
         { status: 500, headers: { 'Content-Type': 'application/json' } },

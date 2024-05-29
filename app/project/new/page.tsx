@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 
 import MarkdownEditor from '@/app/components/MarkdownEditor/MarkdownEditor'
 import { useSession } from 'next-auth/react'
+import { toast } from 'sonner'
 
 export default function NewProjectPage() {
   const [projectName, setProjectName] = useState('')
@@ -74,9 +75,10 @@ export default function NewProjectPage() {
             userId: Number(session?.user.id),
           }),
         })
-
+        toast.success('Projektas sukurtas sėkmingai')
         window.location.href = `/project/${result.project.id}`
       } else {
+        toast.error('Klaida kuriant projektą')
         return new NextResponse(
           JSON.stringify({
             message: 'Error creating project',
@@ -108,6 +110,23 @@ export default function NewProjectPage() {
             </div>
             <div className="flex mb-4 px-6 bg-white">
               <div className="flex flex-col items-start justify-center w-full h-full">
+                <label
+                  htmlFor="projectName"
+                  className="block text-gray-700 font-bold mt-3"
+                >
+                  Pavadinimas
+                </label>
+                <input
+                  type="text"
+                  id="projectName"
+                  placeholder="Pavadinimas"
+                  className="w-full border border-gray-300 py-2 pl-3 rounded outline-none focus-within:border-black"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                />
+                {formErrors.projectName && (
+                  <div className="text-red-500">{formErrors.projectName}</div>
+                )}
 
                 <label htmlFor="projectName" className="block text-gray-700 font-bold mt-3">Pavadinimas</label>
                 <input

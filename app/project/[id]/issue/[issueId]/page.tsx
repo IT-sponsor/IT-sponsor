@@ -7,6 +7,7 @@ import prisma from "@/app/utils/prisma/client";
 import { useSession } from "next-auth/react";
 import { NextResponse } from "next/server";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 interface Project {
     id: number;
@@ -124,11 +125,13 @@ export default function viewIssuePage({ params }: {
             });
 
             if (!response.ok) {
+                toast.error('Nepavyko atnaujinti trūkumo informacijos');
                 throw new Error(`Failed to update issue: ${response.statusText}`);
             }
-
+            toast.success('Trūkumo informacija atnaujinta');
             window.location.reload();
         } catch (error) {
+            toast.error('Įvyko klaida atnaujinant trūkumo informaciją');
             console.error(error);
         }
     };
@@ -195,11 +198,13 @@ export default function viewIssuePage({ params }: {
             if (response.ok) {
                 const result = await response.json();
                 setCanApply(false);
-                // Display success message
+                toast.success('Prašymas pateiktas');
             } else {
+                toast.error('Nepavyko pateikti prašymo');
                 return new NextResponse(JSON.stringify({ message: "Error creating applies", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
             }
         } catch (error) {
+            toast.error('Įvyko klaida pateikiant prašymą');
             return new NextResponse(JSON.stringify({ message: "Network error", error: error.message }), { status: 500, headers: { "Content-Type": "application/json" } });
         }
     }
